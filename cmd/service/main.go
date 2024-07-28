@@ -2,10 +2,12 @@ package main
 
 import (
 	"github.com/s21platform/user-service/internal/config"
-	"log"
+	"github.com/s21platform/user-service/internal/repository/postgres"
 )
 
 func main() {
 	cfg := config.MustLoad()
-	log.Println("config", cfg)
+
+	db := postgres.New(cfg)
+	defer db.Close()
 }
