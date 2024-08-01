@@ -1,27 +1,23 @@
-# Используем базовый образ Ubuntu
-FROM ubuntu:latest
+# Используем официальный образ Golang как базовый
+FROM golang:1.22-alpine
 
-# Обновляем пакеты и устанавливаем необходимые зависимости
-RUN apt-get update && \
-    apt-get install -y \
-    bash \
-    ca-certificates \
-    curl \
-    git \
-    gcc \
-    g++ \
-    libc-dev \
-    postgresql-client && \
-    rm -rf /var/lib/apt/lists/*
+# Установим необходимые зависимости
+RUN apk add --no-cache bash gcc musl-dev postgresql-dev
 
-# Устанавливаем golang-migrate
-RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xz && \
-    mv migrate /usr/local/bin/migrate && \
-    chmod +x /usr/local/bin/migrate
+# Установим Goose
+RUN go install github.com/pressly/goose/v3/cmd/goose@latest
 
-# Копирование миграций в контейнер
+# Создадим рабочую директорию
 WORKDIR /app
-COPY . ./migrations
 
-# Установка entrypoint
-ENTRYPOINT ["/usr/local/bin/migrate"]
+# Скопируем файлы миграций
+COPY . /app/db/migrations
+
+# Скопируем entrypoint скрипт
+COPY entrypoint.sh /app/entrypoint.sh
+
+# Сделаем entrypoint скрипт исполняемым
+RUN chmod +x /app/entrypoint.sh
+
+# Установим entrypoint
+ENTRYPOINT ["/app/entrypoint.sh"]
