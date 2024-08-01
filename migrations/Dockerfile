@@ -11,7 +11,7 @@ RUN go install github.com/pressly/goose/v3/cmd/goose@latest
 WORKDIR /app
 
 # Скопируем файлы миграций
-COPY . /app/db/migrations
+COPY . ./migrations
 
 # Скопируем entrypoint скрипт
 COPY entrypoint.sh /app/entrypoint.sh
