@@ -67,4 +67,5 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE_DEVELOP }}
           script: |
             docker pull ${{ secrets.CR_REGISTRY }}/${{ secrets.CR_NAME }}:develop
+            docker pull ${{ secrets.CR_REGISTRY }}/${{ secrets.CR_NAME }}-migrate:develop
             docker-compose -f ~/space21/docker-compose-dev.yml --env-file ~/space21/.env_dev up -d ${{ secrets.CR_NAME }}
