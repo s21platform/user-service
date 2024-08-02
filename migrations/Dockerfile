@@ -14,10 +14,14 @@ WORKDIR /app
 COPY . ./migrations
 
 # Скопируем entrypoint скрипт
-COPY entrypoint.sh /app/entrypoint.sh
+COPY entrypoint_up_all.sh /app/entrypoint_up_all.sh
+COPY entrypoint_up_one.sh /app/entrypoint_up_one.sh
+COPY entrypoint_down_one.sh /app/entrypoint_down_one.sh
 
 # Сделаем entrypoint скрипт исполняемым
-RUN chmod +x /app/entrypoint.sh
+RUN chmod +x /app/entrypoint_up_all.sh
+RUN chmod +x /app/entrypoint_up_one.sh
+RUN chmod +x /app/entrypoint_down_one.sh
 
 # Установим entrypoint
-ENTRYPOINT ["/app/entrypoint.sh"]
+#ENTRYPOINT ["/app/entrypoint_up_all.sh"]
