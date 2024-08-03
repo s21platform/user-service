@@ -19,7 +19,11 @@ func New(cfg *config.Config, repo DbRepo) *Server {
 }
 
 func (s *Server) GetUserByLogin(ctx context.Context, in *user_proto.GetUserByLoginIn) (*user_proto.GetUserByLoginOut, error) {
-	return nil, nil
+	user, err := s.dbRepo.GetOrSetUserByLogin(in.Login)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "Ошибка создания пользователя")
+	}
+	return &user_proto.GetUserByLoginOut{Uuid: user.Uuid, IsNewUser: user.IsNew}, nil
 }
 
 func (s *Server) IsUserExistByUUID(ctx context.Context, in *user_proto.IsUserExistByUUIDIn) (*user_proto.IsUserExistByUUIDOut, error) {
