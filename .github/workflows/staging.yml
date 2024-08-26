@@ -68,4 +68,4 @@ jobs:
           script: |
             docker pull ${{ secrets.CR_REGISTRY }}/${{ secrets.CR_NAME }}:develop
             docker pull ${{ secrets.CR_REGISTRY }}/${{ secrets.CR_NAME }}-migrate:develop
-            docker-compose -f ~/space21/docker-compose-dev.yml --env-file ~/space21/.env_dev up -d ${{ secrets.CR_NAME }}
+            docker-compose -f ~/space21/staging/staging-deployment/docker-compose.yml --env-file ~/space21/staging/.env up -d ${{ secrets.CR_NAME }}
