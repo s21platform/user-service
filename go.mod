@@ -8,7 +8,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/lib/pq v1.10.9
-	github.com/s21platform/user-proto v0.0.0-20240803211755-588c0944e1fd
+	github.com/s21platform/user-proto v0.0.1
 	google.golang.org/grpc v1.65.0
 )
 
