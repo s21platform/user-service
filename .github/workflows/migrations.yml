@@ -35,12 +35,12 @@ jobs:
             docker pull ${{ secrets.CR_REGISTRY }}/${{ secrets.CR_NAME }}-migrate:develop
             case "${{ github.event.inputs.action }}" in
             apply_one_version)
-            docker-compose -f ~/space21/staging-migrations/user-service-migrate-dev.yml --env-file ~/space21/.env_dev up -d user-service-migrate-up-one-dev
+            docker-compose -f ~/space21/staging/migrations/user-service.yml --env-file ~/space21/staging/.env up -d user-service-migrate-up-one-dev
             ;;
             apply_all_versions)
-            docker-compose -f ~/space21/staging-migrations/user-service-migrate-dev.yml --env-file ~/space21/.env_dev up -d user-service-migrate-up-all-dev
+            docker-compose -f ~/space21/staging/migrations/user-service.yml --env-file ~/space21/staging/.env up -d user-service-migrate-up-all-dev
             ;;
             rollback_one_version)
-            docker-compose -f ~/space21/staging-migrations/user-service-migrate-dev.yml --env-file ~/space21/.env_dev up -d user-service-migrate-down-one-dev
+            docker-compose -f ~/space21/staging/migrations/user-service.yml --env-file ~/space21/staging/.env up -d user-service-migrate-down-one-dev
             ;;
             esac
