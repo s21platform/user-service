@@ -7,6 +7,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/s21platform/user-service/internal/config"
 	"log"
+	"strings"
 )
 
 type Repository struct {
@@ -35,11 +36,15 @@ func (r *Repository) IsUserExistByUUID(uuid string) (bool, error) {
 
 func (r *Repository) GetOrSetUserByLogin(email string) (*CheckUser, error) {
 	var userUuid string
+	nickname, err := checkEmail(email)
+	if err != nil {
+		return nil, err
+	}
 	row := r.conn.QueryRow("SELECT uuid FROM users WHERE email=$1", email)
 	if err := row.Scan(&userUuid); err != nil {
 		if err == sql.ErrNoRows {
 			log.Printf("For user: %s - not found row in DB. Creating...\n", email)
-			uuid_, err := r.createUser(email)
+			uuid_, err := r.createUser(nickname, email)
 			if err != nil {
 				log.Printf("For user: %s - unknown error while create new uuid\n", email)
 				return nil, err
@@ -54,13 +59,25 @@ func (r *Repository) GetOrSetUserByLogin(email string) (*CheckUser, error) {
 	return &CheckUser{Uuid: userUuid, IsNew: false}, nil
 }
 
-func (r *Repository) createUser(email string) (string, error) {
-	// TODO необходимо сюда прокидывать логин
+func checkEmail(email string) (string, error) {
+	res := strings.Split(email, "@")
+	if len(res) != 2 {
+		log.Printf("checkEmail, %s is not email", email)
+		return "", fmt.Errorf("checkEmail, %s is not email", email)
+	}
+	if res[1] != "student.21-school.ru" {
+		log.Printf("checkEmail, %s is not 21-school email", email)
+		return "", fmt.Errorf("checkEmail, %s is not 21-school email", email)
+	}
+	return res[0], nil
+}
+
+func (r *Repository) createUser(nickname, email string) (string, error) {
 	uuid_, err := uuid.NewRandom()
 	if err != nil {
 		return "", err
 	}
-	_, err = r.conn.Exec("INSERT INTO users (login, uuid, email) VALUES ('Test', $1, $2)", uuid_.String(), email)
+	_, err = r.conn.Exec("INSERT INTO users (login, uuid, email) VALUES ($1, $2, $3)", nickname, uuid_.String(), email)
 	if err != nil {
 		return "", err
 	}
