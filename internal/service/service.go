@@ -29,6 +29,7 @@ func (s *Server) GetUserByLogin(ctx context.Context, in *user.GetUserByLoginIn) 
 		err = s.ufrR.SendMessage(ctx, in.Login)
 		if err != nil {
 			log.Println("error send data to kafka:", err)
+			// FIXME Тут не надо возвращать ошибку! она заблочит нормальную работу в случае неполадок
 			return nil, status.Error(codes.Unknown, "Ошибка отправки в очередь")
 		}
 	}

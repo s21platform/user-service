@@ -13,7 +13,7 @@ type FriendsInvite struct {
 func New(cfg *config.Config) *FriendsInvite {
 
 	pdsr := &kafka.Writer{
-		Addr:         kafka.TCP(cfg.Kafka.Broker),
+		Addr:         kafka.TCP(cfg.Kafka.Server),
 		Topic:        cfg.Kafka.FriendsRegister,
 		Balancer:     &kafka.LeastBytes{},
 		RequiredAcks: kafka.RequireAll,
@@ -23,6 +23,7 @@ func New(cfg *config.Config) *FriendsInvite {
 }
 
 func (f FriendsInvite) SendMessage(ctx context.Context, email string) error {
+
 	err := f.pdsr.WriteMessages(ctx, kafka.Message{
 		Value: []byte(email),
 	})

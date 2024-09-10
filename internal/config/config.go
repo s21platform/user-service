@@ -25,7 +25,7 @@ type Postgres struct {
 }
 
 type Kafka struct {
-	Broker          string `env:"KAFKA_BROKER"`
+	Server          string `env:"KAFKA_SERVER"`
 	FriendsRegister string `env:"USER_FRIENDS_REGISTER"`
 }
 
