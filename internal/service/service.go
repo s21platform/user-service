@@ -12,10 +12,11 @@ import (
 type Server struct {
 	user.UnimplementedUserServiceServer
 	dbRepo DbRepo
+	ufrR   UserFriendsRegisterSrv
 }
 
-func New(cfg *config.Config, repo DbRepo) *Server {
-	return &Server{dbRepo: repo}
+func New(cfg *config.Config, repo DbRepo, ufrR UserFriendsRegisterSrv) *Server {
+	return &Server{dbRepo: repo, ufrR: ufrR}
 }
 
 func (s *Server) GetUserByLogin(ctx context.Context, in *user.GetUserByLoginIn) (*user.GetUserByLoginOut, error) {
@@ -23,6 +24,12 @@ func (s *Server) GetUserByLogin(ctx context.Context, in *user.GetUserByLoginIn) 
 	if err != nil {
 		log.Println("GetUserByLogin error:", err)
 		return nil, status.Error(codes.NotFound, "Ошибка создания пользователя")
+	}
+	if userData.IsNew {
+		err = s.ufrR.SendMessage(ctx, in.Login)
+		if err != nil {
+			return nil, status.Error(codes.Unknown, "Ошибка отправки в очередь")
+		}
 	}
 	return &user.GetUserByLoginOut{Uuid: userData.Uuid, IsNewUser: userData.IsNew}, nil
 }
