@@ -28,6 +28,7 @@ func (s *Server) GetUserByLogin(ctx context.Context, in *user.GetUserByLoginIn) 
 	if userData.IsNew {
 		err = s.ufrR.SendMessage(ctx, in.Login)
 		if err != nil {
+			log.Println("error send data to kafka:", err)
 			return nil, status.Error(codes.Unknown, "Ошибка отправки в очередь")
 		}
 	}
