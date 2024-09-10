@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	user_proto "github.com/s21platform/user-proto/user-proto"
+	user "github.com/s21platform/user-proto/user-proto"
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/s21platform/user-service/internal/repository/postgres"
 	"github.com/s21platform/user-service/internal/service"
@@ -20,8 +20,9 @@ func main() {
 	server := service.New(cfg, db)
 
 	s := grpc.NewServer()
-	user_proto.RegisterUserServiceServer(s, server)
+	user.RegisterUserServiceServer(s, server)
 
+	log.Println("starting server", cfg.Service.Port)
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Service.Port))
 	if err != nil {
 		log.Fatalf("Cannnot listen port: %s; Error: %s", cfg.Service.Port, err)
