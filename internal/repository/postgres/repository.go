@@ -2,8 +2,10 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/s21platform/user-service/internal/config"
 	"log"
@@ -11,7 +13,7 @@ import (
 )
 
 type Repository struct {
-	conn *sql.DB
+	conn *sqlx.DB
 }
 
 type CheckUser struct {
@@ -38,22 +40,18 @@ func (r *Repository) GetOrSetUserByLogin(email string) (*CheckUser, error) {
 	var userUuid string
 	nickname, err := checkEmail(email)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error checking email: %v", err)
 	}
-	row := r.conn.QueryRow("SELECT uuid FROM users WHERE email=$1", email)
-	if err := row.Scan(&userUuid); err != nil {
-		if err == sql.ErrNoRows {
-			log.Printf("For user: %s - not found row in DB. Creating...\n", email)
+	err = r.conn.Get(&userUuid, "SELECT uuid FROM users WHERE email=$1", email)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
 			uuid_, err := r.createUser(nickname, email)
 			if err != nil {
-				log.Printf("For user: %s - unknown error while create new uuid\n", email)
-				return nil, err
+				return nil, fmt.Errorf("failed create user: %v", err)
 			}
-			log.Printf("For user: %s - user created\n", email)
 			return &CheckUser{Uuid: uuid_, IsNew: true}, nil
 		}
-		log.Printf("For user: %s - unknown error\n", email)
-		return nil, err
+		return nil, fmt.Errorf("error checking user: %v", err)
 	}
 	log.Printf("For user: %s - exist. ok: %s!\n", email, userUuid)
 	return &CheckUser{Uuid: userUuid, IsNew: false}, nil
@@ -62,11 +60,10 @@ func (r *Repository) GetOrSetUserByLogin(email string) (*CheckUser, error) {
 func checkEmail(email string) (string, error) {
 	res := strings.Split(email, "@")
 	if len(res) != 2 {
-		log.Printf("checkEmail, %s is not email", email)
 		return "", fmt.Errorf("checkEmail, %s is not email", email)
 	}
+	// TODO Тут пропускаются только со школьной почтой
 	if res[1] != "student.21-school.ru" {
-		log.Printf("checkEmail, %s is not 21-school email", email)
 		return "", fmt.Errorf("checkEmail, %s is not 21-school email", email)
 	}
 	return res[0], nil
@@ -93,7 +90,7 @@ func New(cfg *config.Config) *Repository {
 	conStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable",
 		cfg.Postgres.User, cfg.Postgres.Password, cfg.Postgres.Database, cfg.Postgres.Host, cfg.Postgres.Port)
 
-	conn, err := sql.Open("postgres", conStr)
+	conn, err := sqlx.Connect("postgres", conStr)
 	if err != nil {
 		log.Fatal("error connect: ", err)
 	}
