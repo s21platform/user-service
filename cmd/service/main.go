@@ -20,7 +20,7 @@ func main() {
 
 	userFriendsRegister := friends_register.New(cfg)
 
-	server := service.New(cfg, db, userFriendsRegister)
+	server := service.New(db, userFriendsRegister)
 
 	s := grpc.NewServer()
 	user.RegisterUserServiceServer(s, server)

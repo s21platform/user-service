@@ -11,5 +11,5 @@ type DbRepo interface {
 }
 
 type UserFriendsRegisterSrv interface {
-	SendMessage(ctx context.Context, email string) error
+	SendMessage(ctx context.Context, email string, uuid string) error
 }

@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	user "github.com/s21platform/user-proto/user-proto"
-	"github.com/s21platform/user-service/internal/config"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
@@ -15,7 +14,7 @@ type Server struct {
 	ufrR   UserFriendsRegisterSrv
 }
 
-func New(cfg *config.Config, repo DbRepo, ufrR UserFriendsRegisterSrv) *Server {
+func New(repo DbRepo, ufrR UserFriendsRegisterSrv) *Server {
 	return &Server{dbRepo: repo, ufrR: ufrR}
 }
 
@@ -26,7 +25,7 @@ func (s *Server) GetUserByLogin(ctx context.Context, in *user.GetUserByLoginIn) 
 		return nil, status.Error(codes.NotFound, "Ошибка создания пользователя")
 	}
 	if userData.IsNew {
-		err = s.ufrR.SendMessage(ctx, in.Login)
+		err = s.ufrR.SendMessage(ctx, in.Login, userData.Uuid)
 		if err != nil {
 			log.Println("error send data to kafka:", err)
 			// FIXME Тут не надо возвращать ошибку! она заблочит нормальную работу в случае неполадок
