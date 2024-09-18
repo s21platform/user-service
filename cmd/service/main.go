@@ -4,6 +4,7 @@ import (
 	"fmt"
 	user "github.com/s21platform/user-proto/user-proto"
 	"github.com/s21platform/user-service/internal/config"
+	"github.com/s21platform/user-service/internal/repository/kafka/producer/friends_register"
 	"github.com/s21platform/user-service/internal/repository/postgres"
 	"github.com/s21platform/user-service/internal/service"
 	"google.golang.org/grpc"
@@ -17,7 +18,9 @@ func main() {
 	db := postgres.New(cfg)
 	defer db.Close()
 
-	server := service.New(cfg, db)
+	userFriendsRegister := friends_register.New(cfg)
+
+	server := service.New(db, userFriendsRegister)
 
 	s := grpc.NewServer()
 	user.RegisterUserServiceServer(s, server)

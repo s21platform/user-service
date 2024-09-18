@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Service  Service
 	Postgres Postgres
+	Kafka    Kafka
 }
 
 type Service struct {
@@ -21,6 +22,11 @@ type Postgres struct {
 	Database string `env:"USER_SERVICE_POSTGRES_DB"`
 	Host     string `env:"USER_SERVICE_POSTGRES_HOST"`
 	Port     string `env:"USER_SERVICE_POSTGRES_PORT"`
+}
+
+type Kafka struct {
+	Server          string `env:"KAFKA_SERVER"`
+	FriendsRegister string `env:"USER_FRIENDS_REGISTER"`
 }
 
 func MustLoad() *Config {
