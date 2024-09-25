@@ -12,6 +12,8 @@ import (
 	"strings"
 )
 
+const defaultAvatar = "https://storage.yandexcloud.net/space21/avatars/default/logo-discord.jpeg"
+
 type Repository struct {
 	conn *sqlx.DB
 }
@@ -25,7 +27,7 @@ func (r *Repository) IsUserExistByUUID(uuid string) (bool, error) {
 	var exists bool
 	row := r.conn.QueryRow("SELECT 1 FROM users WHERE uuid=$1", uuid)
 	if err := row.Scan(&exists); err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			log.Printf("For user: %s - not found row in DB\n", uuid)
 			return false, nil
 		}
@@ -74,10 +76,26 @@ func (r *Repository) createUser(nickname, email string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	_, err = r.conn.Exec("INSERT INTO users (login, uuid, email) VALUES ($1, $2, $3)", nickname, uuid_.String(), email)
+	tx, err := r.conn.Beginx()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to start transaction: %v", err)
 	}
+	res, err := tx.Exec("INSERT INTO users (login, uuid, email, last_avatar_link) VALUES ($1, $2, $3, $4)", nickname, uuid_.String(), email, defaultAvatar)
+	if err != nil {
+		tx.Rollback()
+		return "", fmt.Errorf("failed to insert user: %v", err)
+	}
+	lastId, err := res.LastInsertId()
+	if err != nil {
+		tx.Rollback()
+		return "", fmt.Errorf("failed to get last insert id: %v", err)
+	}
+	_, err = r.conn.Exec("INSERT INTO data (user_id) VALUES ($1)", lastId)
+	if err != nil {
+		tx.Rollback()
+		return "", fmt.Errorf("failed to insert data: %v", err)
+	}
+	tx.Commit()
 	return uuid_.String(), nil
 }
 
