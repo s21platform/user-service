@@ -80,15 +80,11 @@ func (r *Repository) createUser(nickname, email string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to start transaction: %v", err)
 	}
-	res, err := tx.Exec("INSERT INTO users (login, uuid, email, last_avatar_link) VALUES ($1, $2, $3, $4)", nickname, uuid_.String(), email, defaultAvatar)
+	var lastId int
+	err = tx.QueryRowx("INSERT INTO users (login, uuid, email, last_avatar_link) VALUES ($1, $2, $3, $4) RETURNING id", nickname, uuid_.String(), email, defaultAvatar).Scan(&lastId)
 	if err != nil {
 		tx.Rollback()
-		return "", fmt.Errorf("failed to insert user: %v", err)
-	}
-	lastId, err := res.LastInsertId()
-	if err != nil {
-		tx.Rollback()
-		return "", fmt.Errorf("failed to get last insert id: %v", err)
+		return "", fmt.Errorf("failed to get id of inserted row: %v", err)
 	}
 	_, err = r.conn.Exec("INSERT INTO data (user_id) VALUES ($1)", lastId)
 	if err != nil {
