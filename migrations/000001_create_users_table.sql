@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS data
 
 CREATE TABLE IF NOT EXISTS skills
 (
-    id bigint PRIMARY KEY,
+    id serial PRIMARY KEY,
     user_id bigint not null,
     skill_id bigint not null,
     CONSTRAINT fk_skill_user_id FOREIGN KEY (user_id) REFERENCES users(id)
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS skills
 
 CREATE TABLE IF NOT EXISTS hobbies
 (
-    id bigint PRIMARY KEY,
+    id serial PRIMARY KEY,
     user_id bigint not null,
     hobby_id bigint not null,
     CONSTRAINT fk_hobby_user_id FOREIGN KEY (user_id) REFERENCES users(id)

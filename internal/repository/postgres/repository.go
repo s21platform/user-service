@@ -86,7 +86,7 @@ func (r *Repository) createUser(nickname, email string) (string, error) {
 		tx.Rollback()
 		return "", fmt.Errorf("failed to get id of inserted row: %v", err)
 	}
-	_, err = r.conn.Exec("INSERT INTO data (user_id) VALUES ($1)", lastId)
+	_, err = tx.Exec("INSERT INTO data (user_id) VALUES ($1)", lastId)
 	if err != nil {
 		tx.Rollback()
 		return "", fmt.Errorf("failed to insert data: %v", err)
