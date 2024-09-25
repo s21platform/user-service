@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users
 
 CREATE TABLE IF NOT EXISTS data
 (
-    id            bigint PRIMARY KEY,
+    id            serial PRIMARY KEY,
     user_id       integer not null,
     name          varchar(100),
     surname       varchar(100),
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS hobbies
 
 -- +goose Down
 
-DROP TABLE if exists users;
 DROP TABLE if exists data;
 DROP TABLE if exists skills;
 DROP TABLE if exists hobbies;
+DROP TABLE if exists users;
