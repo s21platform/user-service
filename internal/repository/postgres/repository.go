@@ -99,7 +99,20 @@ func (r *Repository) createUser(nickname, email string) (string, error) {
 
 func (r *Repository) GetUserInfoByUUID(ctx context.Context, uuid string) (model.UserInfo, error) {
 	query := `
-		SELECT * FROM users u 
+		SELECT 
+		    u.login,
+		    u.last_avatar_link,
+		    d.name,
+		    d.surname,
+		    d.birthdate,
+		    d.phone,
+		    d.telegram,
+		    d.git,
+		    d.city_id,
+		    d.os_id,
+		    d.work_id,
+		    d.university_id
+		FROM users u 
 		JOIN data d ON d.user_id = u.id
 		where u.uuid = $1
 	`
