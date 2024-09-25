@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	user "github.com/s21platform/user-proto/user-proto"
+	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
@@ -59,10 +60,10 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 		Phone:      userInfo.Phone,
 		Telegram:   userInfo.Telegram,
 		Git:        userInfo.Git,
-		City:       "Москва [HC]",
-		Os:         "Mac OS [HC]",
-		Work:       "Avito tech [HC]",
-		University: "НИУ МЭИ [HC]",
+		City:       lo.ToPtr("Москва [HC]"),
+		Os:         lo.ToPtr("Mac OS [HC]"),
+		Work:       lo.ToPtr("Avito tech [HC]"),
+		University: lo.ToPtr("НИУ МЭИ [HC]"),
 	}
 	return resp, nil
 }
