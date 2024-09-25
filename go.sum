@@ -26,6 +26,8 @@ github.com/s21platform/user-proto v0.0.0-20240803211755-588c0944e1fd h1:wwK2hZos
 github.com/s21platform/user-proto v0.0.0-20240803211755-588c0944e1fd/go.mod h1:ziBhdNANl68mWxKR7Po1z7NStqbAjVLMvKwh/mlVYis=
 github.com/s21platform/user-proto v0.0.1 h1:n6YYOxfk3OnaUuJqQVQze+5rARIy+xUHUlhJJFoTKJQ=
 github.com/s21platform/user-proto v0.0.1/go.mod h1:IIcTCyxXtvdIyuv3sI6a/iey2CTPJ/t7K9bvh52eazg=
+github.com/s21platform/user-proto v0.0.2 h1:KCcUGNdH6c9VbkjtiWpe68Ns7zou/pStJdpo2jqCGQU=
+github.com/s21platform/user-proto v0.0.2/go.mod h1:IIcTCyxXtvdIyuv3sI6a/iey2CTPJ/t7K9bvh52eazg=
 github.com/segmentio/kafka-go v0.4.47 h1:IqziR4pA3vrZq7YdRxaT3w1/5fvIH5qpCwstUanQQB0=
 github.com/segmentio/kafka-go v0.4.47/go.mod h1:HjF6XbOKh0Pjlkr5GVZxt6CsjjwnmhVOfURM5KMd8qg=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

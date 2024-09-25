@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/s21platform/user-service/internal/config"
+	"github.com/s21platform/user-service/internal/model"
 	"log"
 	"strings"
 )
@@ -95,6 +97,23 @@ func (r *Repository) createUser(nickname, email string) (string, error) {
 	return uuid_.String(), nil
 }
 
+func (r *Repository) GetUserInfoByUUID(ctx context.Context, uuid string) (model.UserInfo, error) {
+	query := `
+		SELECT * FROM users u 
+		JOIN data d ON d.user_id = u.id
+		where u.uuid = $1
+	`
+	var result []model.UserInfo
+	err := r.conn.Select(&result, query, uuid)
+	if err != nil {
+		return model.UserInfo{}, fmt.Errorf("failed to get user info: %v", err)
+	}
+	if len(result) == 0 {
+		return model.UserInfo{}, errors.New("user not found")
+	}
+	return result[0], nil
+}
+
 func (r *Repository) Close() {
 	_ = r.conn.Close()
 }
@@ -110,7 +129,7 @@ func New(cfg *config.Config) *Repository {
 	}
 
 	if err := conn.Ping(); err != nil {
-		log.Println("error ping: ", err)
+		log.Fatal("error ping: ", err)
 	}
 	return &Repository{conn}
 }

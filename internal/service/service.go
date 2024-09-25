@@ -43,3 +43,26 @@ func (s *Server) IsUserExistByUUID(ctx context.Context, in *user.IsUserExistByUU
 	}
 	return &user.IsUserExistByUUIDOut{IsExist: isExist}, nil
 }
+
+func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUUIDIn) (*user.GetUserInfoByUUIDOut, error) {
+	userInfo, err := s.dbRepo.GetUserInfoByUUID(ctx, in.Uuid)
+	if err != nil {
+		log.Println("failed to get user data from repo:", err)
+		return nil, status.Errorf(codes.Internal, "failed to get user data from repo")
+	}
+	resp := &user.GetUserInfoByUUIDOut{
+		Nickname:   userInfo.Nickname,
+		Avatar:     userInfo.LastAvatarLink,
+		Name:       userInfo.Name,
+		Surname:    userInfo.Surname,
+		Birthdate:  userInfo.Birthdate,
+		Phone:      userInfo.Phone,
+		Telegram:   userInfo.Telegram,
+		Git:        userInfo.Git,
+		City:       "Москва [HC]",
+		Os:         "Mac OS [HC]",
+		Work:       "Avito tech [HC]",
+		University: "НИУ МЭИ [HC]",
+	}
+	return resp, nil
+}
