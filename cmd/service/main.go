@@ -23,7 +23,7 @@ func main() {
 	server := service.New(db, userFriendsRegister)
 
 	s := grpc.NewServer(
-	//grpc.UnaryInterceptor(infra.UnaryInterceptor),
+		grpc.UnaryInterceptor(infra.UnaryInterceptor),
 	)
 	user.RegisterUserServiceServer(s, server)
 
