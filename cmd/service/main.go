@@ -4,7 +4,6 @@ import (
 	"fmt"
 	user "github.com/s21platform/user-proto/user-proto"
 	"github.com/s21platform/user-service/internal/config"
-	"github.com/s21platform/user-service/internal/infra"
 	"github.com/s21platform/user-service/internal/repository/kafka/producer/friends_register"
 	"github.com/s21platform/user-service/internal/repository/postgres"
 	"github.com/s21platform/user-service/internal/service"
@@ -24,7 +23,7 @@ func main() {
 	server := service.New(db, userFriendsRegister)
 
 	s := grpc.NewServer(
-		grpc.UnaryInterceptor(infra.UnaryInterceptor),
+	//grpc.UnaryInterceptor(infra.UnaryInterceptor),
 	)
 	user.RegisterUserServiceServer(s, server)
 
