@@ -6,7 +6,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"log"
 )
 
 func UnaryInterceptor(
@@ -16,7 +15,9 @@ func UnaryInterceptor(
 	handler grpc.UnaryHandler,
 ) (interface{}, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
-	log.Println(info.FullMethod)
+	if info.FullMethod == "/UserService/GetUserByLogin" {
+		return handler(ctx, req)
+	}
 	if ok {
 		if userIDs := md["uuid"]; len(userIDs) > 0 {
 			ctx = context.WithValue(ctx, "uuid", userIDs[0])
