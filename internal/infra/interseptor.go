@@ -3,6 +3,8 @@ package infra
 import (
 	"context"
 
+	"github.com/s21platform/user-service/internal/config"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -21,7 +23,7 @@ func UnaryInterceptor(
 	}
 	if ok {
 		if userIDs := md["uuid"]; len(userIDs) > 0 {
-			ctx = context.WithValue(ctx, "uuid", userIDs[0])
+			ctx = context.WithValue(ctx, config.KeyUUID, userIDs[0])
 		} else {
 			return nil, status.Errorf(codes.Unauthenticated, "no uuid found in metadata")
 		}

@@ -6,6 +6,10 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
+type key string
+
+const KeyUUID key = key("uuid")
+
 type Config struct {
 	Service  Service
 	Postgres Postgres

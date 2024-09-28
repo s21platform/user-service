@@ -2,11 +2,14 @@ package service
 
 import (
 	"context"
+	"log"
+
+	"github.com/s21platform/user-service/internal/config"
+
 	user "github.com/s21platform/user-proto/user-proto"
 	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"log"
 )
 
 type Server struct {
@@ -46,7 +49,7 @@ func (s *Server) IsUserExistByUUID(ctx context.Context, in *user.IsUserExistByUU
 }
 
 func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUUIDIn) (*user.GetUserInfoByUUIDOut, error) {
-	test := ctx.Value("uuid")
+	test := ctx.Value(config.KeyUUID)
 	t, ok := test.(string)
 	if !ok {
 		log.Println("GetUserInfoByUUID error:", t)

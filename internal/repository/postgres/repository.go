@@ -5,13 +5,14 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
+	"strings"
+
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/s21platform/user-service/internal/model"
-	"log"
-	"strings"
 )
 
 const defaultAvatar = "https://storage.yandexcloud.net/space21/avatars/default/logo-discord.jpeg"
@@ -85,15 +86,15 @@ func (r *Repository) createUser(nickname, email string) (string, error) {
 	var lastId int
 	err = tx.QueryRowx("INSERT INTO users (login, uuid, email, last_avatar_link) VALUES ($1, $2, $3, $4) RETURNING id", nickname, uuid_.String(), email, defaultAvatar).Scan(&lastId)
 	if err != nil {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return "", fmt.Errorf("failed to get id of inserted row: %v", err)
 	}
 	_, err = tx.Exec("INSERT INTO data (user_id) VALUES ($1)", lastId)
 	if err != nil {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return "", fmt.Errorf("failed to insert data: %v", err)
 	}
-	tx.Commit()
+	_ = tx.Commit()
 	return uuid_.String(), nil
 }
 

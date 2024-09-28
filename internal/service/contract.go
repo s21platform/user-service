@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/s21platform/user-service/internal/model"
 	"github.com/s21platform/user-service/internal/repository/postgres"
 )
