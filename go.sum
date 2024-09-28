@@ -22,6 +22,8 @@ github.com/mattn/go-sqlite3 v1.14.22/go.mod h1:Uh1q+B4BYcTPb+yiD3kU8Ct7aC0hY9fxU
 github.com/pierrec/lz4/v4 v4.1.15 h1:MO0/ucJhngq7299dKLwIMtgTfbkoSPF6AoMYDd8Q4q0=
 github.com/pierrec/lz4/v4 v4.1.15/go.mod h1:gZWDp/Ze/IJXGXf23ltt2EXimqmTUXEy0GFuRQyBid4=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/s21platform/metrics-lib v0.0.5 h1:cKaBowkfTjxvssLDWUMz9LlWYJyT+8IR2K7Pa4yl1MY=
+github.com/s21platform/metrics-lib v0.0.5/go.mod h1:9a9zIs4Yu7KgMLxNZt1O95q8jM9sNIatJRj+vIQiAPY=
 github.com/s21platform/user-proto v0.0.0-20240803211755-588c0944e1fd h1:wwK2hZosyS8zp/SjcXHL5zlxUbNCaxrfYz9hTKdE94Y=
 github.com/s21platform/user-proto v0.0.0-20240803211755-588c0944e1fd/go.mod h1:ziBhdNANl68mWxKR7Po1z7NStqbAjVLMvKwh/mlVYis=
 github.com/s21platform/user-proto v0.0.1 h1:n6YYOxfk3OnaUuJqQVQze+5rARIy+xUHUlhJJFoTKJQ=

@@ -1,8 +1,6 @@
 module github.com/s21platform/user-service
 
-go 1.22.3
-
-toolchain go1.22.5
+go 1.22.5
 
 require (
 	github.com/google/uuid v1.6.0
@@ -18,6 +16,7 @@ require (
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect
+	github.com/s21platform/metrics-lib v0.0.5 // indirect
 	github.com/samber/lo v1.47.0 // indirect
 	github.com/segmentio/kafka-go v0.4.47 // indirect
 	golang.org/x/net v0.25.0 // indirect
