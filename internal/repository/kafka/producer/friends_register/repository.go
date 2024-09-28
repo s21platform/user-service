@@ -3,6 +3,7 @@ package friends_register
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/segmentio/kafka-go"
 )
@@ -17,7 +18,6 @@ type FriendsInviteSendMap struct {
 }
 
 func New(cfg *config.Config) *FriendsInvite {
-
 	pdsr := &kafka.Writer{
 		Addr:         kafka.TCP(cfg.Kafka.Server),
 		Topic:        cfg.Kafka.FriendsRegister,

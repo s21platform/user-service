@@ -6,10 +6,16 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
+type key string
+
+const KeyUUID key = key("uuid")
+
 type Config struct {
 	Service  Service
 	Postgres Postgres
 	Kafka    Kafka
+	Metrics  Metrics
+	Platform Platform
 }
 
 type Service struct {
@@ -27,6 +33,15 @@ type Postgres struct {
 type Kafka struct {
 	Server          string `env:"KAFKA_SERVER"`
 	FriendsRegister string `env:"USER_FRIENDS_REGISTER"`
+}
+
+type Metrics struct {
+	Host string `env:"GRAFANA_HOST"`
+	Port int    `env:"GRAFANA_PORT"`
+}
+
+type Platform struct {
+	Env string `env:"ENV"`
 }
 
 func MustLoad() *Config {

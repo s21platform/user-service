@@ -1,16 +1,21 @@
 package postgres
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
+	"strings"
+
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/s21platform/user-service/internal/config"
-	"log"
-	"strings"
+	"github.com/s21platform/user-service/internal/model"
 )
+
+const defaultAvatar = "https://storage.yandexcloud.net/space21/avatars/default/logo-discord.jpeg"
 
 type Repository struct {
 	conn *sqlx.DB
@@ -25,7 +30,7 @@ func (r *Repository) IsUserExistByUUID(uuid string) (bool, error) {
 	var exists bool
 	row := r.conn.QueryRow("SELECT 1 FROM users WHERE uuid=$1", uuid)
 	if err := row.Scan(&exists); err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			log.Printf("For user: %s - not found row in DB\n", uuid)
 			return false, nil
 		}
@@ -74,11 +79,53 @@ func (r *Repository) createUser(nickname, email string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	_, err = r.conn.Exec("INSERT INTO users (login, uuid, email) VALUES ($1, $2, $3)", nickname, uuid_.String(), email)
+	tx, err := r.conn.Beginx()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to start transaction: %v", err)
 	}
+	var lastId int
+	err = tx.QueryRowx("INSERT INTO users (login, uuid, email, last_avatar_link) VALUES ($1, $2, $3, $4) RETURNING id", nickname, uuid_.String(), email, defaultAvatar).Scan(&lastId)
+	if err != nil {
+		_ = tx.Rollback()
+		return "", fmt.Errorf("failed to get id of inserted row: %v", err)
+	}
+	_, err = tx.Exec("INSERT INTO data (user_id) VALUES ($1)", lastId)
+	if err != nil {
+		_ = tx.Rollback()
+		return "", fmt.Errorf("failed to insert data: %v", err)
+	}
+	_ = tx.Commit()
 	return uuid_.String(), nil
+}
+
+func (r *Repository) GetUserInfoByUUID(ctx context.Context, uuid string) (model.UserInfo, error) {
+	query := `
+		SELECT 
+		    u.login,
+		    u.last_avatar_link,
+		    d.name,
+		    d.surname,
+		    d.birthdate,
+		    d.phone,
+		    d.telegram,
+		    d.git,
+		    d.city_id,
+		    d.os_id,
+		    d.work_id,
+		    d.university_id
+		FROM users u 
+		JOIN data d ON d.user_id = u.id
+		where u.uuid = $1
+	`
+	var result []model.UserInfo
+	err := r.conn.Select(&result, query, uuid)
+	if err != nil {
+		return model.UserInfo{}, fmt.Errorf("failed to get user info: %v", err)
+	}
+	if len(result) == 0 {
+		return model.UserInfo{}, errors.New("user not found")
+	}
+	return result[0], nil
 }
 
 func (r *Repository) Close() {
@@ -96,7 +143,7 @@ func New(cfg *config.Config) *Repository {
 	}
 
 	if err := conn.Ping(); err != nil {
-		log.Println("error ping: ", err)
+		log.Fatal("error ping: ", err)
 	}
 	return &Repository{conn}
 }
