@@ -12,23 +12,29 @@ import (
 )
 
 func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUUIDIn) (*user.GetUserInfoByUUIDOut, error) {
-	test := ctx.Value(config.KeyUUID)
-	t, ok := test.(string)
-	if !ok {
-		log.Println("GetUserInfoByUUID error:", t)
-	}
-	log.Println("uuid from context:", t)
+	_ = ctx.Value(config.KeyUUID).(string)
+	// TODO перейти на использование контекстного значения
 	userInfo, err := s.dbRepo.GetUserInfoByUUID(ctx, in.Uuid)
 	if err != nil {
 		log.Println("failed to get user data from repo:", err)
 		return nil, status.Errorf(codes.Internal, "failed to get user data from repo")
 	}
+
+	var birthday *user.Birthday
+	if userInfo.Birthdate != nil {
+		birthday = &user.Birthday{
+			Day:   int64(userInfo.Birthdate.Day()),
+			Month: int64(userInfo.Birthdate.Month()),
+			Year:  int64(userInfo.Birthdate.Year()),
+		}
+	}
+
 	resp := &user.GetUserInfoByUUIDOut{
 		Nickname:   userInfo.Nickname,
 		Avatar:     userInfo.LastAvatarLink,
 		Name:       userInfo.Name,
 		Surname:    userInfo.Surname,
-		Birthdate:  userInfo.Birthdate,
+		Birthdate:  birthday,
 		Phone:      userInfo.Phone,
 		Telegram:   userInfo.Telegram,
 		Git:        userInfo.Git,

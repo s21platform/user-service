@@ -2,7 +2,6 @@ package infra
 
 import (
 	"context"
-	"log"
 
 	"github.com/s21platform/user-service/internal/config"
 
@@ -19,9 +18,7 @@ func UnaryInterceptor(
 	handler grpc.UnaryHandler,
 ) (interface{}, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
-	log.Printf("first interceptor: %s", info.FullMethod)
 	if info.FullMethod == "/UserService/GetUserByLogin" {
-		log.Printf("skip first interceptor for: %s", info.FullMethod)
 		return handler(ctx, req)
 	}
 	if ok {
@@ -33,6 +30,5 @@ func UnaryInterceptor(
 	} else {
 		return nil, status.Errorf(codes.Unauthenticated, "no uuid found in metadata")
 	}
-	log.Printf("continue first interceptor for: %s", info.FullMethod)
 	return handler(ctx, req)
 }
