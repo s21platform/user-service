@@ -14,7 +14,7 @@ import (
 	"github.com/s21platform/user-service/internal/infra"
 	"github.com/s21platform/user-service/internal/repository/kafka/producer/friends_register"
 	"github.com/s21platform/user-service/internal/repository/postgres"
-	"github.com/s21platform/user-service/internal/service"
+	"github.com/s21platform/user-service/internal/rpc"
 )
 
 func main() {
@@ -30,7 +30,7 @@ func main() {
 
 	userFriendsRegister := friends_register.New(cfg)
 
-	server := service.New(db, userFriendsRegister)
+	server := rpc.New(db, userFriendsRegister)
 
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
@@ -46,6 +46,6 @@ func main() {
 		log.Fatalf("Cannnot listen port: %s; Error: %s", cfg.Service.Port, err)
 	}
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("Cannnot start service: %s; Error: %s", cfg.Service.Port, err)
+		log.Fatalf("Cannnot start rpc: %s; Error: %s", cfg.Service.Port, err)
 	}
 }

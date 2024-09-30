@@ -8,7 +8,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lib/pq v1.10.9
 	github.com/s21platform/metrics-lib v0.0.5
-	github.com/s21platform/user-proto v0.0.3
+	github.com/s21platform/user-proto v0.0.4
 	github.com/samber/lo v1.47.0
 	github.com/segmentio/kafka-go v0.4.47
 	google.golang.org/grpc v1.65.0

@@ -33,6 +33,8 @@ github.com/s21platform/metrics-lib v0.0.5 h1:cKaBowkfTjxvssLDWUMz9LlWYJyT+8IR2K7
 github.com/s21platform/metrics-lib v0.0.5/go.mod h1:9a9zIs4Yu7KgMLxNZt1O95q8jM9sNIatJRj+vIQiAPY=
 github.com/s21platform/user-proto v0.0.3 h1:WReG7PMBvmgCRYp2QKHnirGx7VAUAmG4S8MrI15zqYI=
 github.com/s21platform/user-proto v0.0.3/go.mod h1:IIcTCyxXtvdIyuv3sI6a/iey2CTPJ/t7K9bvh52eazg=
+github.com/s21platform/user-proto v0.0.4 h1:ShxrjDan7cxfookpFVR7lBgTgRKIciS42RzNabTH+cI=
+github.com/s21platform/user-proto v0.0.4/go.mod h1:IIcTCyxXtvdIyuv3sI6a/iey2CTPJ/t7K9bvh52eazg=
 github.com/samber/lo v1.47.0 h1:z7RynLwP5nbyRscyvcD043DWYoOcYRv3mV8lBeqOCLc=
 github.com/samber/lo v1.47.0/go.mod h1:RmDH9Ct32Qy3gduHQuKJ3gW1fMHAnE/fAzQuf6He5cU=
 github.com/segmentio/kafka-go v0.4.47 h1:IqziR4pA3vrZq7YdRxaT3w1/5fvIH5qpCwstUanQQB0=

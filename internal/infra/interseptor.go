@@ -30,6 +30,5 @@ func UnaryInterceptor(
 	} else {
 		return nil, status.Errorf(codes.Unauthenticated, "no uuid found in metadata")
 	}
-
 	return handler(ctx, req)
 }
