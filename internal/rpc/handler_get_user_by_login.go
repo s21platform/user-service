@@ -4,6 +4,8 @@ import (
 	"context"
 	"log"
 
+	"github.com/s21platform/user-service/internal/config"
+
 	"github.com/s21platform/metrics-lib/pkg"
 
 	user "github.com/s21platform/user-proto/user-proto"
@@ -12,7 +14,7 @@ import (
 )
 
 func (s *Server) GetUserByLogin(ctx context.Context, in *user.GetUserByLoginIn) (*user.GetUserByLoginOut, error) {
-	m := pkg.FromContext(ctx)
+	m := pkg.FromContext(ctx, config.KeyMetrics)
 	userData, err := s.dbRepo.GetOrSetUserByLogin(in.Login)
 	if err != nil {
 		log.Println("GetUserByLogin error:", err)
