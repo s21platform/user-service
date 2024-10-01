@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+	"github.com/s21platform/metrics-lib/pkg"
 	"log"
 
 	user "github.com/s21platform/user-proto/user-proto"
@@ -10,6 +11,7 @@ import (
 )
 
 func (s *Server) GetUserByLogin(ctx context.Context, in *user.GetUserByLoginIn) (*user.GetUserByLoginOut, error) {
+	m := pkg.FromContext(ctx)
 	userData, err := s.dbRepo.GetOrSetUserByLogin(in.Login)
 	if err != nil {
 		log.Println("GetUserByLogin error:", err)
@@ -18,10 +20,10 @@ func (s *Server) GetUserByLogin(ctx context.Context, in *user.GetUserByLoginIn) 
 	if userData.IsNew {
 		err = s.ufrR.SendMessage(ctx, in.Login, userData.Uuid)
 		if err != nil {
+			m.Increment("new_friend.error")
 			log.Println("error send data to kafka:", err)
-			// FIXME Тут не надо возвращать ошибку! она заблочит нормальную работу в случае неполадок
-			//return nil, status.Error(codes.Unknown, "Ошибка отправки в очередь")
 		}
 	}
+	m.Increment("test.error")
 	return &user.GetUserByLoginOut{Uuid: userData.Uuid, IsNewUser: userData.IsNew}, nil
 }
