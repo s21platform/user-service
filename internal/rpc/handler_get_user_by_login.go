@@ -2,8 +2,9 @@ package rpc
 
 import (
 	"context"
-	"github.com/s21platform/metrics-lib/pkg"
 	"log"
+
+	"github.com/s21platform/metrics-lib/pkg"
 
 	user "github.com/s21platform/user-proto/user-proto"
 	"google.golang.org/grpc/codes"
