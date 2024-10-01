@@ -25,8 +25,10 @@ func (s *Server) GetUserByLogin(ctx context.Context, in *user.GetUserByLoginIn) 
 		if err != nil {
 			m.Increment("new_friend.error")
 			log.Println("error send data to kafka:", err)
+		} else {
+			m.Increment("new_friend.ok")
 		}
 	}
-	m.Increment("test.error")
+
 	return &user.GetUserByLoginOut{Uuid: userData.Uuid, IsNewUser: userData.IsNew}, nil
 }
