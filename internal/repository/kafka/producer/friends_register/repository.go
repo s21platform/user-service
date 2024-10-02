@@ -1,9 +1,6 @@
 package friends_register
 
 import (
-	"context"
-	"encoding/json"
-
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/segmentio/kafka-go"
 )
@@ -28,22 +25,22 @@ func New(cfg *config.Config) *FriendsInvite {
 	return &FriendsInvite{pdsr: pdsr}
 }
 
-func (f FriendsInvite) SendMessage(ctx context.Context, email string, uuid string) error {
-	mess := FriendsInviteSendMap{
-		Email: email,
-		UUID:  uuid,
-	}
-
-	messJson, err := json.Marshal(mess)
-	if err != nil {
-		return err
-	}
-
-	err = f.pdsr.WriteMessages(ctx, kafka.Message{
-		Value: messJson,
-	})
-	if err != nil {
-		return err
-	}
-	return nil
-}
+//func (f FriendsInvite) SendMessage(ctx context.Context, email string, uuid string) error {
+//	mess := new_friend_register.NewFriendRegister{
+//		Email: email,
+//		Uuid:  uuid,
+//	}
+//
+//	messJson, err := json.Marshal(mess)
+//	if err != nil {
+//		return err
+//	}
+//
+//	err = f.pdsr.WriteMessages(ctx, kafka.Message{
+//		Value: messJson,
+//	})
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
