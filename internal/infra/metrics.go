@@ -2,9 +2,10 @@ package infra
 
 import (
 	"context"
-	"github.com/s21platform/user-service/internal/config"
 	"strings"
 	"time"
+
+	"github.com/s21platform/user-service/internal/config"
 
 	"google.golang.org/grpc"
 
