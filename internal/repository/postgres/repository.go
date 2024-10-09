@@ -26,9 +26,9 @@ type CheckUser struct {
 	IsNew bool
 }
 
-func (r *Repository) UpdateUserAvatar(UUID, link string) error {
+func (r *Repository) UpdateUserAvatar(uuid, link string) error {
 	query := `UPDATE users SET last_avatar_link = $1 WHERE uuid = $2`
-	_, err := r.conn.Exec(query, link, UUID)
+	_, err := r.conn.Exec(query, link, uuid)
 	if err != nil {
 		return err
 	}
