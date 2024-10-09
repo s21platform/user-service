@@ -5,6 +5,8 @@ import (
 	"log"
 	"net"
 
+	kafkalib "github.com/s21platform/kafka-lib"
+
 	"google.golang.org/grpc"
 
 	"github.com/s21platform/metrics-lib/pkg"
@@ -12,7 +14,6 @@ import (
 
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/s21platform/user-service/internal/infra"
-	"github.com/s21platform/user-service/internal/repository/kafka/producer/friends_register"
 	"github.com/s21platform/user-service/internal/repository/postgres"
 	"github.com/s21platform/user-service/internal/rpc"
 )
@@ -28,9 +29,9 @@ func main() {
 		log.Fatalf("failed to create metrics object: %v", err)
 	}
 
-	userFriendsRegister := friends_register.New(cfg)
+	producerNewFriendRegister := kafkalib.NewProducer(cfg.Kafka.Server, cfg.Kafka.FriendsRegister)
 
-	server := rpc.New(db, userFriendsRegister)
+	server := rpc.New(db, producerNewFriendRegister)
 
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
