@@ -32,6 +32,8 @@ github.com/pierrec/lz4/v4 v4.1.21 h1:yOVMLb6qSIDP67pl/5F7RepeKYu/VmTyEXvuMI5d9mQ
 github.com/pierrec/lz4/v4 v4.1.21/go.mod h1:gZWDp/Ze/IJXGXf23ltt2EXimqmTUXEy0GFuRQyBid4=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/s21platform/friends-proto v0.0.8 h1:DN3Q7FGIr5T/FxifCbnVjZ/m84GcAM8IvlzHagwdOAU=
+github.com/s21platform/friends-proto v0.0.8/go.mod h1:2T40nq/qCJzNd7B7FrmaFqN9i2dte+cMcrZS248XwQI=
 github.com/s21platform/kafka-lib v0.0.2 h1:KTEAQ48pvLOCUvj68KRa413Q4sGPGxkZm3so+u8shpE=
 github.com/s21platform/kafka-lib v0.0.2/go.mod h1:wGOSWZQwRO7Vl0HZWFDxtxn3N4eRASlBD2kbl3OF0U4=
 github.com/s21platform/metrics-lib v0.0.6 h1:JcB/a/LsxTEdQf0ffT6wlxBirBWn1Dt8BP3fHEfMh4s=
