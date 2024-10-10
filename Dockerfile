@@ -9,10 +9,13 @@ RUN go mod download
 COPY . .
 
 RUN go build -o build/main cmd/service/main.go
+RUN go build -o build/worker_avatar cmd/workers/avatar/main.go
 
 FROM alpine:latest
 
 WORKDIR /app
 
 COPY --from=builder /usr/src/service/build/main .
-CMD ["/app/main"]
+COPY --from=builder /usr/src/service/build/worker_avatar .
+
+CMD /app/main & /app/worker_avatar

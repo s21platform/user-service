@@ -34,6 +34,7 @@ type Postgres struct {
 type Kafka struct {
 	Server          string `env:"KAFKA_SERVER"`
 	FriendsRegister string `env:"USER_FRIENDS_REGISTER"`
+	SetNewAvatar    string `env:"AVATAR_SET_NEW"`
 }
 
 type Metrics struct {
