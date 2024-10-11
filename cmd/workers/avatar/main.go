@@ -22,7 +22,7 @@ func main() {
 		log.Println("failed to connect graphite: ", err)
 	}
 
-	ctx := context.WithValue(context.Background(), "metrics", metrics)
+	ctx := context.WithValue(context.Background(), config.KeyMetrics, metrics)
 
 	newAvatarConsumer, err := kafkalib.NewConsumer(cfg.Kafka.Server, cfg.Kafka.SetNewAvatar, metrics)
 	if err != nil {
