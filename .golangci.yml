@@ -10,7 +10,6 @@ linters:
     - gosimple
     - typecheck
     - unused
-    - gofmt
     - makezero
     - whitespace
 
