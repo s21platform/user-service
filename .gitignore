@@ -1,3 +1,5 @@
 .idea
-.env
+*.env
 docker-compose.yml
+.DS_Store
+linters.sh
