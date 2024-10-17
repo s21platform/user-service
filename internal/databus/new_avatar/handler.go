@@ -10,12 +10,6 @@ import (
 	"github.com/s21platform/user-service/internal/config"
 )
 
-// AvatarUpdateRsvMap TODO продумать куда впихнуть
-type AvatarUpdateRsvMap struct {
-	UUID string `json:"uuid"`
-	Link string `json:"link"`
-}
-
 type Handler struct {
 	dbR DBRepo
 }
