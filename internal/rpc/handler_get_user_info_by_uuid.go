@@ -3,14 +3,12 @@ package rpc
 import (
 	"context"
 	optionhub_proto "github.com/s21platform/optionhub-proto/optionhub-proto"
-	"log"
-	"strconv"
-
 	user "github.com/s21platform/user-proto/user-proto"
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"log"
 )
 
 func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUUIDIn) (*user.GetUserInfoByUUIDOut, error) {
@@ -31,8 +29,7 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 		}
 	}
 
-	id, _ := strconv.ParseInt(*userInfo.OSId, 10, 64)
-	os, err := s.GetOsById(ctx, &optionhub_proto.GetByIdIn{Id: id})
+	os, err := s.GetOsById(ctx, &optionhub_proto.GetByIdIn{Id: *userInfo.OSId})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get os name")
 	}
