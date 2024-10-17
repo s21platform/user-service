@@ -2,7 +2,9 @@ package rpc
 
 import (
 	"context"
+	optionhub_proto "github.com/s21platform/optionhub-proto/optionhub-proto"
 	"log"
+	"strconv"
 
 	user "github.com/s21platform/user-proto/user-proto"
 	"github.com/s21platform/user-service/internal/config"
@@ -29,6 +31,12 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 		}
 	}
 
+	id, _ := strconv.ParseInt(*userInfo.OSId, 10, 64)
+	os, err := s.GetOsById(ctx, &optionhub_proto.GetByIdIn{Id: id})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get os name")
+	}
+
 	resp := &user.GetUserInfoByUUIDOut{
 		Nickname:   userInfo.Nickname,
 		Avatar:     userInfo.LastAvatarLink,
@@ -39,7 +47,7 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 		Telegram:   userInfo.Telegram,
 		Git:        userInfo.Git,
 		City:       lo.ToPtr("Москва [HC]"),
-		Os:         lo.ToPtr("Mac OS [HC]"),
+		Os:         lo.ToPtr(os.Value),
 		Work:       lo.ToPtr("Avito tech [HC]"),
 		University: lo.ToPtr("НИУ МЭИ [HC]"),
 	}

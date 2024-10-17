@@ -10,6 +10,7 @@ require (
 	github.com/s21platform/friends-proto v0.0.8
 	github.com/s21platform/kafka-lib v0.0.4
 	github.com/s21platform/metrics-lib v0.0.6
+	github.com/s21platform/optionhub-proto v1.0.1
 	github.com/s21platform/user-proto v0.0.6
 	github.com/samber/lo v1.47.0
 	google.golang.org/grpc v1.67.1
