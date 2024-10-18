@@ -2,13 +2,14 @@ package rpc
 
 import (
 	"context"
+	"log"
+
 	optionhub_proto "github.com/s21platform/optionhub-proto/optionhub-proto"
 	user "github.com/s21platform/user-proto/user-proto"
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"log"
 )
 
 func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUUIDIn) (*user.GetUserInfoByUUIDOut, error) {
