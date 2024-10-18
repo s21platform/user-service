@@ -3,6 +3,7 @@ package optoinhub
 import (
 	"context"
 	"fmt"
+	"github.com/samber/lo"
 	"log"
 
 	"github.com/s21platform/user-service/internal/config"
@@ -16,16 +17,16 @@ type Handle struct {
 	client optionhubproto.OptionhubServiceClient
 }
 
-func (h *Handle) GetOs(ctx context.Context, id *int64) (string, error) {
+func (h *Handle) GetOs(ctx context.Context, id *int64) (*string, error) {
 	if id == nil {
-		return "", fmt.Errorf("no os id for this user")
+		return nil, nil
 	}
 
 	os, err := h.client.GetOsById(ctx, &optionhubproto.GetByIdIn{Id: *id})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return os.Value, nil
+	return lo.ToPtr(os.Value), nil
 }
 
 func MustConnect(cfg *config.Config) *Handle {

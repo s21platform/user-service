@@ -44,7 +44,7 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 		Telegram:   userInfo.Telegram,
 		Git:        userInfo.Git,
 		City:       lo.ToPtr("Москва [HC]"),
-		Os:         lo.ToPtr(os),
+		Os:         os,
 		Work:       lo.ToPtr("Avito tech [HC]"),
 		University: lo.ToPtr("НИУ МЭИ [HC]"),
 	}
