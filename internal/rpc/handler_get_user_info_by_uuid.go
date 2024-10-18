@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 
-	optionhub_proto "github.com/s21platform/optionhub-proto/optionhub-proto"
 	user "github.com/s21platform/user-proto/user-proto"
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/samber/lo"
@@ -30,7 +29,7 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 		}
 	}
 
-	os, err := s.GetOsById(ctx, &optionhub_proto.GetByIdIn{Id: *userInfo.OSId})
+	os, err := s.optionhub.GetOs(ctx, userInfo.OSId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get os name")
 	}
@@ -45,7 +44,7 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 		Telegram:   userInfo.Telegram,
 		Git:        userInfo.Git,
 		City:       lo.ToPtr("Москва [HC]"),
-		Os:         lo.ToPtr(os.Value),
+		Os:         lo.ToPtr(os),
 		Work:       lo.ToPtr("Avito tech [HC]"),
 		University: lo.ToPtr("НИУ МЭИ [HC]"),
 	}
