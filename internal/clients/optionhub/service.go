@@ -35,6 +35,6 @@ func MustConnect(cfg *config.Config) *Handle {
 	if err != nil {
 		log.Fatalf("Could not connect to community service: %v", err)
 	}
-	Client := optionhubproto.NewOptionhubServiceClient(conn)
-	return &Handle{client: Client}
+	client := optionhubproto.NewOptionhubServiceClient(conn)
+	return &Handle{client: client}
 }

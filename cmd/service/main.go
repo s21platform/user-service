@@ -31,9 +31,9 @@ func main() {
 	}
 
 	producerNewFriendRegister := kafkalib.NewProducer(cfg.Kafka.Server, cfg.Kafka.FriendsRegister)
-	optionhubService := optoinhub.MustConnect(cfg)
+	optionhubClient := optoinhub.MustConnect(cfg)
 
-	server := rpc.New(db, producerNewFriendRegister, optionhubService)
+	server := rpc.New(db, producerNewFriendRegister, optionhubClient)
 
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
