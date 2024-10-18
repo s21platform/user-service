@@ -29,6 +29,11 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 		}
 	}
 
+	os, err := s.optionhubS.GetOs(ctx, userInfo.OSId)
+	if err != nil {
+		log.Printf("cannot get os, err: %v\n", err)
+	}
+
 	resp := &user.GetUserInfoByUUIDOut{
 		Nickname:   userInfo.Nickname,
 		Avatar:     userInfo.LastAvatarLink,
@@ -39,7 +44,7 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 		Telegram:   userInfo.Telegram,
 		Git:        userInfo.Git,
 		City:       lo.ToPtr("Москва [HC]"),
-		Os:         lo.ToPtr("Mac OS [HC]"),
+		Os:         os,
 		Work:       lo.ToPtr("Avito tech [HC]"),
 		University: lo.ToPtr("НИУ МЭИ [HC]"),
 	}

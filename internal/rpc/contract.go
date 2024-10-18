@@ -16,3 +16,7 @@ type DbRepo interface {
 type UserFriendsRegisterSrv interface {
 	ProduceMessage(message interface{}) error
 }
+
+type OptionhubS interface {
+	GetOs(ctx context.Context, id *int64) (*string, error)
+}

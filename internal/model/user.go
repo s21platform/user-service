@@ -11,8 +11,8 @@ type UserInfo struct {
 	Phone          *string    `db:"phone"`
 	Telegram       *string    `db:"telegram"`
 	Git            *string    `db:"git"`
-	CityId         *string    `db:"city_id"`
-	OSId           *string    `db:"os_id"`
-	WorkId         *string    `db:"work_id"`
-	UniversityId   *string    `db:"university_id"`
+	CityId         *int64     `db:"city_id"`
+	OSId           *int64     `db:"os_id"`
+	WorkId         *int64     `db:"work_id"`
+	UniversityId   *int64     `db:"university_id"`
 }
