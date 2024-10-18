@@ -12,6 +12,7 @@ import (
 	"github.com/s21platform/metrics-lib/pkg"
 	user "github.com/s21platform/user-proto/user-proto"
 
+	optoinhub "github.com/s21platform/user-service/internal/clients/optionhub"
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/s21platform/user-service/internal/infra"
 	"github.com/s21platform/user-service/internal/repository/postgres"
@@ -30,8 +31,9 @@ func main() {
 	}
 
 	producerNewFriendRegister := kafkalib.NewProducer(cfg.Kafka.Server, cfg.Kafka.FriendsRegister)
+	optionhubService := optoinhub.MustConnect(cfg)
 
-	server := rpc.New(db, producerNewFriendRegister)
+	server := rpc.New(db, producerNewFriendRegister, optionhubService)
 
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(

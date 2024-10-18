@@ -12,11 +12,12 @@ const KeyUUID key = key("uuid")
 const KeyMetrics key = key("metrics")
 
 type Config struct {
-	Service  Service
-	Postgres Postgres
-	Kafka    Kafka
-	Metrics  Metrics
-	Platform Platform
+	Service   Service
+	Postgres  Postgres
+	Kafka     Kafka
+	Metrics   Metrics
+	Platform  Platform
+	Optionhub Optionhub
 }
 
 type Service struct {
@@ -44,6 +45,11 @@ type Metrics struct {
 
 type Platform struct {
 	Env string `env:"ENV"`
+}
+
+type Optionhub struct {
+	Host string `env:"OPTIONHUB_SERVICE_HOST"`
+	Port string `env:"OPTIONHUB_SERVICE_PORT"`
 }
 
 func MustLoad() *Config {
