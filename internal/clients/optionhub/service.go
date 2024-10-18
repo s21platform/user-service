@@ -3,8 +3,9 @@ package optoinhub
 import (
 	"context"
 	"fmt"
-	"github.com/samber/lo"
 	"log"
+
+	"github.com/samber/lo"
 
 	"github.com/s21platform/user-service/internal/config"
 	"google.golang.org/grpc"
