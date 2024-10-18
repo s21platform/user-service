@@ -32,7 +32,6 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 	os, err := s.optionhubS.GetOs(ctx, userInfo.OSId)
 	if err != nil {
 		log.Printf("cannot get os, err: %v\n", err)
-		return nil, nil
 	}
 
 	resp := &user.GetUserInfoByUUIDOut{
