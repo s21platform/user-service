@@ -11,6 +11,7 @@ type DbRepo interface {
 	IsUserExistByUUID(uuid string) (bool, error)
 	GetOrSetUserByLogin(email string) (*postgres.CheckUser, error)
 	GetUserInfoByUUID(ctx context.Context, uuid string) (model.UserInfo, error)
+	GetLoginByUuid(ctx context.Context, uuid string) (string, error)
 }
 
 type UserFriendsRegisterSrv interface {
