@@ -148,6 +148,9 @@ func (r *Repository) GetLoginByUuid(ctx context.Context, uuid string) (string, e
 	var result string
 	err := r.conn.Get(&result, query, uuid)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", nil
+		}
 		return "", fmt.Errorf("failed to get login by uuid: %v", err)
 	}
 	return result, nil
