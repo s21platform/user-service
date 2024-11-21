@@ -3,6 +3,7 @@ module github.com/s21platform/user-service
 go 1.22.8
 
 require (
+	github.com/Masterminds/squirrel v1.5.4
 	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jmoiron/sqlx v1.4.0
@@ -11,14 +12,13 @@ require (
 	github.com/s21platform/kafka-lib v0.0.4
 	github.com/s21platform/metrics-lib v0.0.6
 	github.com/s21platform/optionhub-proto v1.0.1
-	github.com/s21platform/user-proto v0.0.8
+	github.com/s21platform/user-proto v0.0.9
 	github.com/samber/lo v1.47.0
 	google.golang.org/grpc v1.67.1
 )
 
 require (
 	github.com/BurntSushi/toml v1.4.0 // indirect
-	github.com/Masterminds/squirrel v1.5.4 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.17.10 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
