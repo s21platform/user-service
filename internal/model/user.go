@@ -32,7 +32,7 @@ type ProfileData struct {
 
 func (pd *ProfileData) ToDTO(in *user_proto.UpdateProfileIn) {
 	birthdate, err := time.Parse(time.RFC3339, in.Birthday)
-	bd := lo.Ternary(err != nil, &birthdate, nil)
+	bd := lo.Ternary(err != nil, nil, &birthdate)
 	pd.Name = in.Name
 	pd.Birthdate = bd
 	pd.Telegram = in.Telegram

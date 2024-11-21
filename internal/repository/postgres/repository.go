@@ -173,12 +173,12 @@ func (r *Repository) UpdateProfile(ctx context.Context, data model.ProfileData, 
 		return fmt.Errorf("failed to build query: %v", err)
 	}
 	var userId int64
-	err = tx.SelectContext(ctx, &userId, query, args...)
+	err = tx.GetContext(ctx, &userId, query, args...)
 	if err != nil {
 		_ = tx.Rollback()
 		return fmt.Errorf("failed to get user id: %v", err)
 	}
-
+	log.Println(data.Birthdate)
 	query, args, err = sq.Update("data").
 		Set("name", data.Name).
 		Set("birthdate", data.Birthdate).
