@@ -8,6 +8,8 @@ import (
 	"log"
 	"strings"
 
+	sq "github.com/Masterminds/squirrel"
+
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -154,6 +156,54 @@ func (r *Repository) GetLoginByUuid(ctx context.Context, uuid string) (string, e
 		return "", fmt.Errorf("failed to get login by uuid: %v", err)
 	}
 	return result, nil
+}
+
+func (r *Repository) UpdateProfile(ctx context.Context, data model.ProfileData, userUuid string) error {
+	tx, err := r.conn.Beginx()
+	if err != nil {
+		return fmt.Errorf("failed to start transaction: %v", err)
+	}
+
+	query, args, err := sq.Select("id").
+		From("users").Where(sq.Eq{"uuid": userUuid}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		_ = tx.Rollback()
+		return fmt.Errorf("failed to build query: %v", err)
+	}
+	var userId int64
+	err = tx.SelectContext(ctx, &userId, query, args...)
+	if err != nil {
+		_ = tx.Rollback()
+		return fmt.Errorf("failed to get user id: %v", err)
+	}
+
+	query, args, err = sq.Update("data").
+		Set("name", data.Name).
+		Set("birthdate", data.Birthdate).
+		Set("git", data.Git).
+		Set("telegram", data.Telegram).
+		Set("os_id", data.OsId).
+		Where(sq.Eq{"user_id": userId}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		_ = tx.Rollback()
+		return fmt.Errorf("failed to update user: %v", err)
+	}
+	_, err = tx.ExecContext(ctx, query, args...)
+	if err != nil {
+		_ = tx.Rollback()
+		return fmt.Errorf("failed to update user: %v", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("failed to commit transaction: %v", err)
+	}
+	return nil
 }
 
 func (r *Repository) Close() {
