@@ -138,6 +138,24 @@ func (r *Repository) GetUserInfoByUUID(ctx context.Context, uuid string) (model.
 	return result[0], nil
 }
 
+func (r *Repository) GetLoginByUuid(ctx context.Context, uuid string) (string, error) {
+	query := `
+		SELECT
+			login 
+		FROM users 
+		WHERE uuid=$1
+	`
+	var result string
+	err := r.conn.Get(&result, query, uuid)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", nil
+		}
+		return "", fmt.Errorf("failed to get login by uuid: %v", err)
+	}
+	return result, nil
+}
+
 func (r *Repository) Close() {
 	_ = r.conn.Close()
 }
