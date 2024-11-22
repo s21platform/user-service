@@ -16,3 +16,9 @@ type UserInfo struct {
 	WorkId         *string    `db:"work_id"`
 	UniversityId   *string    `db:"university_id"`
 }
+
+type UserWithLimit struct {
+	Nickname    string `db:"login"`
+	UUID        string `db:"uuid"`
+	Avatar_link string `db:"last_avatar_link"`
+}
