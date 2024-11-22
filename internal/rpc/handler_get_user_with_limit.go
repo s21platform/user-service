@@ -3,6 +3,7 @@ package rpc
 import (
 	"context"
 	"fmt"
+
 	user "github.com/s21platform/user-proto/user-proto"
 	"github.com/s21platform/user-service/internal/config"
 )
