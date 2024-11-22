@@ -12,6 +12,7 @@ type DbRepo interface {
 	GetOrSetUserByLogin(email string) (*postgres.CheckUser, error)
 	GetUserInfoByUUID(ctx context.Context, uuid string) (model.UserInfo, error)
 	GetLoginByUuid(ctx context.Context, uuid string) (string, error)
+	UpdateProfile(ctx context.Context, data model.ProfileData, userUuid string) error
 }
 
 type UserFriendsRegisterSrv interface {
