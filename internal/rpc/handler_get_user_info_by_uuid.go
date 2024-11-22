@@ -3,6 +3,7 @@ package rpc
 import (
 	"context"
 	"log"
+	"time"
 
 	user "github.com/s21platform/user-proto/user-proto"
 	"github.com/s21platform/user-service/internal/config"
@@ -20,13 +21,14 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 		return nil, status.Errorf(codes.Internal, "failed to get user data from repo")
 	}
 
-	var birthday *user.Birthday
+	os, err := s.optionhubS.GetOs(ctx, userInfo.OSId)
+	if err != nil {
+		log.Printf("cannot get os, err: %v\n", err)
+	}
+
+	var birthday *string
 	if userInfo.Birthdate != nil {
-		birthday = &user.Birthday{
-			Day:   int64(userInfo.Birthdate.Day()),
-			Month: int64(userInfo.Birthdate.Month()),
-			Year:  int64(userInfo.Birthdate.Year()),
-		}
+		birthday = lo.ToPtr(userInfo.Birthdate.Format(time.DateOnly))
 	}
 
 	resp := &user.GetUserInfoByUUIDOut{
@@ -39,7 +41,7 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 		Telegram:   userInfo.Telegram,
 		Git:        userInfo.Git,
 		City:       lo.ToPtr("Москва [HC]"),
-		Os:         lo.ToPtr("Mac OS [HC]"),
+		Os:         os,
 		Work:       lo.ToPtr("Avito tech [HC]"),
 		University: lo.ToPtr("НИУ МЭИ [HC]"),
 	}
