@@ -140,6 +140,15 @@ func (r *Repository) GetUserInfoByUUID(ctx context.Context, uuid string) (model.
 	return result[0], nil
 }
 
+func (r *Repository) GetUserWithLimit(uuid string, limit int64, offset int64) ([]model.UserWithLimit, error) {
+	var userWithLimit []model.UserWithLimit
+	err := r.conn.Select(&userWithLimit, "SELECT login, uuid, last_avatar_link FROM users WHERE uuid != $1 LIMIT $2 OFFSET $3", uuid, limit, offset*limit)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user info: %v", err)
+	}
+	return userWithLimit, nil
+}
+
 func (r *Repository) GetLoginByUuid(ctx context.Context, uuid string) (string, error) {
 	query := `
 		SELECT

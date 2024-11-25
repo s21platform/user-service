@@ -39,3 +39,9 @@ func (pd *ProfileData) ToDTO(in *user_proto.UpdateProfileIn) {
 	pd.Git = in.Github
 	pd.OsId = in.OsId
 }
+
+type UserWithLimit struct {
+	Nickname    string `db:"login"`
+	UUID        string `db:"uuid"`
+	Avatar_link string `db:"last_avatar_link"`
+}
