@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
 	"github.com/samber/lo"
@@ -22,7 +23,7 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 		log.Println("failed to get user data from repo:", err)
 		return nil, status.Errorf(codes.Internal, "failed to get user data from repo")
 	}
-
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("uuid", ctx.Value(config.KeyUUID).(string)))
 	osInfo, err := s.optionhubS.GetOs(ctx, userInfo.OSId)
 	if err != nil {
 		log.Printf("cannot get os, err: %v\n", err)
