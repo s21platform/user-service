@@ -8,7 +8,7 @@ import (
 	"github.com/s21platform/user-service/internal/config"
 )
 
-func (s *Server) GetUserWithLimit(ctx context.Context, in *user.GetUserWithLimitIn) (*user.GetUserWithLimitOut, error) {
+func (s *Server) GetUserWithOffset(ctx context.Context, in *user.GetUserWithOffsetIn) (*user.GetUserWithOffsetOut, error) {
 	uuid, ok := ctx.Value(config.KeyUUID).(string)
 	if !ok {
 		return nil, fmt.Errorf("uuid not found in context")
@@ -25,5 +25,5 @@ func (s *Server) GetUserWithLimit(ctx context.Context, in *user.GetUserWithLimit
 			AvatarLink: u.Avatar_link,
 		})
 	}
-	return &user.GetUserWithLimitOut{User: users, Total: int64(len(users))}, nil
+	return &user.GetUserWithOffsetOut{User: users, Total: int64(len(users))}, nil
 }

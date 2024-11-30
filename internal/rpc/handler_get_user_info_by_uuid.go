@@ -5,11 +5,14 @@ import (
 	"log"
 	"time"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
+
+	"github.com/samber/lo"
+
 	user "github.com/s21platform/user-proto/user-proto"
 	"github.com/s21platform/user-service/internal/config"
-	"github.com/samber/lo"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUUIDIn) (*user.GetUserInfoByUUIDOut, error) {
@@ -20,8 +23,8 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 		log.Println("failed to get user data from repo:", err)
 		return nil, status.Errorf(codes.Internal, "failed to get user data from repo")
 	}
-
-	os, err := s.optionhubS.GetOs(ctx, userInfo.OSId)
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("uuid", ctx.Value(config.KeyUUID).(string)))
+	osInfo, err := s.optionhubS.GetOs(ctx, userInfo.OSId)
 	if err != nil {
 		log.Printf("cannot get os, err: %v\n", err)
 	}
@@ -29,6 +32,14 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 	var birthday *string
 	if userInfo.Birthdate != nil {
 		birthday = lo.ToPtr(userInfo.Birthdate.Format(time.DateOnly))
+	}
+
+	var os *user.GetOs
+	if osInfo != nil {
+		os = &user.GetOs{
+			Id:    osInfo.Id,
+			Label: osInfo.Label,
+		}
 	}
 
 	resp := &user.GetUserInfoByUUIDOut{
