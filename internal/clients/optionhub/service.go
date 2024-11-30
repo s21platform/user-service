@@ -3,9 +3,8 @@ package optoinhub
 import (
 	"context"
 	"fmt"
+	"github.com/s21platform/user-service/internal/model"
 	"log"
-
-	"github.com/samber/lo"
 
 	"github.com/s21platform/user-service/internal/config"
 	"google.golang.org/grpc"
@@ -18,16 +17,19 @@ type Handle struct {
 	client optionhubproto.OptionhubServiceClient
 }
 
-func (h *Handle) GetOs(ctx context.Context, id *int64) (*string, error) {
+func (h *Handle) GetOs(ctx context.Context, id *int64) (*model.OS, error) {
 	if id == nil {
 		return nil, nil
 	}
 
-	os, err := h.client.GetOsById(ctx, &optionhubproto.GetByIdIn{Id: *id})
+	os, err := h.client.GetOsByID(ctx, &optionhubproto.GetByIdIn{Id: *id})
 	if err != nil {
 		return nil, err
 	}
-	return lo.ToPtr(os.Value), nil
+	return &model.OS{
+		Id:    os.Id,
+		Label: os.Value,
+	}, nil
 }
 
 func MustConnect(cfg *config.Config) *Handle {

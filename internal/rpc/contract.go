@@ -21,5 +21,5 @@ type UserFriendsRegisterSrv interface {
 }
 
 type OptionhubS interface {
-	GetOs(ctx context.Context, id *int64) (*string, error)
+	GetOs(ctx context.Context, id *int64) (*model.OS, error)
 }
