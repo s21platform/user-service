@@ -3,14 +3,15 @@ package optoinhub
 import (
 	"context"
 	"fmt"
-	"github.com/s21platform/user-service/internal/model"
 	"log"
 
-	"github.com/s21platform/user-service/internal/config"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
 	optionhubproto "github.com/s21platform/optionhub-proto/optionhub-proto"
+
+	"github.com/s21platform/user-service/internal/config"
+	"github.com/s21platform/user-service/internal/model"
 )
 
 type Handle struct {
