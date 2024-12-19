@@ -23,6 +23,8 @@ func (s *Server) GetUserWithOffset(ctx context.Context, in *user.GetUserWithOffs
 			Nickname:   u.Nickname,
 			Uuid:       u.UUID,
 			AvatarLink: u.Avatar_link,
+			Name:       u.Name,
+			Surname:    u.Surname,
 		})
 	}
 	return &user.GetUserWithOffsetOut{User: users, Total: int64(len(users))}, nil
