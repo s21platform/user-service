@@ -44,4 +44,6 @@ type UserWithLimit struct {
 	Nickname    string `db:"login"`
 	UUID        string `db:"uuid"`
 	Avatar_link string `db:"last_avatar_link"`
+	Name        string `db:"name"`
+	Surname     string `db:"surname"`
 }
