@@ -140,9 +140,9 @@ func (r *Repository) GetUserInfoByUUID(ctx context.Context, uuid string) (model.
 	return result[0], nil
 }
 
-func (r *Repository) GetUserWithLimit(uuid, nicName string, limit int64, offset int64) ([]model.UserWithLimit, error) {
+func (r *Repository) GetUserWithLimit(uuid, nickname string, limit int64, offset int64) ([]model.UserWithLimit, error) {
 	var userWithLimit []model.UserWithLimit
-	likeNick := "%" + nicName + "%"
+	likeNick := "%" + nickname + "%"
 	err := r.conn.Select(&userWithLimit, "SELECT users.login, users.uuid, users.last_avatar_link, COALESCE(data.name, '') as name, COALESCE(data.surname, '') as surname "+
 		"FROM users "+
 		"JOIN data on users.id = data.user_id "+

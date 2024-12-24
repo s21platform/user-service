@@ -22,7 +22,7 @@ func (s *Server) GetUserWithOffset(ctx context.Context, in *user.GetUserWithOffs
 		users = append(users, &user.User{
 			Nickname:   u.Nickname,
 			Uuid:       u.UUID,
-			AvatarLink: u.Avatar_link,
+			AvatarLink: u.AvatarLink,
 			Name:       u.Name,
 			Surname:    u.Surname,
 		})

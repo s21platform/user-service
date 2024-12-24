@@ -41,9 +41,9 @@ func (pd *ProfileData) ToDTO(in *user_proto.UpdateProfileIn) {
 }
 
 type UserWithLimit struct {
-	Nickname    string `db:"login"`
-	UUID        string `db:"uuid"`
-	Avatar_link string `db:"last_avatar_link"`
-	Name        string `db:"name"`
-	Surname     string `db:"surname"`
+	Nickname   string `db:"login"`
+	UUID       string `db:"uuid"`
+	AvatarLink string `db:"last_avatar_link"`
+	Name       string `db:"name"`
+	Surname    string `db:"surname"`
 }
