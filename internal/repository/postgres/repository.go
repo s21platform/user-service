@@ -146,7 +146,7 @@ func (r *Repository) GetUserWithLimit(uuid, nickname string, limit int64, offset
 	err := r.conn.Select(&userWithLimit, "SELECT users.login, users.uuid, users.last_avatar_link, COALESCE(data.name, '') as name, COALESCE(data.surname, '') as surname "+
 		"FROM users "+
 		"JOIN data on users.id = data.user_id "+
-		"WHERE users.uuid != $1 AND users.login LIKE $2 LIMIT $3 OFFSET $4;", uuid, likeNick, limit, offset*limit)
+		"WHERE users.uuid != $1 AND users.login LIKE $2 LIMIT $3 OFFSET $4;", uuid, likeNick, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user info: %v", err)
 	}
