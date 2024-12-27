@@ -13,7 +13,7 @@ func (s *Server) GetUserWithOffset(ctx context.Context, in *user.GetUserWithOffs
 	if !ok {
 		return nil, fmt.Errorf("uuid not found in context")
 	}
-	userWithLimit, err := s.dbRepo.GetUserWithLimit(uuid, in.Nickname, in.Limit, in.Offset)
+	userWithLimit, total, err := s.dbRepo.GetUserWithLimit(uuid, in.Nickname, in.Limit, in.Offset)
 	if err != nil {
 		return nil, fmt.Errorf("get user with limit: %w", err)
 	}
@@ -27,5 +27,5 @@ func (s *Server) GetUserWithOffset(ctx context.Context, in *user.GetUserWithOffs
 			Surname:    u.Surname,
 		})
 	}
-	return &user.GetUserWithOffsetOut{User: users, Total: int64(len(users))}, nil
+	return &user.GetUserWithOffsetOut{User: users, Total: total}, nil
 }
