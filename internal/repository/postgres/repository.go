@@ -140,7 +140,7 @@ func (r *Repository) GetUserInfoByUUID(ctx context.Context, uuid string) (model.
 	return result[0], nil
 }
 
-func (r *Repository) GetUserWithLimit(uuid, nickname string, limit int64, offset int64) ([]model.UserWithLimit, error) {
+func (r *Repository) GetUserWithLimit(uuid, nickname string, limit int64, offset int64) ([]model.UserWithLimit, int64, error) {
 	var userWithLimit []model.UserWithLimit
 	likeNick := "%" + nickname + "%"
 	err := r.conn.Select(&userWithLimit, "SELECT users.login, users.uuid, users.last_avatar_link, COALESCE(data.name, '') as name, COALESCE(data.surname, '') as surname "+
@@ -148,9 +148,20 @@ func (r *Repository) GetUserWithLimit(uuid, nickname string, limit int64, offset
 		"JOIN data on users.id = data.user_id "+
 		"WHERE users.uuid != $1 AND users.login LIKE $2 LIMIT $3 OFFSET $4;", uuid, likeNick, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get user info: %v", err)
+		return nil, 0, fmt.Errorf("failed to get user info: %v", err)
 	}
-	return userWithLimit, nil
+	var total int64
+	query := `
+		SELECT
+			count(uuid)
+		FROM users 
+		WHERE uuid != $1 AND login LIKE $2
+	`
+	err = r.conn.Get(&total, query, uuid, likeNick)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to get user total: %v", err)
+	}
+	return userWithLimit, total, nil
 }
 
 func (r *Repository) GetLoginByUuid(ctx context.Context, uuid string) (string, error) {

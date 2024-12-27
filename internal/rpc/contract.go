@@ -11,7 +11,7 @@ type DbRepo interface {
 	IsUserExistByUUID(uuid string) (bool, error)
 	GetOrSetUserByLogin(email string) (*postgres.CheckUser, error)
 	GetUserInfoByUUID(ctx context.Context, uuid string) (model.UserInfo, error)
-	GetUserWithLimit(uuid, nickname string, limit int64, offset int64) ([]model.UserWithLimit, error)
+	GetUserWithLimit(uuid, nickname string, limit int64, offset int64) ([]model.UserWithLimit, int64, error)
 	GetLoginByUuid(ctx context.Context, uuid string) (string, error)
 	UpdateProfile(ctx context.Context, data model.ProfileData, userUuid string) error
 }
