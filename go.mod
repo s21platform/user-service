@@ -10,7 +10,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/s21platform/friends-proto v0.0.12
 	github.com/s21platform/kafka-lib v0.0.4
-	github.com/s21platform/metrics-lib v0.0.8
+	github.com/s21platform/metrics-lib v0.0.9
 	github.com/s21platform/optionhub-proto v1.0.6
 	github.com/s21platform/user-proto v0.0.11
 	github.com/samber/lo v1.47.0
