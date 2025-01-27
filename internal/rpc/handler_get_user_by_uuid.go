@@ -8,6 +8,7 @@ import (
 )
 
 func (s *Server) GetUsersByUUID(ctx context.Context, in *user.GetUsersByUUIDIn) (*user.GetUsersByUUIDOut, error) {
+	_ = ctx
 	if in == nil || len(in.UsersUuid) == 0 {
 		return nil, fmt.Errorf("no UUIDs provided")
 	}
