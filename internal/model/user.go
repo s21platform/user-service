@@ -22,6 +22,14 @@ type UserInfo struct {
 	UniversityId   *int64     `db:"university_id"`
 }
 
+type UserInfoMin struct {
+	Uuid       string `db:"uuid"`
+	Login      string `db:"login"`
+	LastAvatar string `db:"last_avatar_link"`
+	Name       string `db:"name"`
+	Surname    string `db:"surname"`
+}
+
 type ProfileData struct {
 	Name      string     `db:"name"`
 	Birthdate *time.Time `db:"birthdate"`
