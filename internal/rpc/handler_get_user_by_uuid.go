@@ -7,7 +7,7 @@ import (
 	user "github.com/s21platform/user-proto/user-proto"
 )
 
-func (s *Server) GetUserByUUID(ctx context.Context, in *user.GetUsersByUUIDIn) (*user.GetUsersByUUIDOut, error) {
+func (s *Server) GetUsersByUUID(ctx context.Context, in *user.GetUsersByUUIDIn) (*user.GetUsersByUUIDOut, error) {
 	if in == nil || len(in.UsersUuid) == 0 {
 		return nil, fmt.Errorf("no UUIDs provided")
 	}
