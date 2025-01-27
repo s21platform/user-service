@@ -141,7 +141,8 @@ func (r *Repository) GetUserInfoByUUID(ctx context.Context, uuid string) (model.
 }
 
 func (r *Repository) GetUsersByUUID(uuid string) (model.UserInfoMin, error) {
-	query := "select uuid, login, last_avatar_link, data.name, data.surname from users " +
+	query := "select uuid, login, last_avatar_link, " +
+		"COALESCE(data.name, '') name, COALESCE(data.surname, '') as surname from users " +
 		"join data ON users.id = data.user_id " +
 		"where uuid = $1"
 	var result model.UserInfoMin
