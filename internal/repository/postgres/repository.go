@@ -145,7 +145,7 @@ func (r *Repository) GetUsersByUUID(uuid string) (model.UserInfoMin, error) {
 		"join data ON users.id = data.user_id " +
 		"where uuid = $1"
 	var result model.UserInfoMin
-	err := r.conn.Select(&result, query, uuid)
+	err := r.conn.Get(&result, query, uuid)
 	if err != nil {
 		return model.UserInfoMin{}, fmt.Errorf("failed to get user info: %v", err)
 	}
