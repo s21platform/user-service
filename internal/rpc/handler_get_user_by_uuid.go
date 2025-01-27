@@ -3,6 +3,7 @@ package rpc
 import (
 	"context"
 	"fmt"
+	"log"
 
 	user "github.com/s21platform/user-proto/user-proto"
 )
@@ -16,7 +17,8 @@ func (s *Server) GetUsersByUUID(ctx context.Context, in *user.GetUsersByUUIDIn) 
 	var userInfoMin []*user.UserInfoMin
 	for _, uuid := range in.UsersUuid {
 		if uuid.Uuid == "" {
-			return &user.GetUsersByUUIDOut{UsersInfo: userInfoMin}, fmt.Errorf("empty UUID provided")
+			log.Println("empty UUID provided")
+			return &user.GetUsersByUUIDOut{UsersInfo: userInfoMin}, nil
 		}
 
 		userInfo, err := s.dbRepo.GetUsersByUUID(uuid.Uuid)
