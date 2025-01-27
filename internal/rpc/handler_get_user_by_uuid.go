@@ -16,7 +16,7 @@ func (s *Server) GetUsersByUUID(ctx context.Context, in *user.GetUsersByUUIDIn) 
 	var userInfoMin []*user.UserInfoMin
 	for _, uuid := range in.UsersUuid {
 		if uuid.Uuid == "" {
-			return nil, fmt.Errorf("empty UUID provided")
+			return &user.GetUsersByUUIDOut{UsersInfo: userInfoMin}, fmt.Errorf("empty UUID provided")
 		}
 
 		userInfo, err := s.dbRepo.GetUsersByUUID(uuid.Uuid)
