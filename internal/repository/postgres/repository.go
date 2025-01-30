@@ -140,6 +140,19 @@ func (r *Repository) GetUserInfoByUUID(ctx context.Context, uuid string) (model.
 	return result[0], nil
 }
 
+func (r *Repository) GetUsersByUUID(uuid string) (model.UserInfoMin, error) {
+	query := "select uuid, login, last_avatar_link, " +
+		"COALESCE(data.name, '') name, COALESCE(data.surname, '') as surname from users " +
+		"join data ON users.id = data.user_id " +
+		"where uuid = $1"
+	var result model.UserInfoMin
+	err := r.conn.Get(&result, query, uuid)
+	if err != nil {
+		return model.UserInfoMin{}, fmt.Errorf("failed to get user info: %v", err)
+	}
+	return result, nil
+}
+
 func (r *Repository) GetUserWithLimit(uuid, nickname string, limit int64, offset int64) ([]model.UserWithLimit, int64, error) {
 	var userWithLimit []model.UserWithLimit
 	likeNick := "%" + nickname + "%"

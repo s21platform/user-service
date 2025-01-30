@@ -12,7 +12,7 @@ require (
 	github.com/s21platform/kafka-lib v0.0.4
 	github.com/s21platform/metrics-lib v0.0.9
 	github.com/s21platform/optionhub-proto v1.0.6
-	github.com/s21platform/user-proto v0.0.11
+	github.com/s21platform/user-proto v0.0.12
 	github.com/samber/lo v1.47.0
 	google.golang.org/grpc v1.69.2
 )
