@@ -1,0 +1,24 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: user
+  description: Сервис централизованного хранения персональной информации о пользователях
+  annotations:
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
+#    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
+  tags:
+    - grpc
+    - kafka
+spec:
+  type: service
+  lifecycle: production
+  owner: user-service-team  # GitHub-логин ответственного
+  providesApis:
+    - user-api  # API, который предоставляет сервис
+  consumesApis:
+    - community-api
+    - optionhub-api
+  dependsOn:
+    - component:community
+    - component:optionhub
+#  system: authentication-system  # Можно указать систему, если есть
