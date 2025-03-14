@@ -15,6 +15,9 @@ spec:
   owner: user-service-team  # GitHub-логин ответственного
   providesApis:
     - user-api  # API, который предоставляет сервис
+    - user-v0-GetUserByLogin
+    - user-v0-IsUserExistByUUID
+    - user-kafka
   consumesApis:
     - community-api
     - optionhub-api
