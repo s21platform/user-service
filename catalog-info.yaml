@@ -14,14 +14,16 @@ spec:
   lifecycle: production
   owner: user-service-team  # GitHub-логин ответственного
   providesApis:
-    - user-api  # API, который предоставляет сервис
-    - user-v0-GetUserByLogin
-    - user-v0-IsUserExistByUUID
-    - user-kafka
+    - GetUserByLogin-v0
+    - IsUserExistByUUID-v0
+    - GetUserInfoByUUID-v0
+    - GetLoginByUUID-v0
+    - GetUserWithOffset-v0
+    - UpdateProfile-v0
+    - GetUsersByUUID-v0
+    - user-set-avatar
   consumesApis:
-    - community-api
-    - optionhub-api
+    - GetOsByID-v0
   dependsOn:
-    - component:community
     - component:optionhub
 #  system: authentication-system  # Можно указать систему, если есть
