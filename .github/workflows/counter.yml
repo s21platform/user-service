@@ -1,0 +1,13 @@
+name: Push Counter
+on:
+  push:
+
+jobs:
+  increment-push-counter:
+    name: Send metric to StatsD
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send deploy metric
+        run: |
+          echo "${{ secrets.SERVICE_NAME }}.stage.push_counter:1|c" | nc -u ${{ secrets.HOST_DEVELOP }} ${{ secrets.STATSD_PORT }}
