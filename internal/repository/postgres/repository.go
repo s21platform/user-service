@@ -262,3 +262,47 @@ func New(cfg *config.Config) *Repository {
 	}
 	return &Repository{conn}
 }
+
+func (r *Repository) GetAllInfoUsers(ctx context.Context, nickname string, limit, offset int64) ([]model.UserInfo, int64, error) {
+	likeNick := "%" + nickname + "%"
+	query := `
+		SELECT 
+		    u.login,
+		    u.last_avatar_link,
+		    u.uuid,
+		    d.name,
+		    d.surname,
+		    d.birthdate,
+		    d.phone,
+		    d.telegram,
+		    d.git,
+		    d.city_id,
+		    d.os_id,
+		    d.work_id,
+		    d.university_id
+		FROM users u 
+		JOIN data d ON d.user_id = u.id
+		WHERE login LIKE $1
+		LIMIT $2 OFFSET $3
+	`
+	var result []model.UserInfo
+	err := r.conn.Select(&result, query, likeNick, limit, offset)
+	if err != nil {
+		return []model.UserInfo{}, 0, fmt.Errorf("failed to get user info: %v", err)
+	}
+	if len(result) == 0 {
+		return []model.UserInfo{}, 0, errors.New("user not found")
+	}
+	var total int64
+	query = `
+		SELECT
+			count(uuid)
+		FROM users 
+		WHERE login LIKE $1
+	`
+	err = r.conn.Get(&total, query, nickname)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to get user total: %v", err)
+	}
+	return result, total, nil
+}

@@ -36,6 +36,22 @@ func (m *MockDbRepo) EXPECT() *MockDbRepoMockRecorder {
 	return m.recorder
 }
 
+// GetAllInfoUsers mocks base method.
+func (m *MockDbRepo) GetAllInfoUsers(ctx context.Context, nickname string, limit, offset int64) ([]model.UserInfo, int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllInfoUsers", ctx, nickname, limit, offset)
+	ret0, _ := ret[0].([]model.UserInfo)
+	ret1, _ := ret[1].(int64)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetAllInfoUsers indicates an expected call of GetAllInfoUsers.
+func (mr *MockDbRepoMockRecorder) GetAllInfoUsers(ctx, nickname, limit, offset interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllInfoUsers", reflect.TypeOf((*MockDbRepo)(nil).GetAllInfoUsers), ctx, nickname, limit, offset)
+}
+
 // GetLoginByUuid mocks base method.
 func (m *MockDbRepo) GetLoginByUuid(ctx context.Context, uuid string) (string, error) {
 	m.ctrl.T.Helper()

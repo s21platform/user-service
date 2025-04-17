@@ -20,6 +20,7 @@ type UserInfo struct {
 	OSId           *int64     `db:"os_id"`
 	WorkId         *int64     `db:"work_id"`
 	UniversityId   *int64     `db:"university_id"`
+	UUID           *string    `db:"uuid"`
 }
 
 type UserInfoMin struct {
@@ -54,4 +55,7 @@ type UserWithLimit struct {
 	AvatarLink string `db:"last_avatar_link"`
 	Name       string `db:"name"`
 	Surname    string `db:"surname"`
+}
+
+type AllUserInfo struct {
 }
