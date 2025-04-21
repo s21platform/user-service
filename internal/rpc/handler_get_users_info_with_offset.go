@@ -10,6 +10,7 @@ import (
 )
 
 func (s *Server) GetUsersInfoWithOffset(ctx context.Context, in *user.GetUserWithOffsetIn) (*user.GetUserWithOffsetOutAll, error) {
+	fmt.Println("get info offset", in.Offset)
 	_, ok := ctx.Value(config.KeyUUID).(string)
 	if !ok {
 		return nil, fmt.Errorf("failed to get uuid from context")
