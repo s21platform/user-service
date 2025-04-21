@@ -300,7 +300,7 @@ func (r *Repository) GetAllInfoUsers(ctx context.Context, nickname string, limit
 		FROM users 
 		WHERE login LIKE $1
 	`
-	err = r.conn.Get(&total, query, nickname)
+	err = r.conn.Get(&total, query, likeNick)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to get user total: %v", err)
 	}
