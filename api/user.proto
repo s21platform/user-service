@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+option go_package = "pkg/user";
+
+//Service for friends
+service UserService {
+  //Add friends method
+  rpc GetUserByLogin (GetUserByLoginIn) returns (GetUserByLoginOut){};
+  rpc IsUserExistByUUID (IsUserExistByUUIDIn) returns (IsUserExistByUUIDOut){};
+  rpc GetUserInfoByUUID (GetUserInfoByUUIDIn) returns (GetUserInfoByUUIDOut){};
+  rpc GetLoginByUUID (GetLoginByUUIDIn) returns (GetLoginByUUIDOut){};
+  rpc GetUserWithOffset (GetUserWithOffsetIn) returns (GetUserWithOffsetOut){};
+  rpc UpdateProfile (UpdateProfileIn) returns (UpdateProfileOut){};
+  rpc GetUsersByUUID (GetUsersByUUIDIn) returns (GetUsersByUUIDOut){};
+
+}
+
+// Data in request or getting uuid by login. If User doesnt exist - user will be creating
+message GetUserByLoginIn {
+  // Email of target user
+  string login = 1;
+}
+
+// Message for response
+message GetUserByLoginOut {
+  // UUID of user
+  string uuid = 1;
+  // Flag for indicate of new user
+  bool isNewUser = 2;
+}
+
+// Message for request
+message IsUserExistByUUIDIn {
+  // UUID for target user
+  string uuid = 1;
+}
+// Message for response
+message IsUserExistByUUIDOut {
+  // Flag of indicate user exist
+  bool isExist = 1;
+}
+
+// Request data fo getting user info (for initiator page)
+message GetUserInfoByUUIDIn {
+  // UUID for target user
+  string uuid = 1;
+}
+
+message GetOs {
+  int64 id = 1;
+  string label = 2;
+}
+
+// Response data for initiator page
+message GetUserInfoByUUIDOut {
+  string nickname = 1;
+  string avatar = 2;
+  optional string name = 3;
+  optional string surname = 4;
+  optional string birthdate = 5;
+  optional string phone = 6;
+  optional string city = 7;
+  optional string telegram = 8;
+  optional string git = 9;
+  optional GetOs os = 10;
+  optional string work = 11;
+  optional string university = 12;
+  repeated string skills = 13;
+  repeated string hobbies = 14;
+  optional string uuid = 15;
+}
+
+message GetLoginByUUIDIn {
+  string uuid = 1;
+}
+
+message GetLoginByUUIDOut {
+  string login = 1;
+}
+
+message GetUserWithOffsetIn {
+  int64 limit = 1;
+  int64 offset = 2;
+  string nickname = 3;
+}
+
+message GetUserWithOffsetOut {
+  repeated User user = 1;
+  int64 total = 2;
+}
+
+message GetUserWithOffsetOutAll {
+  repeated GetUserInfoByUUIDOut user = 1;
+  int64 total = 2;
+}
+
+message User {
+  string nickname = 1;
+  string uuid = 2;
+  string avatar_link = 3;
+  string name = 4;
+  string surname = 5;
+}
+
+message UpdateProfileIn {
+  string name = 1;
+  string birthday = 2;
+  string telegram = 3;
+  string github = 4;
+  int64 os_id = 5;
+}
+
+message UpdateProfileOut {
+  bool status = 1;
+}
+
+// Request message for getting multiple users by their UUIDs
+message GetUsersByUUIDIn {
+  repeated UsersUUID users_uuid = 1;
+}
+
+// Response message containing minimal user information
+message GetUsersByUUIDOut {
+  repeated UserInfoMin users_info = 1;
+}
+
+// Message for UsersUUID
+message UsersUUID {
+  string uuid = 1;
+}
+
+// Min user information structure
+message UserInfoMin {
+  string uuid = 1;
+  string login = 2;
+  string last_avatar = 3;
+  string name = 4;
+  string surname = 5;
+}

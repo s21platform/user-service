@@ -6,22 +6,19 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
-type key string
-
-const KeyUUID key = key("uuid")
-const KeyMetrics key = key("metrics")
-
 type Config struct {
 	Service   Service
 	Postgres  Postgres
 	Kafka     Kafka
 	Metrics   Metrics
+	Logger    Logger
 	Platform  Platform
 	Optionhub Optionhub
 }
 
 type Service struct {
 	Port string `env:"USER_SERVICE_PORT"`
+	Name string `env:"USER_SERVICE_NAME"`
 }
 
 type Postgres struct {
@@ -41,6 +38,11 @@ type Kafka struct {
 type Metrics struct {
 	Host string `env:"GRAFANA_HOST"`
 	Port int    `env:"GRAFANA_PORT"`
+}
+
+type Logger struct {
+	Host string `env:"LOGGER_SERVICE_HOST"`
+	Port string `env:"LOGGER_SERVICE_PORT"`
 }
 
 type Platform struct {

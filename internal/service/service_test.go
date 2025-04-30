@@ -1,4 +1,4 @@
-package rpc
+package service
 
 import (
 	"context"
@@ -7,10 +7,11 @@ import (
 
 	"github.com/docker/distribution/uuid"
 	"github.com/golang/mock/gomock"
-	user "github.com/s21platform/user-proto/user-proto"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/s21platform/user-service/internal/model"
-	"github.com/stretchr/testify/assert"
+	"github.com/s21platform/user-service/pkg/user"
 )
 
 func TestServer_GetUsersByUUID(t *testing.T) {

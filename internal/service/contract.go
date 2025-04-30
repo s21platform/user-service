@@ -1,5 +1,5 @@
 //go:generate mockgen -destination=mock_contract_test.go -package=${GOPACKAGE} -source=contract.go
-package rpc
+package service
 
 import (
 	"context"

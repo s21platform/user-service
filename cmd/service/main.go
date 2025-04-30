@@ -5,38 +5,41 @@ import (
 	"log"
 	"net"
 
-	kafkalib "github.com/s21platform/kafka-lib"
-
 	"google.golang.org/grpc"
 
+	kafkalib "github.com/s21platform/kafka-lib"
+	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
-	user "github.com/s21platform/user-proto/user-proto"
+	"github.com/s21platform/user-service/pkg/user"
 
 	optoinhub "github.com/s21platform/user-service/internal/clients/optionhub"
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/s21platform/user-service/internal/infra"
 	"github.com/s21platform/user-service/internal/repository/postgres"
-	"github.com/s21platform/user-service/internal/rpc"
+	"github.com/s21platform/user-service/internal/service"
 )
 
 func main() {
 	cfg := config.MustLoad()
+	logger := logger_lib.New(cfg.Logger.Host, cfg.Logger.Port, cfg.Service.Name, cfg.Platform.Env)
 
 	db := postgres.New(cfg)
 	defer db.Close()
 
 	metrics, err := pkg.NewMetrics(cfg.Metrics.Host, cfg.Metrics.Port, "user", cfg.Platform.Env)
 	if err != nil {
+		logger.Error(fmt.Sprintf("failed to create metrics object: %v", err))
 		log.Fatalf("failed to create metrics object: %v", err)
 	}
 
 	producerNewFriendRegister := kafkalib.NewProducer(cfg.Kafka.Server, cfg.Kafka.FriendsRegister)
 	optionhubClient := optoinhub.MustConnect(cfg)
 
-	server := rpc.New(db, producerNewFriendRegister, optionhubClient)
+	server := service.New(db, producerNewFriendRegister, optionhubClient)
 
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
+			infra.Logger(logger),
 			infra.UnaryInterceptor,
 			infra.MetricsInterceptor(metrics),
 		),
@@ -46,9 +49,11 @@ func main() {
 	log.Println("starting server", cfg.Service.Port)
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Service.Port))
 	if err != nil {
+		logger.Error(fmt.Sprintf("cannnot listen port; error: %s", err))
 		log.Fatalf("Cannnot listen port: %s; Error: %s", cfg.Service.Port, err)
 	}
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("Cannnot start rpc: %s; Error: %s", cfg.Service.Port, err)
+		logger.Error(fmt.Sprintf("cannot start service; error: %s", err))
+		log.Fatalf("Cannnot start service: %s; Error: %s", cfg.Service.Port, err)
 	}
 }
