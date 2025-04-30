@@ -1,5 +1,5 @@
 //go:generate mockgen -destination=mock_contract_test.go -package=${GOPACKAGE} -source=contract.go
-package rpc
+package service
 
 import (
 	"context"
@@ -19,7 +19,7 @@ type DbRepo interface {
 }
 
 type UserFriendsRegisterSrv interface {
-	ProduceMessage(message interface{}) error
+	ProduceMessage(ctx context.Context, message any, key any) error
 }
 
 type OptionhubS interface {

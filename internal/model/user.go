@@ -3,8 +3,9 @@ package model
 import (
 	"time"
 
-	user_proto "github.com/s21platform/user-proto/user-proto"
 	"github.com/samber/lo"
+
+	"github.com/s21platform/user-service/pkg/user"
 )
 
 type UserInfo struct {
@@ -38,7 +39,7 @@ type ProfileData struct {
 	OsId      int64      `db:"os_id"`
 }
 
-func (pd *ProfileData) ToDTO(in *user_proto.UpdateProfileIn) {
+func (pd *ProfileData) ToDTO(in *user.UpdateProfileIn) {
 	birthdate, err := time.Parse(time.RFC3339, in.Birthday)
 	bd := lo.Ternary(err != nil, nil, &birthdate)
 	pd.Name = in.Name

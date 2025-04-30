@@ -27,3 +27,258 @@ spec:
   dependsOn:
     - component:optionhub
 #  system: authentication-system  # Можно указать систему, если есть
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: GetUserByLogin-v0
+  description: Получение или создание юзера по логину
+  annotations:
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
+  #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
+  tags:
+    - proto
+spec:
+  type: grpc
+  lifecycle: production
+  owner: user-service-team  # GitHub-логин ответственного
+  definition: |
+    rpc GetUserByLogin (GetUserByLoginIn) returns (GetUserByLoginOut){};
+    
+    message GetUserByLoginIn {
+     string login = 1;
+    }
+    
+    message GetUserByLoginOut {
+     string uuid = 1;
+     bool isNewUser = 2;
+    }
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: IsUserExistByUUID-v0
+  description: Получение информации - существует ли пользователь по логину
+  annotations:
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
+  #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
+  tags:
+    - proto
+spec:
+  type: grpc
+  lifecycle: production
+  owner: user-service-team  # GitHub-логин ответственного
+  definition: |
+    rpc IsUserExistByUUID (IsUserExistByUUIDIn) returns (IsUserExistByUUIDOut){};
+    
+    message IsUserExistByUUIDIn {
+      string uuid = 1;
+    }
+    
+    message IsUserExistByUUIDOut {
+      bool isExist = 1;
+    }
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: GetUserInfoByUUID-v0
+  description: Получение информации по пользователю по его UUID
+  annotations:
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
+  #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
+  tags:
+    - proto
+spec:
+  type: grpc
+  lifecycle: production
+  owner: user-service-team  # GitHub-логин ответственного
+  definition: |
+    rpc GetUserInfoByUUID (GetUserInfoByUUIDIn) returns (GetUserInfoByUUIDOut){};
+    
+    message GetUserInfoByUUIDIn {
+      string uuid = 1;
+    }
+    
+    message GetOs {
+      int64 id = 1;
+      string label = 2;
+    }
+    
+    message GetUserInfoByUUIDOut {
+      string nickname = 1;
+      string avatar = 2;
+      optional string name = 3;
+      optional string surname = 4;
+      optional string birthdate = 5;
+      optional string phone = 6;
+      optional string city = 7;
+      optional string telegram = 8;
+      optional string git = 9;
+      optional GetOs os = 10;
+      optional string work = 11;
+      optional string university = 12;
+      repeated string skills = 13;
+      repeated string hobbies = 14;
+    }
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: GetLoginByUUID-v0
+  description: Получение логина по UUID пользователя
+  annotations:
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
+  #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
+  tags:
+    - proto
+spec:
+  type: grpc
+  lifecycle: production
+  owner: user-service-team  # GitHub-логин ответственного
+  definition: |
+    rpc GetLoginByUUID (GetLoginByUUIDIn) returns (GetLoginByUUIDOut){};
+    
+    message GetLoginByUUIDIn {
+      string uuid = 1;
+    }
+    
+    message GetLoginByUUIDOut {
+      string login = 1;
+    }
+
+---
+
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: GetUserWithOffset-v0
+  description: Получение данных пользователей по логину с офсетом и лимитом
+  annotations:
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
+  #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
+  tags:
+    - proto
+spec:
+  type: grpc
+  lifecycle: production
+  owner: user-service-team  # GitHub-логин ответственного
+  definition: |
+    rpc GetUserWithOffset (GetUserWithOffsetIn) returns (GetUserWithOffsetOut){};
+    
+    message GetUserWithOffsetIn {
+      int64 limit = 1;
+      int64 offset = 2;
+      string nickname = 3;
+    }
+    
+    message User {
+      string nickname = 1;
+      string uuid = 2;
+      string avatar_link = 3;
+      string name = 4;
+      string surname = 5;
+    }
+    
+    message GetUserWithOffsetOut {
+      repeated User user = 1;
+      int64 total = 2;
+    }
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: UpdateProfile-v0
+  description: Обновление данных пользователя
+  annotations:
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
+  #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
+  tags:
+    - proto
+spec:
+  type: grpc
+  lifecycle: production
+  owner: user-service-team  # GitHub-логин ответственного
+  definition: |
+    rpc UpdateProfile (UpdateProfileIn) returns (UpdateProfileOut){};
+    
+    message UpdateProfileIn {
+      string name = 1;
+      string birthday = 2;
+      string telegram = 3;
+      string github = 4;
+      int64 os_id = 5;
+    }
+    
+    message UpdateProfileOut {
+      bool status = 1;
+    }
+
+---
+
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: GetUsersByUUID-v0
+  description: Получение данных пользователей по массиву их UUID
+  annotations:
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
+  #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
+  tags:
+    - proto
+spec:
+  type: grpc
+  lifecycle: production
+  owner: user-service-team  # GitHub-логин ответственного
+  definition: |
+    rpc GetUsersByUUID (GetUsersByUUIDIn) returns (GetUsersByUUIDOut){};
+    
+    message GetUsersByUUIDIn {
+      repeated UsersUUID users_uuid = 1;
+    }
+    
+    message UserInfoMin {
+      string uuid = 1;
+      string login = 2;
+      string last_avatar = 3;
+      string name = 4;
+      string surname = 5;
+    }
+    
+    message GetUsersByUUIDOut {
+      repeated UserInfoMin users_info = 1;
+    }
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: user-set-avatar
+  description: Описание сообщений, потребляемых сервисом
+  annotations:
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
+  #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
+  tags:
+    - kafka
+spec:
+  type: asynchronous
+  lifecycle: production
+  owner: user-service-team  # GitHub-логин ответственного
+  definition: |
+    message NewAvatarRegister {
+      string uuid = 1;
+      string link = 2;
+    }
