@@ -36,7 +36,7 @@ metadata:
   name: GetUserByLogin-v0
   description: Получение или создание юзера по логину
   annotations:
-    github.com/project-slug: s21platform/user-proto  # Укажите правильный репозиторий
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
   #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
   tags:
     - proto
@@ -64,7 +64,7 @@ metadata:
   name: IsUserExistByUUID-v0
   description: Получение информации - существует ли пользователь по логину
   annotations:
-    github.com/project-slug: s21platform/user-proto  # Укажите правильный репозиторий
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
   #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
   tags:
     - proto
@@ -91,7 +91,7 @@ metadata:
   name: GetUserInfoByUUID-v0
   description: Получение информации по пользователю по его UUID
   annotations:
-    github.com/project-slug: s21platform/user-proto  # Укажите правильный репозиторий
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
   #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
   tags:
     - proto
@@ -136,7 +136,7 @@ metadata:
   name: GetLoginByUUID-v0
   description: Получение логина по UUID пользователя
   annotations:
-    github.com/project-slug: s21platform/user-proto  # Укажите правильный репозиторий
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
   #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
   tags:
     - proto
@@ -164,7 +164,7 @@ metadata:
   name: GetUserWithOffset-v0
   description: Получение данных пользователей по логину с офсетом и лимитом
   annotations:
-    github.com/project-slug: s21platform/user-proto  # Укажите правильный репозиторий
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
   #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
   tags:
     - proto
@@ -202,7 +202,7 @@ metadata:
   name: UpdateProfile-v0
   description: Обновление данных пользователя
   annotations:
-    github.com/project-slug: s21platform/user-proto  # Укажите правильный репозиторий
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
   #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
   tags:
     - proto
@@ -234,7 +234,7 @@ metadata:
   name: GetUsersByUUID-v0
   description: Получение данных пользователей по массиву их UUID
   annotations:
-    github.com/project-slug: s21platform/user-proto  # Укажите правильный репозиторий
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
   #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
   tags:
     - proto
@@ -269,7 +269,7 @@ metadata:
   name: user-set-avatar
   description: Описание сообщений, потребляемых сервисом
   annotations:
-    github.com/project-slug: s21platform/user-proto  # Укажите правильный репозиторий
+    github.com/project-slug: s21platform/user-service  # Укажите правильный репозиторий
   #    backstage.io/techdocs-ref: dir:.  # Если планируете использовать TechDocs
   tags:
     - kafka
