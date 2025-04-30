@@ -58,6 +58,10 @@ github.com/s21platform/logger-lib v0.0.6 h1:Aa3wV7zsaUSUkLa4P8stKNKxmKpZEn9dNBsk
 github.com/s21platform/logger-lib v0.0.6/go.mod h1:KjnZvBFSCUriTW9QCp9y1LAPU4gUo3m8PmWNR3Th7MI=
 github.com/s21platform/metrics-lib v0.0.9 h1:nFz4W+xps2nlxpOyGW/JLjZf2sTN/YXomumuC9nXwQ0=
 github.com/s21platform/metrics-lib v0.0.9/go.mod h1:Z1Aiy5uuyEmM//rQmhqkVh0JR8l5sVwe83TQegdNFxQ=
+github.com/s21platform/optionhub-lib v0.0.0-20250430112032-36d285e11db5 h1:z5p8OAdgBYOJzs9F7EEuMTYIzrJrT1nyUhHPIWq+Qvk=
+github.com/s21platform/optionhub-lib v0.0.0-20250430112032-36d285e11db5/go.mod h1:OquJOfrnSULkKEz6/W3A83aNuhG3Z22xuZTE2GkLWvw=
+github.com/s21platform/optionhub-lib v0.0.1 h1:NPbAmNDSJiEN2cy04XOVNAGbFl6/qWHVXXRvtOanOCY=
+github.com/s21platform/optionhub-lib v0.0.1/go.mod h1:OquJOfrnSULkKEz6/W3A83aNuhG3Z22xuZTE2GkLWvw=
 github.com/s21platform/optionhub-proto v1.0.6 h1:PSZvk4keCZy2CWIawBYVeMS9w60Ds/QVZOHDVuyMI3Q=
 github.com/s21platform/optionhub-proto v1.0.6/go.mod h1:XcEajWv9RbE5INy10s4QWpXTXcoa4FWrN80oeKffYew=
 github.com/samber/lo v1.47.0 h1:z7RynLwP5nbyRscyvcD043DWYoOcYRv3mV8lBeqOCLc=

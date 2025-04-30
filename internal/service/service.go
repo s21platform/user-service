@@ -25,13 +25,15 @@ type Server struct {
 	dbRepo     DbRepo
 	ufrR       UserFriendsRegisterSrv
 	optionhubS OptionhubS
+	ohP        OptionhubParser
 }
 
-func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS) *Server {
+func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS, ohP OptionhubParser) *Server {
 	return &Server{
 		dbRepo:     repo,
 		ufrR:       ufrR,
 		optionhubS: optionhubService,
+		ohP:        ohP,
 	}
 }
 
@@ -183,5 +185,22 @@ func (s *Server) UpdateProfile(ctx context.Context, in *user.UpdateProfileIn) (*
 	}
 	return &user.UpdateProfileOut{
 		Status: true,
+	}, nil
+}
+
+func (s *Server) UpdateProfileTest(ctx context.Context, in *user.UpdateProfileTestIn) (*user.UpdateProfileTestOut, error) {
+	f, err := s.ohP.ParseAttributes(in.Data)
+	if err != nil {
+		return nil, err
+	}
+	var data model.ProfileData
+	for _, v := range f {
+		if f, ok := model.AttributeSetters[v.AttributeId]; ok {
+			f(v, &data)
+		}
+	}
+	log.Println(data.Name, data.Birthdate, data.OsId, data.Git, data.Telegram)
+	return &user.UpdateProfileTestOut{
+		Success: true,
 	}, nil
 }

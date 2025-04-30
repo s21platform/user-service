@@ -20,6 +20,8 @@
     - [IsUserExistByUUIDOut](#-IsUserExistByUUIDOut)
     - [UpdateProfileIn](#-UpdateProfileIn)
     - [UpdateProfileOut](#-UpdateProfileOut)
+    - [UpdateProfileTestIn](#-UpdateProfileTestIn)
+    - [UpdateProfileTestOut](#-UpdateProfileTestOut)
     - [User](#-User)
     - [UserInfoMin](#-UserInfoMin)
     - [UsersUUID](#-UsersUUID)
@@ -301,6 +303,36 @@ Message for response
 
 
 
+<a name="-UpdateProfileTestIn"></a>
+
+### UpdateProfileTestIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| data | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="-UpdateProfileTestOut"></a>
+
+### UpdateProfileTestOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| success | [bool](#bool) |  |  |
+
+
+
+
+
+
 <a name="-User"></a>
 
 ### User
@@ -374,6 +406,7 @@ Service for friends
 | GetUserWithOffset | [.GetUserWithOffsetIn](#GetUserWithOffsetIn) | [.GetUserWithOffsetOut](#GetUserWithOffsetOut) |  |
 | UpdateProfile | [.UpdateProfileIn](#UpdateProfileIn) | [.UpdateProfileOut](#UpdateProfileOut) |  |
 | GetUsersByUUID | [.GetUsersByUUIDIn](#GetUsersByUUIDIn) | [.GetUsersByUUIDOut](#GetUsersByUUIDOut) |  |
+| UpdateProfileTest | [.UpdateProfileTestIn](#UpdateProfileTestIn) | [.UpdateProfileTestOut](#UpdateProfileTestOut) |  |
 
  
 

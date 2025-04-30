@@ -13,6 +13,16 @@ service UserService {
   rpc UpdateProfile (UpdateProfileIn) returns (UpdateProfileOut){};
   rpc GetUsersByUUID (GetUsersByUUIDIn) returns (GetUsersByUUIDOut){};
 
+  rpc UpdateProfileTest (UpdateProfileTestIn) returns (UpdateProfileTestOut){};
+
+}
+
+message UpdateProfileTestIn {
+  bytes data = 1;
+}
+
+message UpdateProfileTestOut {
+  bool success = 1;
 }
 
 // Data in request or getting uuid by login. If User doesnt exist - user will be creating
