@@ -30,7 +30,8 @@ type Postgres struct {
 }
 
 type Kafka struct {
-	Server          string `env:"KAFKA_SERVER"`
+	Host            string `env:"KAFKA_HOST"`
+	Port            string `env:"KAFKA_PORT"`
 	FriendsRegister string `env:"USER_FRIENDS_REGISTER"`
 	SetNewAvatar    string `env:"AVATAR_SET_NEW_USER"`
 }

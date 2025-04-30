@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"log"
 
+	"github.com/s21platform/avatar-service/pkg/avatar"
 	"github.com/s21platform/metrics-lib/pkg"
-	userproto "github.com/s21platform/user-proto/user-proto/new_avatar_register"
+
 	"github.com/s21platform/user-service/internal/config"
 )
 
@@ -26,17 +27,16 @@ func convertMessage(bMessage []byte, target interface{}) error {
 	return nil
 }
 
-func (h *Handler) Handler(ctx context.Context, in []byte) {
+func (h *Handler) Handler(ctx context.Context, in []byte) error {
 	m := pkg.FromContext(ctx, config.KeyMetrics)
 
-	var msg userproto.NewAvatarRegister
+	var msg avatar.NewAvatarRegister
 	err := convertMessage(in, &msg)
 
 	if err != nil {
 		m.Increment("new_avatar.error")
 		log.Printf("failed to convert message: %v", err)
-
-		return
+		return err
 	}
 
 	err = h.dbR.UpdateUserAvatar(msg.Uuid, msg.Link)
@@ -44,7 +44,7 @@ func (h *Handler) Handler(ctx context.Context, in []byte) {
 	if err != nil {
 		m.Increment("new_avatar.error")
 		log.Printf("failed to update avatar: %v", err)
-
-		return
+		return err
 	}
+	return nil
 }

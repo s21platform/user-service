@@ -48,7 +48,7 @@ func (s *Server) GetUserByLogin(ctx context.Context, in *user.GetUserByLoginIn) 
 			Email: in.Login,
 			Uuid:  userData.Uuid,
 		}
-		err = s.ufrR.ProduceMessage(mess)
+		err = s.ufrR.ProduceMessage(ctx, mess, userData.Uuid)
 		if err != nil {
 			m.Increment("new_friend.error")
 			log.Println("error send data to kafka:", err)

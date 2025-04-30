@@ -32,7 +32,8 @@ func main() {
 		log.Fatalf("failed to create metrics object: %v", err)
 	}
 
-	producerNewFriendRegister := kafkalib.NewProducer(cfg.Kafka.Server, cfg.Kafka.FriendsRegister)
+	producerCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.FriendsRegister)
+	producerNewFriendRegister := kafkalib.NewProducer(producerCfg)
 	optionhubClient := optoinhub.MustConnect(cfg)
 
 	server := service.New(db, producerNewFriendRegister, optionhubClient)

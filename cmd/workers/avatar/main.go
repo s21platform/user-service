@@ -24,7 +24,8 @@ func main() {
 
 	ctx := context.WithValue(context.Background(), config.KeyMetrics, metrics)
 
-	newAvatarConsumer, err := kafkalib.NewConsumer(cfg.Kafka.Server, cfg.Kafka.SetNewAvatar, metrics)
+	consumerCfg := kafkalib.DefaultConsumerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.SetNewAvatar, "user")
+	newAvatarConsumer, err := kafkalib.NewConsumer(consumerCfg, metrics)
 	if err != nil {
 		log.Println("error create consumer: ", err)
 	}
