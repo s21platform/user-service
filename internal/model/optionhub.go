@@ -13,7 +13,7 @@ const (
 )
 
 var AttributeSetters = map[int64]func(attr model.AttributeValue, model *ProfileData){
-	Attribute_name: func(attr model.AttributeValue, model *ProfileData) {
+	model.Attribute_Name: func(attr model.AttributeValue, model *ProfileData) {
 		if attr.ValueString != nil {
 			model.Name = *attr.ValueString
 		}
