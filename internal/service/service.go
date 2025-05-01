@@ -193,8 +193,7 @@ func (s *Server) UpdateProfileTest(ctx context.Context, in *user.UpdateProfileTe
 	if err != nil {
 		return nil, err
 	}
-	var data model.ProfileData
-	data.ToDTOv2(parsedData)
+	data := model.ToDTOv2(parsedData)
 	log.Println(data.Name, data.Birthdate, data.OsId, data.Git, data.Telegram)
 	return &user.UpdateProfileTestOut{
 		Success: true,

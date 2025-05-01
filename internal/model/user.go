@@ -41,12 +41,14 @@ type ProfileData struct {
 	OsId      int64      `db:"os_id"`
 }
 
-func (pd *ProfileData) ToDTOv2(parsedData []optionhub_lib.AttributeValue) {
+func ToDTOv2(parsedData []optionhub_lib.AttributeValue) ProfileData {
+	var pd ProfileData
 	for _, v := range parsedData {
 		if f, ok := AttributeSetters[v.AttributeId]; ok {
-			f(v, pd)
+			f(v, &pd)
 		}
 	}
+	return pd
 }
 
 func (pd *ProfileData) ToDTO(in *user.UpdateProfileIn) {
