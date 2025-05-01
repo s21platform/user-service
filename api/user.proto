@@ -14,7 +14,15 @@ service UserService {
   rpc GetUsersByUUID (GetUsersByUUIDIn) returns (GetUsersByUUIDOut){};
 
   rpc UpdateProfileTest (UpdateProfileTestIn) returns (UpdateProfileTestOut){};
+ rpc UpdateProfileForm (UpdateProfileFormIn) returns (UpdateProfileFormOut){};
+}
 
+message UpdateProfileFormIn {
+
+}
+
+message UpdateProfileFormOut {
+  bytes data = 1;
 }
 
 message UpdateProfileTestIn {

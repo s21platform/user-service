@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	optionhub_lib "github.com/s21platform/optionhub-lib"
 	"log"
 	"time"
 
@@ -198,4 +200,29 @@ func (s *Server) UpdateProfileTest(ctx context.Context, in *user.UpdateProfileTe
 	return &user.UpdateProfileTestOut{
 		Success: true,
 	}, nil
+}
+
+func (s *Server) UpdateProfileForm(ctx context.Context, _ *user.UpdateProfileFormIn) (*user.UpdateProfileFormOut, error) {
+	name := "alex"
+	age := int64(10)
+
+	// это будет выглядеть изящнее) тут для показа принципа
+	m := []optionhub_lib.AttributeValue{
+		{
+			AttributeId: 1,
+			ValueString: &name,
+		},
+		{
+			AttributeId: 2,
+			ValueInt:    &age,
+		},
+	}
+	d, err := json.Marshal(m)
+	if err != nil {
+		log.Println(err)
+	}
+	return &user.UpdateProfileFormOut{
+		Data: d,
+	}, nil
+
 }

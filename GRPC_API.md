@@ -18,6 +18,8 @@
     - [GetUsersByUUIDOut](#-GetUsersByUUIDOut)
     - [IsUserExistByUUIDIn](#-IsUserExistByUUIDIn)
     - [IsUserExistByUUIDOut](#-IsUserExistByUUIDOut)
+    - [UpdateProfileFormIn](#-UpdateProfileFormIn)
+    - [UpdateProfileFormOut](#-UpdateProfileFormOut)
     - [UpdateProfileIn](#-UpdateProfileIn)
     - [UpdateProfileOut](#-UpdateProfileOut)
     - [UpdateProfileTestIn](#-UpdateProfileTestIn)
@@ -269,6 +271,31 @@ Message for response
 
 
 
+<a name="-UpdateProfileFormIn"></a>
+
+### UpdateProfileFormIn
+
+
+
+
+
+
+
+<a name="-UpdateProfileFormOut"></a>
+
+### UpdateProfileFormOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| data | [bytes](#bytes) |  |  |
+
+
+
+
+
+
 <a name="-UpdateProfileIn"></a>
 
 ### UpdateProfileIn
@@ -407,6 +434,7 @@ Service for friends
 | UpdateProfile | [.UpdateProfileIn](#UpdateProfileIn) | [.UpdateProfileOut](#UpdateProfileOut) |  |
 | GetUsersByUUID | [.GetUsersByUUIDIn](#GetUsersByUUIDIn) | [.GetUsersByUUIDOut](#GetUsersByUUIDOut) |  |
 | UpdateProfileTest | [.UpdateProfileTestIn](#UpdateProfileTestIn) | [.UpdateProfileTestOut](#UpdateProfileTestOut) |  |
+| UpdateProfileForm | [.UpdateProfileFormIn](#UpdateProfileFormIn) | [.UpdateProfileFormOut](#UpdateProfileFormOut) |  |
 
  
 
