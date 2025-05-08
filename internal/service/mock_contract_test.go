@@ -127,6 +127,21 @@ func (mr *MockDbRepoMockRecorder) IsUserExistByUUID(uuid interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUserExistByUUID", reflect.TypeOf((*MockDbRepo)(nil).IsUserExistByUUID), uuid)
 }
 
+// SetFriends mocks base method.
+func (m *MockDbRepo) SetFriends(ctx context.Context, peer1, peer2 string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetFriends", ctx, peer1, peer2)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SetFriends indicates an expected call of SetFriends.
+func (mr *MockDbRepoMockRecorder) SetFriends(ctx, peer1, peer2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetFriends", reflect.TypeOf((*MockDbRepo)(nil).SetFriends), ctx, peer1, peer2)
+}
+
 // UpdateProfile mocks base method.
 func (m *MockDbRepo) UpdateProfile(ctx context.Context, data model.ProfileData, userUuid string) error {
 	m.ctrl.T.Helper()
@@ -165,17 +180,17 @@ func (m *MockUserFriendsRegisterSrv) EXPECT() *MockUserFriendsRegisterSrvMockRec
 }
 
 // ProduceMessage mocks base method.
-func (m *MockUserFriendsRegisterSrv) ProduceMessage(message interface{}) error {
+func (m *MockUserFriendsRegisterSrv) ProduceMessage(ctx context.Context, message, key any) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ProduceMessage", message)
+	ret := m.ctrl.Call(m, "ProduceMessage", ctx, message, key)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // ProduceMessage indicates an expected call of ProduceMessage.
-func (mr *MockUserFriendsRegisterSrvMockRecorder) ProduceMessage(message interface{}) *gomock.Call {
+func (mr *MockUserFriendsRegisterSrvMockRecorder) ProduceMessage(ctx, message, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProduceMessage", reflect.TypeOf((*MockUserFriendsRegisterSrv)(nil).ProduceMessage), message)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProduceMessage", reflect.TypeOf((*MockUserFriendsRegisterSrv)(nil).ProduceMessage), ctx, message, key)
 }
 
 // MockOptionhubS is a mock of OptionhubS interface.
