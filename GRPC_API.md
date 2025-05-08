@@ -18,6 +18,8 @@
     - [GetUsersByUUIDOut](#-GetUsersByUUIDOut)
     - [IsUserExistByUUIDIn](#-IsUserExistByUUIDIn)
     - [IsUserExistByUUIDOut](#-IsUserExistByUUIDOut)
+    - [RemoveFriendsIn](#-RemoveFriendsIn)
+    - [RemoveFriendsOut](#-RemoveFriendsOut)
     - [SetFriendsIn](#-SetFriendsIn)
     - [SetFriendsOut](#-SetFriendsOut)
     - [UpdateProfileIn](#-UpdateProfileIn)
@@ -269,6 +271,36 @@ Message for response
 
 
 
+<a name="-RemoveFriendsIn"></a>
+
+### RemoveFriendsIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| peer | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-RemoveFriendsOut"></a>
+
+### RemoveFriendsOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| success | [bool](#bool) |  |  |
+
+
+
+
+
+
 <a name="-SetFriendsIn"></a>
 
 ### SetFriendsIn
@@ -407,6 +439,7 @@ Service for friends
 | UpdateProfile | [.UpdateProfileIn](#UpdateProfileIn) | [.UpdateProfileOut](#UpdateProfileOut) |  |
 | GetUsersByUUID | [.GetUsersByUUIDIn](#GetUsersByUUIDIn) | [.GetUsersByUUIDOut](#GetUsersByUUIDOut) |  |
 | SetFriends | [.SetFriendsIn](#SetFriendsIn) | [.SetFriendsOut](#SetFriendsOut) |  |
+| RemoveFriends | [.RemoveFriendsIn](#RemoveFriendsIn) | [.RemoveFriendsOut](#RemoveFriendsOut) |  |
 
  
 

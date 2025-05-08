@@ -13,6 +13,7 @@ service UserService {
   rpc UpdateProfile (UpdateProfileIn) returns (UpdateProfileOut){};
   rpc GetUsersByUUID (GetUsersByUUIDIn) returns (GetUsersByUUIDOut){};
   rpc SetFriends(SetFriendsIn) returns (SetFriendsOut){};
+  rpc RemoveFriends(RemoveFriendsIn) returns (RemoveFriendsOut){};
 
 }
 
@@ -144,5 +145,13 @@ message SetFriendsIn {
 }
 
 message SetFriendsOut {
+  bool success = 1;
+}
+
+message RemoveFriendsIn {
+  string peer = 1;
+}
+
+message RemoveFriendsOut{
   bool success = 1;
 }

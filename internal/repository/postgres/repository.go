@@ -54,6 +54,30 @@ func (r *Repository) SetFriends(ctx context.Context, peer1, peer2 string) (bool,
 	return true, nil
 }
 
+func (r *Repository) RemoveFriends(ctx context.Context, peer1, peer2 string) (bool, error) {
+	res, err := r.isRowFriendsExist(ctx, peer1, peer2)
+	if err != nil {
+		return false, fmt.Errorf("failed to check an RowExist: %v", err)
+	}
+	if !res {
+		return false, nil
+	}
+
+	query := sq.Delete("friends").
+		Where(sq.Eq{"initiator": peer1, "user_id": peer2}).
+		PlaceholderFormat(sq.Dollar)
+
+	sqlString, args, err := query.ToSql()
+	if err != nil {
+		return false, fmt.Errorf("failed to build query string: %v", err)
+	}
+	_, err = r.conn.ExecContext(ctx, sqlString, args...)
+	if err != nil {
+		return false, fmt.Errorf("failed to execute query: %v", err)
+	}
+	return true, nil
+}
+
 func (r *Repository) isRowFriendsExist(ctx context.Context, peer1, peer2 string) (bool, error) {
 	var exists bool
 

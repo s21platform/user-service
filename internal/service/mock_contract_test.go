@@ -127,6 +127,21 @@ func (mr *MockDbRepoMockRecorder) IsUserExistByUUID(uuid interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUserExistByUUID", reflect.TypeOf((*MockDbRepo)(nil).IsUserExistByUUID), uuid)
 }
 
+// RemoveFriends mocks base method.
+func (m *MockDbRepo) RemoveFriends(ctx context.Context, peer1, peer2 string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveFriends", ctx, peer1, peer2)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveFriends indicates an expected call of RemoveFriends.
+func (mr *MockDbRepoMockRecorder) RemoveFriends(ctx, peer1, peer2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveFriends", reflect.TypeOf((*MockDbRepo)(nil).RemoveFriends), ctx, peer1, peer2)
+}
+
 // SetFriends mocks base method.
 func (m *MockDbRepo) SetFriends(ctx context.Context, peer1, peer2 string) (bool, error) {
 	m.ctrl.T.Helper()
