@@ -112,6 +112,21 @@ func (mr *MockDbRepoMockRecorder) GetUsersByUUID(uuid interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsersByUUID", reflect.TypeOf((*MockDbRepo)(nil).GetUsersByUUID), uuid)
 }
 
+// IsRowFriendsExist mocks base method.
+func (m *MockDbRepo) IsRowFriendsExist(ctx context.Context, peer1, peer2 string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsRowFriendsExist", ctx, peer1, peer2)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsRowFriendsExist indicates an expected call of IsRowFriendsExist.
+func (mr *MockDbRepoMockRecorder) IsRowFriendsExist(ctx, peer1, peer2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsRowFriendsExist", reflect.TypeOf((*MockDbRepo)(nil).IsRowFriendsExist), ctx, peer1, peer2)
+}
+
 // IsUserExistByUUID mocks base method.
 func (m *MockDbRepo) IsUserExistByUUID(uuid string) (bool, error) {
 	m.ctrl.T.Helper()
@@ -128,12 +143,11 @@ func (mr *MockDbRepoMockRecorder) IsUserExistByUUID(uuid interface{}) *gomock.Ca
 }
 
 // RemoveFriends mocks base method.
-func (m *MockDbRepo) RemoveFriends(ctx context.Context, peer1, peer2 string) (bool, error) {
+func (m *MockDbRepo) RemoveFriends(ctx context.Context, peer1, peer2 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemoveFriends", ctx, peer1, peer2)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // RemoveFriends indicates an expected call of RemoveFriends.
@@ -143,12 +157,11 @@ func (mr *MockDbRepoMockRecorder) RemoveFriends(ctx, peer1, peer2 interface{}) *
 }
 
 // SetFriends mocks base method.
-func (m *MockDbRepo) SetFriends(ctx context.Context, peer1, peer2 string) (bool, error) {
+func (m *MockDbRepo) SetFriends(ctx context.Context, peer1, peer2 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetFriends", ctx, peer1, peer2)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // SetFriends indicates an expected call of SetFriends.
