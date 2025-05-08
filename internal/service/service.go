@@ -191,18 +191,23 @@ func (s *Server) SetFriends(ctx context.Context, in *user.SetFriendsIn) (*user.S
 	logger.AddFuncName("SetFriends")
 	userUUID := ctx.Value(config.KeyUUID).(string)
 	if userUUID == "" {
-		logger.Error("failed to get user UUID in context")
-		return nil, fmt.Errorf("failed to get user UUID in context")
+		logger.Error("failed to get user UUID from context")
+		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
-	res, err := s.dbRepo.SetFriends(ctx, userUUID, in.Peer)
+	res, err := s.dbRepo.IsRowFriendsExist(ctx, userUUID, in.Peer)
 	if err != nil {
-		logger.Error("failed to SetFriends from BD")
-		return nil, err
+		logger.Error("failed to check user friends exist")
+		return nil, fmt.Errorf("failed to check an RowExist: %v", err)
+	}
+	if res {
+		logger.Error("user already in friends")
+		return &user.SetFriendsOut{Success: false}, nil
 	}
 
-	if !res {
-		logger.Info("user already in friends")
-		return &user.SetFriendsOut{Success: false}, nil
+	err = s.dbRepo.SetFriends(ctx, userUUID, in.Peer)
+	if err != nil {
+		logger.Error("failed to SetFriends from dbRepo")
+		return nil, err
 	}
 
 	return &user.SetFriendsOut{Success: true}, nil
@@ -210,20 +215,26 @@ func (s *Server) SetFriends(ctx context.Context, in *user.SetFriendsIn) (*user.S
 
 func (s *Server) RemoveFriends(ctx context.Context, in *user.RemoveFriendsIn) (*user.RemoveFriendsOut, error) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	logger.AddFuncName("SetFriends")
+	logger.AddFuncName("RemoveFriends")
 	userUUID := ctx.Value(config.KeyUUID).(string)
 	if userUUID == "" {
-		logger.Error("failed to get user UUID in context")
-		return nil, fmt.Errorf("failed to get user UUID in context")
+		logger.Error("failed to get user UUID from context")
+		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
-	res, err := s.dbRepo.RemoveFriends(ctx, userUUID, in.Peer)
+	res, err := s.dbRepo.IsRowFriendsExist(ctx, userUUID, in.Peer)
 	if err != nil {
-		logger.Error("failed to RemoveFriends from BD")
-		return nil, err
+		logger.Error("failed to check user friends exist")
+		return nil, fmt.Errorf("failed to check an RowExist: %v", err)
 	}
 	if !res {
-		logger.Info("user already in friends")
+		logger.Error("user already not friends")
 		return &user.RemoveFriendsOut{Success: false}, nil
+	}
+
+	err = s.dbRepo.RemoveFriends(ctx, userUUID, in.Peer)
+	if err != nil {
+		logger.Error("failed to RemoveFriends from dbRepo")
+		return nil, err
 	}
 	return &user.RemoveFriendsOut{Success: true}, nil
 }

@@ -28,65 +28,46 @@ type CheckUser struct {
 	IsNew bool
 }
 
-func (r *Repository) SetFriends(ctx context.Context, peer1, peer2 string) (bool, error) {
-	res, err := r.isRowFriendsExist(ctx, peer1, peer2)
-	if err != nil {
-		return false, fmt.Errorf("failed to check an RowExist: %v", err)
-	}
-	if res {
-		return false, nil
-	}
-
-	query := sq.Insert("friends").
+func (r *Repository) SetFriends(ctx context.Context, peer1, peer2 string) error {
+	sqlString, args, err := sq.Insert("friends").
 		Columns("initiator", "user_id").
 		Values(peer1, peer2).
-		PlaceholderFormat(sq.Dollar)
+		PlaceholderFormat(sq.Dollar).ToSql()
 
-	sqlString, args, err := query.ToSql()
 	if err != nil {
-		return false, fmt.Errorf("failed to build query string: %v", err)
+		return fmt.Errorf("failed to build query string: %v", err)
 	}
 
 	_, err = r.conn.ExecContext(ctx, sqlString, args...)
 	if err != nil {
-		return false, fmt.Errorf("failed to execute query: %v", err)
+		return fmt.Errorf("failed to execute query: %v", err)
 	}
-	return true, nil
+	return nil
 }
 
-func (r *Repository) RemoveFriends(ctx context.Context, peer1, peer2 string) (bool, error) {
-	res, err := r.isRowFriendsExist(ctx, peer1, peer2)
-	if err != nil {
-		return false, fmt.Errorf("failed to check an RowExist: %v", err)
-	}
-	if !res {
-		return false, nil
-	}
-
-	query := sq.Delete("friends").
+func (r *Repository) RemoveFriends(ctx context.Context, peer1, peer2 string) error {
+	sqlString, args, err := sq.Delete("friends").
 		Where(sq.Eq{"initiator": peer1, "user_id": peer2}).
-		PlaceholderFormat(sq.Dollar)
+		PlaceholderFormat(sq.Dollar).ToSql()
 
-	sqlString, args, err := query.ToSql()
 	if err != nil {
-		return false, fmt.Errorf("failed to build query string: %v", err)
+		return fmt.Errorf("failed to build query string: %v", err)
 	}
 	_, err = r.conn.ExecContext(ctx, sqlString, args...)
 	if err != nil {
-		return false, fmt.Errorf("failed to execute query: %v", err)
+		return fmt.Errorf("failed to execute query: %v", err)
 	}
-	return true, nil
+	return nil
 }
 
-func (r *Repository) isRowFriendsExist(ctx context.Context, peer1, peer2 string) (bool, error) {
+func (r *Repository) IsRowFriendsExist(ctx context.Context, peer1, peer2 string) (bool, error) {
 	var exists bool
 
-	query := sq.Select("COUNT(1) > 0").
+	sqlString, args, err := sq.Select("COUNT(1) > 0").
 		From("friends").
 		Where(sq.Eq{"initiator": peer1, "user_id": peer2}).
-		PlaceholderFormat(sq.Dollar)
+		PlaceholderFormat(sq.Dollar).ToSql()
 
-	sqlString, args, err := query.ToSql()
 	if err != nil {
 		return false, fmt.Errorf("failed to build SQL query: %w", err)
 	}

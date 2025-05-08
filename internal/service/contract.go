@@ -16,8 +16,9 @@ type DbRepo interface {
 	GetLoginByUuid(ctx context.Context, uuid string) (string, error)
 	UpdateProfile(ctx context.Context, data model.ProfileData, userUuid string) error
 	GetUsersByUUID(uuid string) (model.UserInfoMin, error)
-	SetFriends(ctx context.Context, peer1, peer2 string) (bool, error)
-	RemoveFriends(ctx context.Context, peer1, peer2 string) (bool, error)
+	SetFriends(ctx context.Context, peer1, peer2 string) error
+	RemoveFriends(ctx context.Context, peer1, peer2 string) error
+	IsRowFriendsExist(ctx context.Context, peer1, peer2 string) (bool, error)
 }
 
 type UserFriendsRegisterSrv interface {
