@@ -28,6 +28,53 @@ type CheckUser struct {
 	IsNew bool
 }
 
+func (r *Repository) SetFriends(ctx context.Context, peer1, peer2 string) (bool, error) {
+	res, err := r.isRowFriendsExist(ctx, peer1, peer2)
+	if err != nil {
+		return false, fmt.Errorf("failed to check an RowExist: %v", err)
+	}
+	if res {
+		return false, nil
+	}
+
+	query := sq.Insert("friends").
+		Columns("initiator", "user_id").
+		Values(peer1, peer2).
+		PlaceholderFormat(sq.Dollar)
+
+	sqlString, args, err := query.ToSql()
+	if err != nil {
+		return false, fmt.Errorf("failed to build query string: %v", err)
+	}
+
+	_, err = r.conn.ExecContext(ctx, sqlString, args...)
+	if err != nil {
+		return false, fmt.Errorf("failed to execute query: %v", err)
+	}
+	return true, nil
+}
+
+func (r *Repository) isRowFriendsExist(ctx context.Context, peer1, peer2 string) (bool, error) {
+	var exists bool
+
+	query := sq.Select("COUNT(1) > 0").
+		From("friends").
+		Where(sq.Eq{"initiator": peer1, "user_id": peer2}).
+		PlaceholderFormat(sq.Dollar)
+
+	sqlString, args, err := query.ToSql()
+	if err != nil {
+		return false, fmt.Errorf("failed to build SQL query: %w", err)
+	}
+
+	err = r.conn.GetContext(ctx, &exists, sqlString, args...)
+	if err != nil {
+		return false, fmt.Errorf("failed to check friends existence: %w", err)
+	}
+
+	return exists, nil
+}
+
 func (r *Repository) UpdateUserAvatar(uuid, link string) error {
 	query := `UPDATE users SET last_avatar_link = $1 WHERE uuid = $2`
 	_, err := r.conn.Exec(query, link, uuid)

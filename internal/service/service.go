@@ -185,3 +185,25 @@ func (s *Server) UpdateProfile(ctx context.Context, in *user.UpdateProfileIn) (*
 		Status: true,
 	}, nil
 }
+
+func (s *Server) SetFriends(ctx context.Context, in *user.SetFriendsIn) (*user.SetFriendsOut, error) {
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("SetFriends")
+	userUUID := ctx.Value(config.KeyUUID).(string)
+	if userUUID == "" {
+		logger.Error("failed to get user UUID in context")
+		return nil, fmt.Errorf("failed to get user UUID in context")
+	}
+	res, err := s.dbRepo.SetFriends(ctx, userUUID, in.Peer)
+	if err != nil {
+		logger.Error("failed to SetFriends from BD")
+		return nil, err
+	}
+
+	if !res {
+		logger.Info("user already in friends")
+		return &user.SetFriendsOut{Success: false}, nil
+	}
+
+	return &user.SetFriendsOut{Success: true}, nil
+}

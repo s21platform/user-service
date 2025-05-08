@@ -12,6 +12,7 @@ service UserService {
   rpc GetUserWithOffset (GetUserWithOffsetIn) returns (GetUserWithOffsetOut){};
   rpc UpdateProfile (UpdateProfileIn) returns (UpdateProfileOut){};
   rpc GetUsersByUUID (GetUsersByUUIDIn) returns (GetUsersByUUIDOut){};
+  rpc SetFriends(SetFriendsIn) returns (SetFriendsOut){};
 
 }
 
@@ -136,4 +137,12 @@ message UserInfoMin {
   string last_avatar = 3;
   string name = 4;
   string surname = 5;
+}
+
+message SetFriendsIn {
+  string peer = 1;
+}
+
+message SetFriendsOut {
+  bool success = 1;
 }
