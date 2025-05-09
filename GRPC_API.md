@@ -4,6 +4,8 @@
 ## Table of Contents
 
 - [api/user.proto](#api_user-proto)
+    - [EmptyFriends](#-EmptyFriends)
+    - [GetCountFriendsOut](#-GetCountFriendsOut)
     - [GetLoginByUUIDIn](#-GetLoginByUUIDIn)
     - [GetLoginByUUIDOut](#-GetLoginByUUIDOut)
     - [GetOs](#-GetOs)
@@ -18,6 +20,10 @@
     - [GetUsersByUUIDOut](#-GetUsersByUUIDOut)
     - [IsUserExistByUUIDIn](#-IsUserExistByUUIDIn)
     - [IsUserExistByUUIDOut](#-IsUserExistByUUIDOut)
+    - [RemoveFriendsIn](#-RemoveFriendsIn)
+    - [RemoveFriendsOut](#-RemoveFriendsOut)
+    - [SetFriendsIn](#-SetFriendsIn)
+    - [SetFriendsOut](#-SetFriendsOut)
     - [UpdateProfileIn](#-UpdateProfileIn)
     - [UpdateProfileOut](#-UpdateProfileOut)
     - [User](#-User)
@@ -34,6 +40,32 @@
 <p align="right"><a href="#top">Top</a></p>
 
 ## api/user.proto
+
+
+
+<a name="-EmptyFriends"></a>
+
+### EmptyFriends
+
+
+
+
+
+
+
+<a name="-GetCountFriendsOut"></a>
+
+### GetCountFriendsOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| subscription | [int64](#int64) |  |  |
+| subscribers | [int64](#int64) |  |  |
+
+
+
 
 
 
@@ -267,6 +299,66 @@ Message for response
 
 
 
+<a name="-RemoveFriendsIn"></a>
+
+### RemoveFriendsIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| peer | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-RemoveFriendsOut"></a>
+
+### RemoveFriendsOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| success | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="-SetFriendsIn"></a>
+
+### SetFriendsIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| peer | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-SetFriendsOut"></a>
+
+### SetFriendsOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| success | [bool](#bool) |  |  |
+
+
+
+
+
+
 <a name="-UpdateProfileIn"></a>
 
 ### UpdateProfileIn
@@ -374,6 +466,9 @@ Service for friends
 | GetUserWithOffset | [.GetUserWithOffsetIn](#GetUserWithOffsetIn) | [.GetUserWithOffsetOut](#GetUserWithOffsetOut) |  |
 | UpdateProfile | [.UpdateProfileIn](#UpdateProfileIn) | [.UpdateProfileOut](#UpdateProfileOut) |  |
 | GetUsersByUUID | [.GetUsersByUUIDIn](#GetUsersByUUIDIn) | [.GetUsersByUUIDOut](#GetUsersByUUIDOut) |  |
+| SetFriends | [.SetFriendsIn](#SetFriendsIn) | [.SetFriendsOut](#SetFriendsOut) |  |
+| RemoveFriends | [.RemoveFriendsIn](#RemoveFriendsIn) | [.RemoveFriendsOut](#RemoveFriendsOut) |  |
+| GetCountFriends | [.EmptyFriends](#EmptyFriends) | [.GetCountFriendsOut](#GetCountFriendsOut) |  |
 
  
 
