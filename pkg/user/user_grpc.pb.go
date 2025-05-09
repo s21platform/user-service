@@ -26,6 +26,8 @@ const (
 	UserService_GetUserWithOffset_FullMethodName = "/UserService/GetUserWithOffset"
 	UserService_UpdateProfile_FullMethodName     = "/UserService/UpdateProfile"
 	UserService_GetUsersByUUID_FullMethodName    = "/UserService/GetUsersByUUID"
+	UserService_UpdateProfileTest_FullMethodName = "/UserService/UpdateProfileTest"
+	UserService_UpdateProfileForm_FullMethodName = "/UserService/UpdateProfileForm"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -42,6 +44,8 @@ type UserServiceClient interface {
 	GetUserWithOffset(ctx context.Context, in *GetUserWithOffsetIn, opts ...grpc.CallOption) (*GetUserWithOffsetOut, error)
 	UpdateProfile(ctx context.Context, in *UpdateProfileIn, opts ...grpc.CallOption) (*UpdateProfileOut, error)
 	GetUsersByUUID(ctx context.Context, in *GetUsersByUUIDIn, opts ...grpc.CallOption) (*GetUsersByUUIDOut, error)
+	UpdateProfileTest(ctx context.Context, in *UpdateProfileTestIn, opts ...grpc.CallOption) (*UpdateProfileTestOut, error)
+	UpdateProfileForm(ctx context.Context, in *UpdateProfileFormIn, opts ...grpc.CallOption) (*UpdateProfileFormOut, error)
 }
 
 type userServiceClient struct {
@@ -122,6 +126,26 @@ func (c *userServiceClient) GetUsersByUUID(ctx context.Context, in *GetUsersByUU
 	return out, nil
 }
 
+func (c *userServiceClient) UpdateProfileTest(ctx context.Context, in *UpdateProfileTestIn, opts ...grpc.CallOption) (*UpdateProfileTestOut, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateProfileTestOut)
+	err := c.cc.Invoke(ctx, UserService_UpdateProfileTest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) UpdateProfileForm(ctx context.Context, in *UpdateProfileFormIn, opts ...grpc.CallOption) (*UpdateProfileFormOut, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateProfileFormOut)
+	err := c.cc.Invoke(ctx, UserService_UpdateProfileForm_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -136,6 +160,8 @@ type UserServiceServer interface {
 	GetUserWithOffset(context.Context, *GetUserWithOffsetIn) (*GetUserWithOffsetOut, error)
 	UpdateProfile(context.Context, *UpdateProfileIn) (*UpdateProfileOut, error)
 	GetUsersByUUID(context.Context, *GetUsersByUUIDIn) (*GetUsersByUUIDOut, error)
+	UpdateProfileTest(context.Context, *UpdateProfileTestIn) (*UpdateProfileTestOut, error)
+	UpdateProfileForm(context.Context, *UpdateProfileFormIn) (*UpdateProfileFormOut, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -166,6 +192,12 @@ func (UnimplementedUserServiceServer) UpdateProfile(context.Context, *UpdateProf
 }
 func (UnimplementedUserServiceServer) GetUsersByUUID(context.Context, *GetUsersByUUIDIn) (*GetUsersByUUIDOut, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUsersByUUID not implemented")
+}
+func (UnimplementedUserServiceServer) UpdateProfileTest(context.Context, *UpdateProfileTestIn) (*UpdateProfileTestOut, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateProfileTest not implemented")
+}
+func (UnimplementedUserServiceServer) UpdateProfileForm(context.Context, *UpdateProfileFormIn) (*UpdateProfileFormOut, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateProfileForm not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -314,6 +346,42 @@ func _UserService_GetUsersByUUID_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_UpdateProfileTest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateProfileTestIn)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UpdateProfileTest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_UpdateProfileTest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UpdateProfileTest(ctx, req.(*UpdateProfileTestIn))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_UpdateProfileForm_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateProfileFormIn)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UpdateProfileForm(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_UpdateProfileForm_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UpdateProfileForm(ctx, req.(*UpdateProfileFormIn))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -348,6 +416,14 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUsersByUUID",
 			Handler:    _UserService_GetUsersByUUID_Handler,
+		},
+		{
+			MethodName: "UpdateProfileTest",
+			Handler:    _UserService_UpdateProfileTest_Handler,
+		},
+		{
+			MethodName: "UpdateProfileForm",
+			Handler:    _UserService_UpdateProfileForm_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

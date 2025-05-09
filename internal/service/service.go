@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	optionhub_lib "github.com/s21platform/optionhub-lib"
 	"log"
 	"time"
 
@@ -25,13 +27,15 @@ type Server struct {
 	dbRepo     DbRepo
 	ufrR       UserFriendsRegisterSrv
 	optionhubS OptionhubS
+	ohP        OptionhubParser
 }
 
-func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS) *Server {
+func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS, ohP OptionhubParser) *Server {
 	return &Server{
 		dbRepo:     repo,
 		ufrR:       ufrR,
 		optionhubS: optionhubService,
+		ohP:        ohP,
 	}
 }
 
@@ -184,4 +188,41 @@ func (s *Server) UpdateProfile(ctx context.Context, in *user.UpdateProfileIn) (*
 	return &user.UpdateProfileOut{
 		Status: true,
 	}, nil
+}
+
+func (s *Server) UpdateProfileTest(ctx context.Context, in *user.UpdateProfileTestIn) (*user.UpdateProfileTestOut, error) {
+	parsedData, err := s.ohP.ParseAttributes(in.Data)
+	if err != nil {
+		return nil, err
+	}
+	data := model.ProfileDataFromAttributes(parsedData)
+	log.Println(data.Name, data.Birthdate, data.OsId, data.Git, data.Telegram)
+	return &user.UpdateProfileTestOut{
+		Success: true,
+	}, nil
+}
+
+func (s *Server) UpdateProfileForm(ctx context.Context, _ *user.UpdateProfileFormIn) (*user.UpdateProfileFormOut, error) {
+	name := "alex"
+	age := int64(10)
+
+	// это будет выглядеть изящнее) тут для показа принципа
+	m := []optionhub_lib.AttributeValue{
+		{
+			AttributeId: 1,
+			ValueString: &name,
+		},
+		{
+			AttributeId: 2,
+			ValueInt:    &age,
+		},
+	}
+	d, err := json.Marshal(m)
+	if err != nil {
+		log.Println(err)
+	}
+	return &user.UpdateProfileFormOut{
+		Data: d,
+	}, nil
+
 }

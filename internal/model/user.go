@@ -5,6 +5,8 @@ import (
 
 	"github.com/samber/lo"
 
+	optionhub_lib "github.com/s21platform/optionhub-lib"
+
 	"github.com/s21platform/user-service/pkg/user"
 )
 
@@ -37,6 +39,16 @@ type ProfileData struct {
 	Telegram  string     `db:"telegram"`
 	Git       string     `db:"git"`
 	OsId      int64      `db:"os_id"`
+}
+
+func ProfileDataFromAttributes(parsedData []optionhub_lib.AttributeValue) ProfileData {
+	var pd ProfileData
+	for _, v := range parsedData {
+		if f, ok := AttributeSetters[v.AttributeId]; ok {
+			f(v, &pd)
+		}
+	}
+	return pd
 }
 
 func (pd *ProfileData) ToDTO(in *user.UpdateProfileIn) {

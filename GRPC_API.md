@@ -18,8 +18,12 @@
     - [GetUsersByUUIDOut](#-GetUsersByUUIDOut)
     - [IsUserExistByUUIDIn](#-IsUserExistByUUIDIn)
     - [IsUserExistByUUIDOut](#-IsUserExistByUUIDOut)
+    - [UpdateProfileFormIn](#-UpdateProfileFormIn)
+    - [UpdateProfileFormOut](#-UpdateProfileFormOut)
     - [UpdateProfileIn](#-UpdateProfileIn)
     - [UpdateProfileOut](#-UpdateProfileOut)
+    - [UpdateProfileTestIn](#-UpdateProfileTestIn)
+    - [UpdateProfileTestOut](#-UpdateProfileTestOut)
     - [User](#-User)
     - [UserInfoMin](#-UserInfoMin)
     - [UsersUUID](#-UsersUUID)
@@ -267,6 +271,31 @@ Message for response
 
 
 
+<a name="-UpdateProfileFormIn"></a>
+
+### UpdateProfileFormIn
+
+
+
+
+
+
+
+<a name="-UpdateProfileFormOut"></a>
+
+### UpdateProfileFormOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| data | [bytes](#bytes) |  |  |
+
+
+
+
+
+
 <a name="-UpdateProfileIn"></a>
 
 ### UpdateProfileIn
@@ -295,6 +324,36 @@ Message for response
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | status | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="-UpdateProfileTestIn"></a>
+
+### UpdateProfileTestIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| data | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="-UpdateProfileTestOut"></a>
+
+### UpdateProfileTestOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| success | [bool](#bool) |  |  |
 
 
 
@@ -374,6 +433,8 @@ Service for friends
 | GetUserWithOffset | [.GetUserWithOffsetIn](#GetUserWithOffsetIn) | [.GetUserWithOffsetOut](#GetUserWithOffsetOut) |  |
 | UpdateProfile | [.UpdateProfileIn](#UpdateProfileIn) | [.UpdateProfileOut](#UpdateProfileOut) |  |
 | GetUsersByUUID | [.GetUsersByUUIDIn](#GetUsersByUUIDIn) | [.GetUsersByUUIDOut](#GetUsersByUUIDOut) |  |
+| UpdateProfileTest | [.UpdateProfileTestIn](#UpdateProfileTestIn) | [.UpdateProfileTestOut](#UpdateProfileTestOut) |  |
+| UpdateProfileForm | [.UpdateProfileFormIn](#UpdateProfileFormIn) | [.UpdateProfileFormOut](#UpdateProfileFormOut) |  |
 
  
 

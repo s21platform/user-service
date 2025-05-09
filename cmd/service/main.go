@@ -10,6 +10,7 @@ import (
 	kafkalib "github.com/s21platform/kafka-lib"
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
+	optionhub_lib "github.com/s21platform/optionhub-lib"
 	"github.com/s21platform/user-service/pkg/user"
 
 	optoinhub "github.com/s21platform/user-service/internal/clients/optionhub"
@@ -35,8 +36,9 @@ func main() {
 	producerCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.FriendsRegister)
 	producerNewFriendRegister := kafkalib.NewProducer(producerCfg)
 	optionhubClient := optoinhub.MustConnect(cfg)
+	optionhubParser := optionhub_lib.New(logger)
 
-	server := service.New(db, producerNewFriendRegister, optionhubClient)
+	server := service.New(db, producerNewFriendRegister, optionhubClient, optionhubParser)
 
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(

@@ -3,6 +3,9 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+
+	optionhub "github.com/s21platform/optionhub-lib"
 
 	"github.com/s21platform/user-service/internal/model"
 	"github.com/s21platform/user-service/internal/repository/postgres"
@@ -24,4 +27,8 @@ type UserFriendsRegisterSrv interface {
 
 type OptionhubS interface {
 	GetOs(ctx context.Context, id *int64) (*model.OS, error)
+}
+
+type OptionhubParser interface {
+	ParseAttributes(data json.RawMessage) ([]optionhub.AttributeValue, error)
 }
