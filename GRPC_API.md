@@ -4,6 +4,8 @@
 ## Table of Contents
 
 - [api/user.proto](#api_user-proto)
+    - [EmptyFriends](#-EmptyFriends)
+    - [GetCountFriendsOut](#-GetCountFriendsOut)
     - [GetLoginByUUIDIn](#-GetLoginByUUIDIn)
     - [GetLoginByUUIDOut](#-GetLoginByUUIDOut)
     - [GetOs](#-GetOs)
@@ -38,6 +40,32 @@
 <p align="right"><a href="#top">Top</a></p>
 
 ## api/user.proto
+
+
+
+<a name="-EmptyFriends"></a>
+
+### EmptyFriends
+
+
+
+
+
+
+
+<a name="-GetCountFriendsOut"></a>
+
+### GetCountFriendsOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| subscription | [int64](#int64) |  |  |
+| subscribers | [int64](#int64) |  |  |
+
+
+
 
 
 
@@ -440,6 +468,7 @@ Service for friends
 | GetUsersByUUID | [.GetUsersByUUIDIn](#GetUsersByUUIDIn) | [.GetUsersByUUIDOut](#GetUsersByUUIDOut) |  |
 | SetFriends | [.SetFriendsIn](#SetFriendsIn) | [.SetFriendsOut](#SetFriendsOut) |  |
 | RemoveFriends | [.RemoveFriendsIn](#RemoveFriendsIn) | [.RemoveFriendsOut](#RemoveFriendsOut) |  |
+| GetCountFriends | [.EmptyFriends](#EmptyFriends) | [.GetCountFriendsOut](#GetCountFriendsOut) |  |
 
  
 

@@ -194,12 +194,12 @@ func (s *Server) SetFriends(ctx context.Context, in *user.SetFriendsIn) (*user.S
 		logger.Error("failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
-	res, err := s.dbRepo.IsRowFriendsExist(ctx, userUUID, in.Peer)
+	areFriends, err := s.dbRepo.CheckFriendship(ctx, userUUID, in.Peer)
 	if err != nil {
 		logger.Error("failed to check user friends exist")
 		return nil, fmt.Errorf("failed to check an RowExist: %v", err)
 	}
-	if res {
+	if areFriends {
 		logger.Error("user already in friends")
 		return &user.SetFriendsOut{Success: false}, nil
 	}
@@ -221,12 +221,12 @@ func (s *Server) RemoveFriends(ctx context.Context, in *user.RemoveFriendsIn) (*
 		logger.Error("failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
-	res, err := s.dbRepo.IsRowFriendsExist(ctx, userUUID, in.Peer)
+	areFriends, err := s.dbRepo.CheckFriendship(ctx, userUUID, in.Peer)
 	if err != nil {
 		logger.Error("failed to check user friends exist")
 		return nil, fmt.Errorf("failed to check an RowExist: %v", err)
 	}
-	if !res {
+	if !areFriends {
 		logger.Error("user already not friends")
 		return &user.RemoveFriendsOut{Success: false}, nil
 	}
@@ -237,4 +237,25 @@ func (s *Server) RemoveFriends(ctx context.Context, in *user.RemoveFriendsIn) (*
 		return nil, err
 	}
 	return &user.RemoveFriendsOut{Success: true}, nil
+}
+
+func (s *Server) GetCountFriends(ctx context.Context, in *user.EmptyFriends) (*user.GetCountFriendsOut, error) {
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("GetCountFriends")
+	userUUID := ctx.Value(config.KeyUUID).(string)
+	if userUUID == "" {
+		logger.Error("failed to get user UUID from context")
+		return nil, fmt.Errorf("failed to get user UUID from context")
+	}
+	subscription, err := s.dbRepo.GetSubscriptionCount(ctx, userUUID)
+	if err != nil {
+		logger.Error("failed to get subscription count")
+		return nil, err
+	}
+	subscribers, err := s.dbRepo.GetSubscribersCount(ctx, userUUID)
+	if err != nil {
+		logger.Error("failed to get subscribers count")
+		return nil, err
+	}
+	return &user.GetCountFriendsOut{Subscription: subscription, Subscribers: subscribers}, nil
 }

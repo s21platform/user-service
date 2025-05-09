@@ -14,8 +14,12 @@ service UserService {
   rpc GetUsersByUUID (GetUsersByUUIDIn) returns (GetUsersByUUIDOut){};
   rpc SetFriends(SetFriendsIn) returns (SetFriendsOut){};
   rpc RemoveFriends(RemoveFriendsIn) returns (RemoveFriendsOut){};
+  rpc GetCountFriends(EmptyFriends) returns (GetCountFriendsOut){};
+
 
 }
+
+message EmptyFriends {}
 
 // Data in request or getting uuid by login. If User doesnt exist - user will be creating
 message GetUserByLoginIn {
@@ -154,4 +158,9 @@ message RemoveFriendsIn {
 
 message RemoveFriendsOut{
   bool success = 1;
+}
+
+message GetCountFriendsOut {
+  int64 subscription = 1;
+  int64 subscribers = 2;
 }

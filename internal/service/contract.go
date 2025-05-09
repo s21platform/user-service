@@ -18,7 +18,9 @@ type DbRepo interface {
 	GetUsersByUUID(uuid string) (model.UserInfoMin, error)
 	SetFriends(ctx context.Context, peer1, peer2 string) error
 	RemoveFriends(ctx context.Context, peer1, peer2 string) error
-	IsRowFriendsExist(ctx context.Context, peer1, peer2 string) (bool, error)
+	CheckFriendship(ctx context.Context, peer1, peer2 string) (bool, error)
+	GetSubscribersCount(ctx context.Context, userUUID string) (int64, error)
+	GetSubscriptionCount(ctx context.Context, userUUID string) (int64, error)
 }
 
 type UserFriendsRegisterSrv interface {

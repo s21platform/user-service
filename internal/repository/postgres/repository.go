@@ -28,6 +28,44 @@ type CheckUser struct {
 	IsNew bool
 }
 
+func (r *Repository) GetSubscribersCount(ctx context.Context, userUUID string) (int64, error) {
+	sqlString, args, err := sq.Select("COUNT(initiator)").
+		From("friends").
+		Where(sq.Eq{"user_id": userUUID}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return 0, fmt.Errorf("failed to build query string: %v", err)
+	}
+
+	var count int64
+	if err := r.conn.GetContext(ctx, &count, sqlString, args...); err != nil {
+		return 0, fmt.Errorf("failed to get subscribers count: %w", err)
+	}
+
+	return count, nil
+}
+
+func (r *Repository) GetSubscriptionCount(ctx context.Context, userUUID string) (int64, error) {
+	sqlString, args, err := sq.Select("COUNT(initiator)").
+		From("friends").
+		Where(sq.Eq{"initiator": userUUID}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return 0, fmt.Errorf("failed to build query string: %v", err)
+	}
+
+	var count int64
+	if err := r.conn.GetContext(ctx, &count, sqlString, args...); err != nil {
+		return 0, fmt.Errorf("failed to get subscription count: %w", err)
+	}
+
+	return count, nil
+}
+
 func (r *Repository) SetFriends(ctx context.Context, peer1, peer2 string) error {
 	sqlString, args, err := sq.Insert("friends").
 		Columns("initiator", "user_id").
@@ -60,7 +98,7 @@ func (r *Repository) RemoveFriends(ctx context.Context, peer1, peer2 string) err
 	return nil
 }
 
-func (r *Repository) IsRowFriendsExist(ctx context.Context, peer1, peer2 string) (bool, error) {
+func (r *Repository) CheckFriendship(ctx context.Context, peer1, peer2 string) (bool, error) {
 	var exists bool
 
 	sqlString, args, err := sq.Select("COUNT(1) > 0").
