@@ -3,11 +3,12 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/s21platform/user-service/internal/pkg/generator"
 	"log"
+	"regexp"
+	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -19,6 +20,7 @@ import (
 
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/s21platform/user-service/internal/model"
+	"github.com/s21platform/user-service/internal/pkg/generator"
 	"github.com/s21platform/user-service/pkg/user"
 )
 
@@ -189,31 +191,53 @@ func (s *Server) UpdateProfile(ctx context.Context, in *user.UpdateProfileIn) (*
 }
 
 func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.CreateUserOut, error) {
-	if in.Email == "" {
-		return nil, fmt.Errorf("email is required")
+	email := strings.TrimSpace(in.Email)
+	if email == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "email is required")
 	}
-	// FIXME  почта может быть не почтового формата. Надо понять критично ли это
+	if len(email) > 100 {
+		return nil, status.Errorf(codes.InvalidArgument, "email exceeds maximum length of 100 characters")
+	}
+	if !regexp.MustCompile(`^[a-zA-Z0-9.!#$%&'*+/=?^_{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$`).MatchString(email) {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid email format")
+	}
+
+	userInfo, err := s.dbRepo.CheckUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	if userInfo != nil {
+		return &user.CreateUserOut{
+			UserUuid: userInfo.UUID,
+			Nickname: userInfo.Nickname,
+		}, nil
+	}
+
 	var nickname string
 	for {
 		nickname = generator.GenerateNickname()
 		isAvailable, err := s.dbRepo.CheckNicknameAvailability(ctx, nickname)
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "cannot check nickname availability: %v", err)
+			return nil, status.Errorf(codes.Internal, "failed to check nickname availability: %v", err)
 		}
 		if isAvailable {
 			break
 		}
 	}
-	user_uuid, err := uuid.NewRandom()
+
+	userUUID, err := uuid.NewRandom()
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "cannot create user uuid: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to generate user UUID: %v", err)
 	}
-	err = s.dbRepo.CreateUser(ctx, user_uuid.String(), in.Email, nickname)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "cannot create user: %v", err)
+	userUUIDStr := userUUID.String()
+
+	if err := s.dbRepo.CreateUser(ctx, userUUIDStr, email, nickname); err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
 	}
+
 	return &user.CreateUserOut{
-		UserUuid: user_uuid.String(),
+		UserUuid: userUUIDStr,
 		Nickname: nickname,
 	}, nil
 }

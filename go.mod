@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/docker/distribution v2.8.3+incompatible
+	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
@@ -25,7 +25,6 @@ require (
 require (
 	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/alexcesaro/statsd v2.0.0+incompatible // indirect
-	github.com/brianvoe/gofakeit/v6 v6.28.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect

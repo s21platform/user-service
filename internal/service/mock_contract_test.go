@@ -37,11 +37,12 @@ func (m *MockDbRepo) EXPECT() *MockDbRepoMockRecorder {
 }
 
 // CheckNicknameAvailability mocks base method.
-func (m *MockDbRepo) CheckNicknameAvailability(ctx context.Context, nickname string) error {
+func (m *MockDbRepo) CheckNicknameAvailability(ctx context.Context, nickname string) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckNicknameAvailability", ctx, nickname)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CheckNicknameAvailability indicates an expected call of CheckNicknameAvailability.
@@ -50,18 +51,33 @@ func (mr *MockDbRepoMockRecorder) CheckNicknameAvailability(ctx, nickname interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckNicknameAvailability", reflect.TypeOf((*MockDbRepo)(nil).CheckNicknameAvailability), ctx, nickname)
 }
 
-// CreateUser mocks base method.
-func (m *MockDbRepo) CreateUser(ctx context.Context, user_uuid, email, nickname string) error {
+// CheckUserByEmail mocks base method.
+func (m *MockDbRepo) CheckUserByEmail(ctx context.Context, email string) (*model.UserAuthInfo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUser", ctx, user_uuid, email, nickname)
+	ret := m.ctrl.Call(m, "CheckUserByEmail", ctx, email)
+	ret0, _ := ret[0].(*model.UserAuthInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckUserByEmail indicates an expected call of CheckUserByEmail.
+func (mr *MockDbRepoMockRecorder) CheckUserByEmail(ctx, email interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserByEmail", reflect.TypeOf((*MockDbRepo)(nil).CheckUserByEmail), ctx, email)
+}
+
+// CreateUser mocks base method.
+func (m *MockDbRepo) CreateUser(ctx context.Context, userUUID, email, nickname string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUser", ctx, userUUID, email, nickname)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateUser indicates an expected call of CreateUser.
-func (mr *MockDbRepoMockRecorder) CreateUser(ctx, user_uuid, email, nickname interface{}) *gomock.Call {
+func (mr *MockDbRepoMockRecorder) CreateUser(ctx, userUUID, email, nickname interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockDbRepo)(nil).CreateUser), ctx, user_uuid, email, nickname)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockDbRepo)(nil).CreateUser), ctx, userUUID, email, nickname)
 }
 
 // GetLoginByUuid mocks base method.

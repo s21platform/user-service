@@ -17,7 +17,8 @@ type DbRepo interface {
 	UpdateProfile(ctx context.Context, data model.ProfileData, userUuid string) error
 	GetUsersByUUID(uuid string) (model.UserInfoMin, error)
 	CheckNicknameAvailability(ctx context.Context, nickname string) (bool, error)
-	CreateUser(ctx context.Context, user_uuid string, email string, nickname string) error
+	CreateUser(ctx context.Context, userUUID string, email string, nickname string) error
+	CheckUserByEmail(ctx context.Context, email string) (*model.UserAuthInfo, error)
 }
 
 type UserFriendsRegisterSrv interface {
