@@ -4,148 +4,169 @@ import (
 	"math/rand"
 	"strings"
 	"time"
-	"unicode"
-
-	"github.com/brianvoe/gofakeit/v6"
 )
 
-// набор согласных для создания более читаемых комбинаций
-var consonants = []string{"b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "z"}
-
-// набор гласных для создания более читаемых комбинаций
-var vowels = []string{"a", "e", "i", "o", "u", "y"}
-
-// интересные краткие слова для генерации
-var interestingWords = []string{
-	"seed", "moon", "star", "sky", "rain", "sun", "air", "fire", "ice",
-	"flow", "wave", "wind", "leaf", "tree", "rock", "cave", "hill", "sand",
-	"dawn", "dusk", "echo", "cake", "soda", "brew", "milk", "wine", "mint",
-	"sage", "rose", "lily", "pine", "oak", "time", "bell", "song", "tune",
-}
-
-// популярные имена разных культур
-var popularNames = []string{
-	"luna", "alex", "mila", "dora", "zora", "tara", "lena", "maya", "elsa",
-	"nora", "lisa", "emma", "yara", "aria", "mira", "sara", "cora", "lola",
-	"kira", "nova", "ava", "nia", "geo", "leo", "kai", "mio", "neo", "ari",
-}
-
-// генерирует простое читаемое слово
-func generateReadableWord(minLength, maxLength int) string {
+func GenerateNickname() (res string) {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
-	// определяем случайную длину слова в заданных пределах
-	wordLength := minLength
-	if maxLength > minLength {
-		wordLength = minLength + r.Intn(maxLength-minLength+1)
+	vowels := []string{"a", "e", "i", "o", "u", "y"}
+
+	initialConsonants := []string{
+		"b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "qu", "r",
+		"s", "t", "v", "w", "x", "z", "ch", "cr", "dr", "fr", "gr", "kl", "ph",
+		"pr", "st", "tr", "sh", "th", "wh",
 	}
 
-	var word strings.Builder
-
-	// начинаем с согласной или гласной с равной вероятностью
-	if r.Intn(2) == 0 {
-		word.WriteString(consonants[r.Intn(len(consonants))])
-	} else {
-		word.WriteString(vowels[r.Intn(len(vowels))])
+	midConsonants := []string{
+		"b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "r",
+		"s", "t", "v", "z", "br", "cr", "dr", "gr", "kr", "pr", "tr",
+		"ss", "tt", "ll", "mm", "nn", "th", "sh", "ph", "st", "sk", "sp",
 	}
 
-	// добавляем слоги, чередуя гласные и согласные
-	for word.Len() < wordLength {
-		lastChar := rune(word.String()[word.Len()-1])
-		if isVowel(lastChar) {
-			word.WriteString(consonants[r.Intn(len(consonants))])
+	finalConsonants := []string{
+		"b", "c", "d", "f", "g", "h", "k", "l", "m", "n", "p", "r",
+		"s", "t", "x", "z", "sh", "th", "ph", "ng", "ch", "gh", "ck",
+	}
+
+	suffixes := []string{
+		"a", "o", "ia", "io", "is", "os", "us", "um", "ix", "ox", "ax",
+		"an", "en", "in", "on", "ar", "er", "ir", "or", "ur", "az", "ez",
+		"iz", "oz", "uz",
+	}
+
+	generatePseudoroot := func(minLength, maxLength int) string {
+		rootLength := minLength
+		if maxLength > minLength {
+			rootLength = minLength + r.Intn(maxLength-minLength+1)
+		}
+
+		var root strings.Builder
+
+		if r.Float64() > 0.2 {
+			root.WriteString(initialConsonants[r.Intn(len(initialConsonants))])
 		} else {
-			word.WriteString(vowels[r.Intn(len(vowels))])
+			root.WriteString(vowels[r.Intn(len(vowels))])
 		}
-	}
 
-	// обрезаем слово до нужной длины
-	if word.Len() > wordLength {
-		return word.String()[:wordLength]
-	}
+		for root.Len() < rootLength {
+			lastChar := root.String()[root.Len()-1]
+			isVowel := false
 
-	return word.String()
-}
+			for _, v := range vowels {
+				if string(lastChar) == v {
+					isVowel = true
+					break
+				}
+			}
 
-// проверяет, является ли символ гласной
-func isVowel(r rune) bool {
-	r = unicode.ToLower(r)
-	for _, v := range vowels {
-		if string(r) == v {
-			return true
+			if isVowel {
+				root.WriteString(midConsonants[r.Intn(len(midConsonants))])
+			} else {
+				root.WriteString(vowels[r.Intn(len(vowels))])
+			}
 		}
+
+		if root.Len() > rootLength {
+			return root.String()[:rootLength]
+		}
+
+		lastChar := root.String()[root.Len()-1]
+		isVowel := false
+
+		for _, v := range vowels {
+			if string(lastChar) == v {
+				isVowel = true
+				break
+			}
+		}
+
+		if !isVowel && r.Float64() > 0.5 {
+			root.WriteString(vowels[r.Intn(len(vowels))])
+		}
+
+		return root.String()
 	}
-	return false
-}
 
-// GenerateNickname создает читаемый никнейм длиной ровно 10 символов
-func GenerateNickname() string {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	gofakeit.Seed(0)
+	length := 10
 
-	// выбираем стратегию генерации
-	strategy := r.Intn(5)
+	strategy := r.Intn(4) + 1
 
-	var nickname string
+	nickname := ""
 
 	switch strategy {
-	case 0:
-		// короткое имя + читаемое слово
-		name := strings.ToLower(popularNames[r.Intn(len(popularNames))])
-		remainingLength := 10 - len(name)
-		if remainingLength > 0 {
-			secondPart := generateReadableWord(remainingLength, remainingLength)
-			nickname = name + secondPart
-		} else {
-			nickname = name[:10]
-		}
-
 	case 1:
-		// известное короткое слово + слоги
-		word := interestingWords[r.Intn(len(interestingWords))]
-		remainingLength := 10 - len(word)
-		suffix := ""
-		for i := 0; i < remainingLength; i++ {
-			if i%2 == 0 {
-				suffix += consonants[r.Intn(len(consonants))]
-			} else {
-				suffix += vowels[r.Intn(len(vowels))]
+		rootLength := length - 2
+		nickname = generatePseudoroot(3, rootLength)
+
+		if len(nickname) <= length-2 {
+			var suitableSuffixes []string
+			for _, suffix := range suffixes {
+				if len(suffix) <= length-len(nickname) {
+					suitableSuffixes = append(suitableSuffixes, suffix)
+				}
+			}
+
+			if len(suitableSuffixes) > 0 {
+				nickname += suitableSuffixes[r.Intn(len(suitableSuffixes))]
 			}
 		}
-		nickname = word + suffix
 
 	case 2:
-		// случайное читаемое слово + одна буква или цифра
-		mainWord := generateReadableWord(8, 9)
-		suffix := ""
-		if len(mainWord) < 10 {
-			remainingLength := 10 - len(mainWord)
-			for i := 0; i < remainingLength; i++ {
-				// добавляем одну букву или цифру
-				suffix += string('a' + rune(r.Intn(26)))
+		firstPartLength := 3 + r.Intn(length-5)
+		firstPart := generatePseudoroot(3, firstPartLength)
+
+		secondPartLength := length - len(firstPart)
+		if secondPartLength >= 2 {
+			secondPart := generatePseudoroot(2, secondPartLength)
+			nickname = firstPart + secondPart
+		} else {
+			nickname = firstPart
+			letters := "abcdefghijklmnopqrstuvwxyz"
+			for i := 0; i < secondPartLength; i++ {
+				nickname += string(letters[r.Intn(len(letters))])
 			}
 		}
-		nickname = mainWord + suffix
 
 	case 3:
-		// два коротких читаемых слова
-		firstWord := generateReadableWord(4, 6)
-		remainingLength := 10 - len(firstWord)
-		secondWord := generateReadableWord(remainingLength, remainingLength)
-		nickname = firstWord + secondWord
+		rootLength := length - 1
+		nickname = generatePseudoroot(3, rootLength)
+
+		if len(nickname) < length {
+			if r.Float64() > 0.6 {
+				nickname += string('0' + rune(r.Intn(10)))
+			} else {
+				letters := "abcdefghijklmnopqrstuvwxyz"
+				nickname += string(letters[r.Intn(len(letters))])
+			}
+		}
 
 	case 4:
-		// полностью случайное но читаемое слово
-		nickname = generateReadableWord(10, 10)
+		nickname = generatePseudoroot(length, length)
 	}
 
-	// обеспечиваем ровно 10 символов
-	if len(nickname) > 10 {
-		nickname = nickname[:10]
-	} else if len(nickname) < 10 {
-		// добавляем случайные буквы, если не хватает
-		for len(nickname) < 10 {
-			nickname += consonants[r.Intn(len(consonants))]
+	if len(nickname) > length {
+		nickname = nickname[:length]
+	}
+
+	for len(nickname) < length {
+		lastChar := nickname[len(nickname)-1]
+		isVowel := false
+
+		for _, v := range vowels {
+			if string(lastChar) == v {
+				isVowel = true
+				break
+			}
+		}
+
+		if isVowel {
+			nickname += finalConsonants[r.Intn(len(finalConsonants))]
+		} else {
+			nickname += vowels[r.Intn(len(vowels))]
+		}
+
+		if len(nickname) > length {
+			nickname = nickname[:length]
 		}
 	}
 
