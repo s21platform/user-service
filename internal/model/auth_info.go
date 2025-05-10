@@ -1,6 +1,6 @@
 package model
 
 type UserAuthInfo struct {
-	UUID     string
-	Nickname string
+	UUID     string `db:"uuid"`
+	Nickname string `db:"login"`
 }
