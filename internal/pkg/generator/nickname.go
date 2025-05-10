@@ -30,14 +30,6 @@ var popularNames = []string{
 	"kira", "nova", "ava", "nia", "geo", "leo", "kai", "mio", "neo", "ari",
 }
 
-// генерирует один случайный слог
-func generateSyllable() string {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	// чередование согласной и гласной
-	return consonants[r.Intn(len(consonants))] + vowels[r.Intn(len(vowels))]
-}
-
 // генерирует простое читаемое слово
 func generateReadableWord(minLength, maxLength int) string {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
