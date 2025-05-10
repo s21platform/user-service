@@ -32,7 +32,6 @@ func GenerateNickname() (res string) {
 		return
 	}
 
-	ost -= len(color)
 	dinner := gofakeit.Dinner()
 	res = (name + surname + color + dinner)[0:10]
 	return
