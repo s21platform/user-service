@@ -2,9 +2,8 @@ syntax = "proto3";
 
 option go_package = "pkg/user";
 
-//Service for friends
+// Service for user info
 service UserService {
-  //Add friends method
   rpc GetUserByLogin (GetUserByLoginIn) returns (GetUserByLoginOut){};
   rpc IsUserExistByUUID (IsUserExistByUUIDIn) returns (IsUserExistByUUIDOut){};
   rpc GetUserInfoByUUID (GetUserInfoByUUIDIn) returns (GetUserInfoByUUIDOut){};
@@ -12,7 +11,7 @@ service UserService {
   rpc GetUserWithOffset (GetUserWithOffsetIn) returns (GetUserWithOffsetOut){};
   rpc UpdateProfile (UpdateProfileIn) returns (UpdateProfileOut){};
   rpc GetUsersByUUID (GetUsersByUUIDIn) returns (GetUsersByUUIDOut){};
-
+  rpc CreateUser (CreateUserIn) returns (CreateUserOut){};
 }
 
 // Data in request or getting uuid by login. If User doesnt exist - user will be creating
@@ -136,4 +135,13 @@ message UserInfoMin {
   string last_avatar = 3;
   string name = 4;
   string surname = 5;
+}
+
+message CreateUserIn {
+  string email = 1;
+}
+
+message CreateUserOut {
+  string nickname = 1;
+  string user_uuid = 2;
 }
