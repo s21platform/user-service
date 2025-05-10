@@ -243,6 +243,47 @@ func (r *Repository) UpdateProfile(ctx context.Context, data model.ProfileData, 
 	return nil
 }
 
+func (r *Repository) CheckNicknameAvailability(ctx context.Context, nickname string) (bool, error) {
+	query, args, err := sq.Select(`login`).
+		From("users").
+		Where(sq.Eq{"login": nickname}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return false, fmt.Errorf("failed to build query: %v", err)
+	}
+
+	var login string
+	err = r.conn.GetContext(ctx, &login, query, args...)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return true, nil
+		}
+		return false, fmt.Errorf("failed to execute query: %v", err)
+	}
+	return false, nil
+}
+
+func (r *Repository) CreateUser(ctx context.Context, user_uuid string, email string, nickname string) error {
+	query, args, err := sq.
+		Insert(`users`).
+		Columns(`login`, `email`, `uuid`, `last_avatar_link`).
+		Values(nickname, email, user_uuid, defaultAvatar).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return fmt.Errorf("failed to build query: %v", err)
+	}
+
+	_, err = r.conn.ExecContext(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("failed to execute query: %v", err)
+	}
+	return nil
+}
+
 func (r *Repository) Close() {
 	_ = r.conn.Close()
 }

@@ -1147,6 +1147,104 @@ func (x *UserInfoMin) GetSurname() string {
 	return ""
 }
 
+type CreateUserIn struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Email string `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+}
+
+func (x *CreateUserIn) Reset() {
+	*x = CreateUserIn{}
+	mi := &file_api_user_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateUserIn) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateUserIn) ProtoMessage() {}
+
+func (x *CreateUserIn) ProtoReflect() protoreflect.Message {
+	mi := &file_api_user_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateUserIn.ProtoReflect.Descriptor instead.
+func (*CreateUserIn) Descriptor() ([]byte, []int) {
+	return file_api_user_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *CreateUserIn) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+type CreateUserOut struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Nickname string `protobuf:"bytes,1,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	UserUuid string `protobuf:"bytes,2,opt,name=user_uuid,json=userUuid,proto3" json:"user_uuid,omitempty"`
+}
+
+func (x *CreateUserOut) Reset() {
+	*x = CreateUserOut{}
+	mi := &file_api_user_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateUserOut) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateUserOut) ProtoMessage() {}
+
+func (x *CreateUserOut) ProtoReflect() protoreflect.Message {
+	mi := &file_api_user_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateUserOut.ProtoReflect.Descriptor instead.
+func (*CreateUserOut) Descriptor() ([]byte, []int) {
+	return file_api_user_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *CreateUserOut) GetNickname() string {
+	if x != nil {
+		return x.Nickname
+	}
+	return ""
+}
+
+func (x *CreateUserOut) GetUserUuid() string {
+	if x != nil {
+		return x.UserUuid
+	}
+	return ""
+}
+
 var File_api_user_proto protoreflect.FileDescriptor
 
 var file_api_user_proto_rawDesc = []byte{
@@ -1264,7 +1362,14 @@ var file_api_user_proto_rawDesc = []byte{
 	0x52, 0x0a, 0x6c, 0x61, 0x73, 0x74, 0x41, 0x76, 0x61, 0x74, 0x61, 0x72, 0x12, 0x12, 0x0a, 0x04,
 	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65,
 	0x12, 0x18, 0x0a, 0x07, 0x73, 0x75, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x07, 0x73, 0x75, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x32, 0xc2, 0x03, 0x0a, 0x0b, 0x55,
+	0x09, 0x52, 0x07, 0x73, 0x75, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x24, 0x0a, 0x0c, 0x43, 0x72,
+	0x65, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x6d,
+	0x61, 0x69, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c,
+	0x22, 0x48, 0x0a, 0x0d, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x4f, 0x75,
+	0x74, 0x12, 0x1a, 0x0a, 0x08, 0x6e, 0x69, 0x63, 0x6b, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x08, 0x6e, 0x69, 0x63, 0x6b, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x1b, 0x0a,
+	0x09, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x55, 0x75, 0x69, 0x64, 0x32, 0xf1, 0x03, 0x0a, 0x0b, 0x55,
 	0x73, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x39, 0x0a, 0x0e, 0x47, 0x65,
 	0x74, 0x55, 0x73, 0x65, 0x72, 0x42, 0x79, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x12, 0x11, 0x2e, 0x47,
 	0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x42, 0x79, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x49, 0x6e, 0x1a,
@@ -1292,9 +1397,12 @@ var file_api_user_proto_rawDesc = []byte{
 	0x75, 0x74, 0x22, 0x00, 0x12, 0x39, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x73,
 	0x42, 0x79, 0x55, 0x55, 0x49, 0x44, 0x12, 0x11, 0x2e, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72,
 	0x73, 0x42, 0x79, 0x55, 0x55, 0x49, 0x44, 0x49, 0x6e, 0x1a, 0x12, 0x2e, 0x47, 0x65, 0x74, 0x55,
-	0x73, 0x65, 0x72, 0x73, 0x42, 0x79, 0x55, 0x55, 0x49, 0x44, 0x4f, 0x75, 0x74, 0x22, 0x00, 0x42,
-	0x0a, 0x5a, 0x08, 0x70, 0x6b, 0x67, 0x2f, 0x75, 0x73, 0x65, 0x72, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x73, 0x65, 0x72, 0x73, 0x42, 0x79, 0x55, 0x55, 0x49, 0x44, 0x4f, 0x75, 0x74, 0x22, 0x00, 0x12,
+	0x2d, 0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x12, 0x0d, 0x2e,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x1a, 0x0e, 0x2e, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x4f, 0x75, 0x74, 0x22, 0x00, 0x42, 0x0a,
+	0x5a, 0x08, 0x70, 0x6b, 0x67, 0x2f, 0x75, 0x73, 0x65, 0x72, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -1309,7 +1417,7 @@ func file_api_user_proto_rawDescGZIP() []byte {
 	return file_api_user_proto_rawDescData
 }
 
-var file_api_user_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_api_user_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_api_user_proto_goTypes = []any{
 	(*GetUserByLoginIn)(nil),        // 0: GetUserByLoginIn
 	(*GetUserByLoginOut)(nil),       // 1: GetUserByLoginOut
@@ -1330,6 +1438,8 @@ var file_api_user_proto_goTypes = []any{
 	(*GetUsersByUUIDOut)(nil),       // 16: GetUsersByUUIDOut
 	(*UsersUUID)(nil),               // 17: UsersUUID
 	(*UserInfoMin)(nil),             // 18: UserInfoMin
+	(*CreateUserIn)(nil),            // 19: CreateUserIn
+	(*CreateUserOut)(nil),           // 20: CreateUserOut
 }
 var file_api_user_proto_depIdxs = []int32{
 	5,  // 0: GetUserInfoByUUIDOut.os:type_name -> GetOs
@@ -1344,15 +1454,17 @@ var file_api_user_proto_depIdxs = []int32{
 	9,  // 9: UserService.GetUserWithOffset:input_type -> GetUserWithOffsetIn
 	13, // 10: UserService.UpdateProfile:input_type -> UpdateProfileIn
 	15, // 11: UserService.GetUsersByUUID:input_type -> GetUsersByUUIDIn
-	1,  // 12: UserService.GetUserByLogin:output_type -> GetUserByLoginOut
-	3,  // 13: UserService.IsUserExistByUUID:output_type -> IsUserExistByUUIDOut
-	6,  // 14: UserService.GetUserInfoByUUID:output_type -> GetUserInfoByUUIDOut
-	8,  // 15: UserService.GetLoginByUUID:output_type -> GetLoginByUUIDOut
-	10, // 16: UserService.GetUserWithOffset:output_type -> GetUserWithOffsetOut
-	14, // 17: UserService.UpdateProfile:output_type -> UpdateProfileOut
-	16, // 18: UserService.GetUsersByUUID:output_type -> GetUsersByUUIDOut
-	12, // [12:19] is the sub-list for method output_type
-	5,  // [5:12] is the sub-list for method input_type
+	19, // 12: UserService.CreateUser:input_type -> CreateUserIn
+	1,  // 13: UserService.GetUserByLogin:output_type -> GetUserByLoginOut
+	3,  // 14: UserService.IsUserExistByUUID:output_type -> IsUserExistByUUIDOut
+	6,  // 15: UserService.GetUserInfoByUUID:output_type -> GetUserInfoByUUIDOut
+	8,  // 16: UserService.GetLoginByUUID:output_type -> GetLoginByUUIDOut
+	10, // 17: UserService.GetUserWithOffset:output_type -> GetUserWithOffsetOut
+	14, // 18: UserService.UpdateProfile:output_type -> UpdateProfileOut
+	16, // 19: UserService.GetUsersByUUID:output_type -> GetUsersByUUIDOut
+	20, // 20: UserService.CreateUser:output_type -> CreateUserOut
+	13, // [13:21] is the sub-list for method output_type
+	5,  // [5:13] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -1370,7 +1482,7 @@ func file_api_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_api_user_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   19,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

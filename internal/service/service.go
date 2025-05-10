@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
+	"github.com/s21platform/user-service/internal/pkg/generator"
 	"log"
 	"time"
 
@@ -183,5 +185,35 @@ func (s *Server) UpdateProfile(ctx context.Context, in *user.UpdateProfileIn) (*
 	}
 	return &user.UpdateProfileOut{
 		Status: true,
+	}, nil
+}
+
+func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.CreateUserOut, error) {
+	if in.Email == "" {
+		return nil, fmt.Errorf("email is required")
+	}
+	// FIXME  почта может быть не почтового формата. Надо понять критично ли это
+	var nickname string
+	for {
+		nickname = generator.GenerateNickname()
+		isAvailable, err := s.dbRepo.CheckNicknameAvailability(ctx, nickname)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "cannot check nickname availability: %v", err)
+		}
+		if isAvailable {
+			break
+		}
+	}
+	user_uuid, err := uuid.NewRandom()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "cannot create user uuid: %v", err)
+	}
+	err = s.dbRepo.CreateUser(ctx, user_uuid.String(), in.Email, nickname)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "cannot create user: %v", err)
+	}
+	return &user.CreateUserOut{
+		UserUuid: user_uuid.String(),
+		Nickname: nickname,
 	}, nil
 }
