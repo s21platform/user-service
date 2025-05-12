@@ -21,6 +21,8 @@ type DbRepo interface {
 	CheckFriendship(ctx context.Context, peer1, peer2 string) (bool, error)
 	GetSubscribersCount(ctx context.Context, userUUID string) (int64, error)
 	GetSubscriptionCount(ctx context.Context, userUUID string) (int64, error)
+	GetPeerFollow(ctx context.Context, userUUID string) ([]string, error)
+	GetWhoFollowPeer(ctx context.Context, userUUID string) ([]string, error)
 }
 
 type UserFriendsRegisterSrv interface {

@@ -9,6 +9,8 @@
     - [GetLoginByUUIDIn](#-GetLoginByUUIDIn)
     - [GetLoginByUUIDOut](#-GetLoginByUUIDOut)
     - [GetOs](#-GetOs)
+    - [GetPeerFollowIn](#-GetPeerFollowIn)
+    - [GetPeerFollowOut](#-GetPeerFollowOut)
     - [GetUserByLoginIn](#-GetUserByLoginIn)
     - [GetUserByLoginOut](#-GetUserByLoginOut)
     - [GetUserInfoByUUIDIn](#-GetUserInfoByUUIDIn)
@@ -18,8 +20,11 @@
     - [GetUserWithOffsetOutAll](#-GetUserWithOffsetOutAll)
     - [GetUsersByUUIDIn](#-GetUsersByUUIDIn)
     - [GetUsersByUUIDOut](#-GetUsersByUUIDOut)
+    - [GetWhoFollowPeerIn](#-GetWhoFollowPeerIn)
+    - [GetWhoFollowPeerOut](#-GetWhoFollowPeerOut)
     - [IsUserExistByUUIDIn](#-IsUserExistByUUIDIn)
     - [IsUserExistByUUIDOut](#-IsUserExistByUUIDOut)
+    - [Peer](#-Peer)
     - [RemoveFriendsIn](#-RemoveFriendsIn)
     - [RemoveFriendsOut](#-RemoveFriendsOut)
     - [SetFriendsIn](#-SetFriendsIn)
@@ -109,6 +114,36 @@
 | ----- | ---- | ----- | ----------- |
 | id | [int64](#int64) |  |  |
 | label | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-GetPeerFollowIn"></a>
+
+### GetPeerFollowIn
+Request for subscription
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| uuid | [string](#string) |  | Peer uuid |
+
+
+
+
+
+
+<a name="-GetPeerFollowOut"></a>
+
+### GetPeerFollowOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| subscription | [Peer](#Peer) | repeated |  |
 
 
 
@@ -269,6 +304,36 @@ Response message containing minimal user information
 
 
 
+<a name="-GetWhoFollowPeerIn"></a>
+
+### GetWhoFollowPeerIn
+Request for subscribers
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| uuid | [string](#string) |  | Peer uuid |
+
+
+
+
+
+
+<a name="-GetWhoFollowPeerOut"></a>
+
+### GetWhoFollowPeerOut
+Response subscribers
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| subscribers | [Peer](#Peer) | repeated | Result of the operation |
+
+
+
+
+
+
 <a name="-IsUserExistByUUIDIn"></a>
 
 ### IsUserExistByUUIDIn
@@ -293,6 +358,21 @@ Message for response
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | isExist | [bool](#bool) |  | Flag of indicate user exist |
+
+
+
+
+
+
+<a name="-Peer"></a>
+
+### Peer
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| uuid | [string](#string) |  | Peer uuid |
 
 
 
@@ -469,6 +549,8 @@ Service for friends
 | SetFriends | [.SetFriendsIn](#SetFriendsIn) | [.SetFriendsOut](#SetFriendsOut) |  |
 | RemoveFriends | [.RemoveFriendsIn](#RemoveFriendsIn) | [.RemoveFriendsOut](#RemoveFriendsOut) |  |
 | GetCountFriends | [.EmptyFriends](#EmptyFriends) | [.GetCountFriendsOut](#GetCountFriendsOut) |  |
+| GetPeerFollow | [.GetPeerFollowIn](#GetPeerFollowIn) | [.GetPeerFollowOut](#GetPeerFollowOut) |  |
+| GetWhoFollowPeer | [.GetWhoFollowPeerIn](#GetWhoFollowPeerIn) | [.GetWhoFollowPeerOut](#GetWhoFollowPeerOut) |  |
 
  
 

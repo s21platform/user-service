@@ -15,8 +15,8 @@ service UserService {
   rpc SetFriends(SetFriendsIn) returns (SetFriendsOut){};
   rpc RemoveFriends(RemoveFriendsIn) returns (RemoveFriendsOut){};
   rpc GetCountFriends(EmptyFriends) returns (GetCountFriendsOut){};
-
-
+  rpc GetPeerFollow(GetPeerFollowIn) returns (GetPeerFollowOut){};
+  rpc GetWhoFollowPeer(GetWhoFollowPeerIn) returns (GetWhoFollowPeerOut){};
 }
 
 message EmptyFriends {}
@@ -163,4 +163,29 @@ message RemoveFriendsOut{
 message GetCountFriendsOut {
   int64 subscription = 1;
   int64 subscribers = 2;
+}
+
+message Peer {
+  //Peer uuid
+  string uuid = 1;
+}
+
+message GetPeerFollowOut {
+  repeated Peer subscription = 1;
+}
+
+//Response subscribers
+message GetWhoFollowPeerOut {
+  //Result of the operation
+  repeated Peer subscribers = 1;
+}
+//Request for subscription
+message GetPeerFollowIn {
+  //Peer uuid
+  string uuid = 1;
+}
+//Request for subscribers
+message GetWhoFollowPeerIn {
+  //Peer uuid
+  string uuid = 1;
 }

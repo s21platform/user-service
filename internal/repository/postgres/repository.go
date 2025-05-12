@@ -28,6 +28,42 @@ type CheckUser struct {
 	IsNew bool
 }
 
+func (r *Repository) GetPeerFollow(ctx context.Context, userUUID string) ([]string, error) {
+	sqlString, args, err := sq.Select("user_id").
+		From("friends").
+		Where(sq.Eq{"initiator": userUUID}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query string: %w", err)
+	}
+
+	var follows []string
+	if err := r.conn.SelectContext(ctx, &follows, sqlString, args...); err != nil {
+		return nil, fmt.Errorf("failed to fetch follows: %w", err)
+	}
+	return follows, nil
+}
+
+func (r *Repository) GetWhoFollowPeer(ctx context.Context, userUUID string) ([]string, error) {
+	sqlString, args, err := sq.Select("initiator").
+		From("friends").
+		Where(sq.Eq{"user_id": userUUID}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query string: %w", err)
+	}
+
+	var follows []string
+	if err := r.conn.SelectContext(ctx, &follows, sqlString, args...); err != nil {
+		return nil, fmt.Errorf("failed to fetch follows: %w", err)
+	}
+	return follows, nil
+}
+
 func (r *Repository) GetSubscribersCount(ctx context.Context, userUUID string) (int64, error) {
 	sqlString, args, err := sq.Select("COUNT(initiator)").
 		From("friends").
