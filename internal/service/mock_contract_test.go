@@ -51,21 +51,6 @@ func (mr *MockDbRepoMockRecorder) CheckNicknameAvailability(ctx, nickname interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckNicknameAvailability", reflect.TypeOf((*MockDbRepo)(nil).CheckNicknameAvailability), ctx, nickname)
 }
 
-// CheckUserByEmail mocks base method.
-func (m *MockDbRepo) CheckUserByEmail(ctx context.Context, email string) (*model.UserAuthInfo, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckUserByEmail", ctx, email)
-	ret0, _ := ret[0].(*model.UserAuthInfo)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CheckUserByEmail indicates an expected call of CheckUserByEmail.
-func (mr *MockDbRepoMockRecorder) CheckUserByEmail(ctx, email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserByEmail", reflect.TypeOf((*MockDbRepo)(nil).CheckUserByEmail), ctx, email)
-}
-
 // CreateUser mocks base method.
 func (m *MockDbRepo) CreateUser(ctx context.Context, userUUID, email, nickname string) error {
 	m.ctrl.T.Helper()
@@ -108,6 +93,21 @@ func (m *MockDbRepo) GetOrSetUserByLogin(email string) (*postgres.CheckUser, err
 func (mr *MockDbRepoMockRecorder) GetOrSetUserByLogin(email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrSetUserByLogin", reflect.TypeOf((*MockDbRepo)(nil).GetOrSetUserByLogin), email)
+}
+
+// GetUserForCreation mocks base method.
+func (m *MockDbRepo) GetUserForCreation(ctx context.Context, email string) (*model.UserAuthInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserForCreation", ctx, email)
+	ret0, _ := ret[0].(*model.UserAuthInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserForCreation indicates an expected call of GetUserForCreation.
+func (mr *MockDbRepoMockRecorder) GetUserForCreation(ctx, email interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserForCreation", reflect.TypeOf((*MockDbRepo)(nil).GetUserForCreation), ctx, email)
 }
 
 // GetUserInfoByUUID mocks base method.

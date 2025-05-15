@@ -243,7 +243,7 @@ func (r *Repository) UpdateProfile(ctx context.Context, data model.ProfileData, 
 	return nil
 }
 
-func (r *Repository) CheckUserByEmail(ctx context.Context, email string) (*model.UserAuthInfo, error) {
+func (r *Repository) GetUserForCreation(ctx context.Context, email string) (*model.UserAuthInfo, error) {
 	query, args, err := sq.
 		Select(`uuid`, `login`).
 		From(`users`).

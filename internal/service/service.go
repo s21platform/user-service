@@ -202,7 +202,7 @@ func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.C
 		return nil, status.Errorf(codes.InvalidArgument, "invalid email format")
 	}
 
-	userInfo, err := s.dbRepo.CheckUserByEmail(ctx, email)
+	userInfo, err := s.dbRepo.GetUserForCreation(ctx, email)
 	if err != nil {
 		return nil, err
 	}

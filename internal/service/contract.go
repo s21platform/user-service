@@ -18,7 +18,7 @@ type DbRepo interface {
 	GetUsersByUUID(uuid string) (model.UserInfoMin, error)
 	CheckNicknameAvailability(ctx context.Context, nickname string) (bool, error)
 	CreateUser(ctx context.Context, userUUID string, email string, nickname string) error
-	CheckUserByEmail(ctx context.Context, email string) (*model.UserAuthInfo, error)
+	GetUserForCreation(ctx context.Context, email string) (*model.UserAuthInfo, error)
 }
 
 type UserFriendsRegisterSrv interface {
