@@ -201,7 +201,7 @@ func (s *Server) SetFriends(ctx context.Context, in *user.SetFriendsIn) (*user.S
 	}
 	if areFriends {
 		logger.Error("user already in friends")
-		return &user.SetFriendsOut{Success: false}, nil
+		return &user.SetFriendsOut{Success: true}, nil
 	}
 
 	err = s.dbRepo.SetFriends(ctx, userUUID, in.Peer)
