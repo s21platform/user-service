@@ -28,6 +28,132 @@ type CheckUser struct {
 	IsNew bool
 }
 
+func (r *Repository) GetPeerFollow(ctx context.Context, userUUID string) ([]string, error) {
+	sqlString, args, err := sq.Select("user_id").
+		From("friends").
+		Where(sq.Eq{"initiator": userUUID}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query string: %w", err)
+	}
+
+	var follows []string
+	if err := r.conn.SelectContext(ctx, &follows, sqlString, args...); err != nil {
+		return nil, fmt.Errorf("failed to fetch follows: %w", err)
+	}
+	return follows, nil
+}
+
+func (r *Repository) GetWhoFollowPeer(ctx context.Context, userUUID string) ([]string, error) {
+	sqlString, args, err := sq.Select("initiator").
+		From("friends").
+		Where(sq.Eq{"user_id": userUUID}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query string: %w", err)
+	}
+
+	var follows []string
+	if err := r.conn.SelectContext(ctx, &follows, sqlString, args...); err != nil {
+		return nil, fmt.Errorf("failed to fetch follows: %w", err)
+	}
+	return follows, nil
+}
+
+func (r *Repository) GetSubscribersCount(ctx context.Context, userUUID string) (int64, error) {
+	sqlString, args, err := sq.Select("COUNT(initiator)").
+		From("friends").
+		Where(sq.Eq{"user_id": userUUID}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return 0, fmt.Errorf("failed to build query string: %v", err)
+	}
+
+	var count int64
+	if err := r.conn.GetContext(ctx, &count, sqlString, args...); err != nil {
+		return 0, fmt.Errorf("failed to get subscribers count: %w", err)
+	}
+
+	return count, nil
+}
+
+func (r *Repository) GetSubscriptionCount(ctx context.Context, userUUID string) (int64, error) {
+	sqlString, args, err := sq.Select("COUNT(initiator)").
+		From("friends").
+		Where(sq.Eq{"initiator": userUUID}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return 0, fmt.Errorf("failed to build query string: %v", err)
+	}
+
+	var count int64
+	if err := r.conn.GetContext(ctx, &count, sqlString, args...); err != nil {
+		return 0, fmt.Errorf("failed to get subscription count: %w", err)
+	}
+
+	return count, nil
+}
+
+func (r *Repository) SetFriends(ctx context.Context, peer1, peer2 string) error {
+	sqlString, args, err := sq.Insert("friends").
+		Columns("initiator", "user_id").
+		Values(peer1, peer2).
+		PlaceholderFormat(sq.Dollar).ToSql()
+
+	if err != nil {
+		return fmt.Errorf("failed to build query string: %v", err)
+	}
+
+	_, err = r.conn.ExecContext(ctx, sqlString, args...)
+	if err != nil {
+		return fmt.Errorf("failed to execute query: %v", err)
+	}
+	return nil
+}
+
+func (r *Repository) RemoveFriends(ctx context.Context, peer1, peer2 string) error {
+	sqlString, args, err := sq.Delete("friends").
+		Where(sq.Eq{"initiator": peer1, "user_id": peer2}).
+		PlaceholderFormat(sq.Dollar).ToSql()
+
+	if err != nil {
+		return fmt.Errorf("failed to build query string: %v", err)
+	}
+	_, err = r.conn.ExecContext(ctx, sqlString, args...)
+	if err != nil {
+		return fmt.Errorf("failed to execute query: %v", err)
+	}
+	return nil
+}
+
+func (r *Repository) CheckFriendship(ctx context.Context, peer1, peer2 string) (bool, error) {
+	var exists bool
+
+	sqlString, args, err := sq.Select("COUNT(1) > 0").
+		From("friends").
+		Where(sq.Eq{"initiator": peer1, "user_id": peer2}).
+		PlaceholderFormat(sq.Dollar).ToSql()
+
+	if err != nil {
+		return false, fmt.Errorf("failed to build SQL query: %w", err)
+	}
+
+	err = r.conn.GetContext(ctx, &exists, sqlString, args...)
+	if err != nil {
+		return false, fmt.Errorf("failed to check friends existence: %w", err)
+	}
+
+	return exists, nil
+}
+
 func (r *Repository) UpdateUserAvatar(uuid, link string) error {
 	query := `UPDATE users SET last_avatar_link = $1 WHERE uuid = $2`
 	_, err := r.conn.Exec(query, link, uuid)

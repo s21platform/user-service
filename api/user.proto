@@ -12,8 +12,14 @@ service UserService {
   rpc GetUserWithOffset (GetUserWithOffsetIn) returns (GetUserWithOffsetOut){};
   rpc UpdateProfile (UpdateProfileIn) returns (UpdateProfileOut){};
   rpc GetUsersByUUID (GetUsersByUUIDIn) returns (GetUsersByUUIDOut){};
-
+  rpc SetFriends(SetFriendsIn) returns (SetFriendsOut){};
+  rpc RemoveFriends(RemoveFriendsIn) returns (RemoveFriendsOut){};
+  rpc GetCountFriends(EmptyFriends) returns (GetCountFriendsOut){};
+  rpc GetPeerFollow(GetPeerFollowIn) returns (GetPeerFollowOut){};
+  rpc GetWhoFollowPeer(GetWhoFollowPeerIn) returns (GetWhoFollowPeerOut){};
 }
+
+message EmptyFriends {}
 
 // Data in request or getting uuid by login. If User doesnt exist - user will be creating
 message GetUserByLoginIn {
@@ -136,4 +142,50 @@ message UserInfoMin {
   string last_avatar = 3;
   string name = 4;
   string surname = 5;
+}
+
+message SetFriendsIn {
+  string peer = 1;
+}
+
+message SetFriendsOut {
+  bool success = 1;
+}
+
+message RemoveFriendsIn {
+  string peer = 1;
+}
+
+message RemoveFriendsOut{
+  bool success = 1;
+}
+
+message GetCountFriendsOut {
+  int64 subscription = 1;
+  int64 subscribers = 2;
+}
+
+message Peer {
+  //Peer uuid
+  string uuid = 1;
+}
+
+message GetPeerFollowOut {
+  repeated Peer subscription = 1;
+}
+
+//Response subscribers
+message GetWhoFollowPeerOut {
+  //Result of the operation
+  repeated Peer subscribers = 1;
+}
+//Request for subscription
+message GetPeerFollowIn {
+  //Peer uuid
+  string uuid = 1;
+}
+//Request for subscribers
+message GetWhoFollowPeerIn {
+  //Peer uuid
+  string uuid = 1;
 }
