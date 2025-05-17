@@ -36,6 +36,21 @@ func (m *MockDbRepo) EXPECT() *MockDbRepoMockRecorder {
 	return m.recorder
 }
 
+// CheckFriendship mocks base method.
+func (m *MockDbRepo) CheckFriendship(ctx context.Context, peer1, peer2 string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckFriendship", ctx, peer1, peer2)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckFriendship indicates an expected call of CheckFriendship.
+func (mr *MockDbRepoMockRecorder) CheckFriendship(ctx, peer1, peer2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckFriendship", reflect.TypeOf((*MockDbRepo)(nil).CheckFriendship), ctx, peer1, peer2)
+}
+
 // CheckNicknameAvailability mocks base method.
 func (m *MockDbRepo) CheckNicknameAvailability(ctx context.Context, nickname string) (bool, error) {
 	m.ctrl.T.Helper()
@@ -93,6 +108,51 @@ func (m *MockDbRepo) GetOrSetUserByLogin(email string) (*postgres.CheckUser, err
 func (mr *MockDbRepoMockRecorder) GetOrSetUserByLogin(email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrSetUserByLogin", reflect.TypeOf((*MockDbRepo)(nil).GetOrSetUserByLogin), email)
+}
+
+// GetPeerFollow mocks base method.
+func (m *MockDbRepo) GetPeerFollow(ctx context.Context, userUUID string) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPeerFollow", ctx, userUUID)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPeerFollow indicates an expected call of GetPeerFollow.
+func (mr *MockDbRepoMockRecorder) GetPeerFollow(ctx, userUUID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPeerFollow", reflect.TypeOf((*MockDbRepo)(nil).GetPeerFollow), ctx, userUUID)
+}
+
+// GetSubscribersCount mocks base method.
+func (m *MockDbRepo) GetSubscribersCount(ctx context.Context, userUUID string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSubscribersCount", ctx, userUUID)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSubscribersCount indicates an expected call of GetSubscribersCount.
+func (mr *MockDbRepoMockRecorder) GetSubscribersCount(ctx, userUUID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSubscribersCount", reflect.TypeOf((*MockDbRepo)(nil).GetSubscribersCount), ctx, userUUID)
+}
+
+// GetSubscriptionCount mocks base method.
+func (m *MockDbRepo) GetSubscriptionCount(ctx context.Context, userUUID string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSubscriptionCount", ctx, userUUID)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSubscriptionCount indicates an expected call of GetSubscriptionCount.
+func (mr *MockDbRepoMockRecorder) GetSubscriptionCount(ctx, userUUID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSubscriptionCount", reflect.TypeOf((*MockDbRepo)(nil).GetSubscriptionCount), ctx, userUUID)
 }
 
 // GetUserForCreation mocks base method.
@@ -156,6 +216,21 @@ func (mr *MockDbRepoMockRecorder) GetUsersByUUID(uuid interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsersByUUID", reflect.TypeOf((*MockDbRepo)(nil).GetUsersByUUID), uuid)
 }
 
+// GetWhoFollowPeer mocks base method.
+func (m *MockDbRepo) GetWhoFollowPeer(ctx context.Context, userUUID string) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetWhoFollowPeer", ctx, userUUID)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetWhoFollowPeer indicates an expected call of GetWhoFollowPeer.
+func (mr *MockDbRepoMockRecorder) GetWhoFollowPeer(ctx, userUUID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWhoFollowPeer", reflect.TypeOf((*MockDbRepo)(nil).GetWhoFollowPeer), ctx, userUUID)
+}
+
 // IsUserExistByUUID mocks base method.
 func (m *MockDbRepo) IsUserExistByUUID(uuid string) (bool, error) {
 	m.ctrl.T.Helper()
@@ -169,6 +244,34 @@ func (m *MockDbRepo) IsUserExistByUUID(uuid string) (bool, error) {
 func (mr *MockDbRepoMockRecorder) IsUserExistByUUID(uuid interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUserExistByUUID", reflect.TypeOf((*MockDbRepo)(nil).IsUserExistByUUID), uuid)
+}
+
+// RemoveFriends mocks base method.
+func (m *MockDbRepo) RemoveFriends(ctx context.Context, peer1, peer2 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveFriends", ctx, peer1, peer2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveFriends indicates an expected call of RemoveFriends.
+func (mr *MockDbRepoMockRecorder) RemoveFriends(ctx, peer1, peer2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveFriends", reflect.TypeOf((*MockDbRepo)(nil).RemoveFriends), ctx, peer1, peer2)
+}
+
+// SetFriends mocks base method.
+func (m *MockDbRepo) SetFriends(ctx context.Context, peer1, peer2 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetFriends", ctx, peer1, peer2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetFriends indicates an expected call of SetFriends.
+func (mr *MockDbRepoMockRecorder) SetFriends(ctx, peer1, peer2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetFriends", reflect.TypeOf((*MockDbRepo)(nil).SetFriends), ctx, peer1, peer2)
 }
 
 // UpdateProfile mocks base method.

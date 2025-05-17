@@ -56,3 +56,7 @@ type UserWithLimit struct {
 	Name       string `db:"name"`
 	Surname    string `db:"surname"`
 }
+
+//type Peer struct {
+//	uuid string
+//}

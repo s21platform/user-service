@@ -16,6 +16,13 @@ type DbRepo interface {
 	GetLoginByUuid(ctx context.Context, uuid string) (string, error)
 	UpdateProfile(ctx context.Context, data model.ProfileData, userUuid string) error
 	GetUsersByUUID(uuid string) (model.UserInfoMin, error)
+	SetFriends(ctx context.Context, peer1, peer2 string) error
+	RemoveFriends(ctx context.Context, peer1, peer2 string) error
+	CheckFriendship(ctx context.Context, peer1, peer2 string) (bool, error)
+	GetSubscribersCount(ctx context.Context, userUUID string) (int64, error)
+	GetSubscriptionCount(ctx context.Context, userUUID string) (int64, error)
+	GetPeerFollow(ctx context.Context, userUUID string) ([]string, error)
+	GetWhoFollowPeer(ctx context.Context, userUUID string) ([]string, error)
 	CheckNicknameAvailability(ctx context.Context, nickname string) (bool, error)
 	CreateUser(ctx context.Context, userUUID string, email string, nickname string) error
 	GetUserForCreation(ctx context.Context, email string) (*model.UserAuthInfo, error)
