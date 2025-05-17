@@ -32,6 +32,10 @@ type UserFriendsRegisterSrv interface {
 	ProduceMessage(ctx context.Context, message any, key any) error
 }
 
+type UserCreatedProducer interface {
+	ProduceMessage(ctx context.Context, message any, key any) error
+}
+
 type OptionhubS interface {
 	GetOs(ctx context.Context, id *int64) (*model.OS, error)
 }

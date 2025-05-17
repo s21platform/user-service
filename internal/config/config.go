@@ -34,6 +34,7 @@ type Kafka struct {
 	Port            string `env:"KAFKA_PORT"`
 	FriendsRegister string `env:"USER_FRIENDS_REGISTER"`
 	SetNewAvatar    string `env:"AVATAR_SET_NEW_USER"`
+	UserCreated     string `env:"USER_CREATED"`
 }
 
 type Metrics struct {

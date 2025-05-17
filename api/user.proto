@@ -198,3 +198,10 @@ message CreateUserOut {
   string nickname = 1;
   string user_uuid = 2;
 }
+
+
+// ---- Kafka Messages
+
+message UserCreatedMessage {
+  string user_uuid = 1;
+}

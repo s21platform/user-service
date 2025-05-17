@@ -34,6 +34,7 @@
     - [UpdateProfileIn](#-UpdateProfileIn)
     - [UpdateProfileOut](#-UpdateProfileOut)
     - [User](#-User)
+    - [UserCreatedMessage](#-UserCreatedMessage)
     - [UserInfoMin](#-UserInfoMin)
     - [UsersUUID](#-UsersUUID)
   
@@ -519,6 +520,21 @@ Message for response
 | avatar_link | [string](#string) |  |  |
 | name | [string](#string) |  |  |
 | surname | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-UserCreatedMessage"></a>
+
+### UserCreatedMessage
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_uuid | [string](#string) |  |  |
 
 
 

@@ -21,6 +21,7 @@ import (
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/s21platform/user-service/internal/model"
 	"github.com/s21platform/user-service/internal/pkg/generator"
+	"github.com/s21platform/user-service/internal/pkg/tx"
 	"github.com/s21platform/user-service/pkg/user"
 )
 
@@ -29,13 +30,15 @@ type Server struct {
 	dbRepo     DbRepo
 	ufrR       UserFriendsRegisterSrv
 	optionhubS OptionhubS
+	ucP        UserCreatedProducer
 }
 
-func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS) *Server {
+func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS, ucP UserCreatedProducer) *Server {
 	return &Server{
 		dbRepo:     repo,
 		ufrR:       ufrR,
 		optionhubS: optionhubService,
+		ucP:        ucP,
 	}
 }
 
@@ -232,7 +235,20 @@ func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.C
 	}
 	userUUIDStr := userUUID.String()
 
-	if err := s.dbRepo.CreateUser(ctx, userUUIDStr, email, nickname); err != nil {
+	err = tx.TxExecute(ctx, func(ctx context.Context) error {
+		if err := s.dbRepo.CreateUser(ctx, userUUIDStr, email, nickname); err != nil {
+			return fmt.Errorf("failed to create user: %v", err)
+		}
+
+		err = s.ucP.ProduceMessage(ctx, user.UserCreatedMessage{
+			UserUuid: userUUIDStr,
+		}, userUUIDStr)
+		if err != nil {
+			return fmt.Errorf("failed to produce message: %v", err)
+		}
+		return nil
+	})
+	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
 	}
 
