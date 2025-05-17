@@ -24,6 +24,7 @@
     - [GetWhoFollowPeerOut](#-GetWhoFollowPeerOut)
     - [IsUserExistByUUIDIn](#-IsUserExistByUUIDIn)
     - [IsUserExistByUUIDOut](#-IsUserExistByUUIDOut)
+    - [NewNicknameRegister](#-NewNicknameRegister)
     - [Peer](#-Peer)
     - [RemoveFriendsIn](#-RemoveFriendsIn)
     - [RemoveFriendsOut](#-RemoveFriendsOut)
@@ -358,6 +359,22 @@ Message for response
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | isExist | [bool](#bool) |  | Flag of indicate user exist |
+
+
+
+
+
+
+<a name="-NewNicknameRegister"></a>
+
+### NewNicknameRegister
+------ kafka messages
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_uuid | [string](#string) |  |  |
+| nickname | [string](#string) |  |  |
 
 
 

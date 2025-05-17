@@ -189,3 +189,9 @@ message GetWhoFollowPeerIn {
   //Peer uuid
   string uuid = 1;
 }
+
+// ------ kafka messages
+message NewNicknameRegister {
+  string user_uuid = 1;
+  string nickname = 2;
+}
