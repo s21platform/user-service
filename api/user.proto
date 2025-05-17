@@ -2,9 +2,8 @@ syntax = "proto3";
 
 option go_package = "pkg/user";
 
-//Service for friends
+// Service for user info
 service UserService {
-  //Add friends method
   rpc GetUserByLogin (GetUserByLoginIn) returns (GetUserByLoginOut){};
   rpc IsUserExistByUUID (IsUserExistByUUIDIn) returns (IsUserExistByUUIDOut){};
   rpc GetUserInfoByUUID (GetUserInfoByUUIDIn) returns (GetUserInfoByUUIDOut){};
@@ -12,6 +11,7 @@ service UserService {
   rpc GetUserWithOffset (GetUserWithOffsetIn) returns (GetUserWithOffsetOut){};
   rpc UpdateProfile (UpdateProfileIn) returns (UpdateProfileOut){};
   rpc GetUsersByUUID (GetUsersByUUIDIn) returns (GetUsersByUUIDOut){};
+  rpc CreateUser (CreateUserIn) returns (CreateUserOut){};
   rpc SetFriends(SetFriendsIn) returns (SetFriendsOut){};
   rpc RemoveFriends(RemoveFriendsIn) returns (RemoveFriendsOut){};
   rpc GetCountFriends(EmptyFriends) returns (GetCountFriendsOut){};
@@ -188,4 +188,20 @@ message GetPeerFollowIn {
 message GetWhoFollowPeerIn {
   //Peer uuid
   string uuid = 1;
+}
+
+message CreateUserIn {
+  string email = 1;
+}
+
+message CreateUserOut {
+  string nickname = 1;
+  string user_uuid = 2;
+}
+
+
+// ---- Kafka Messages
+
+message UserCreatedMessage {
+  string user_uuid = 1;
 }

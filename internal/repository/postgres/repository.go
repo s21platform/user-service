@@ -20,7 +20,7 @@ import (
 const defaultAvatar = "https://storage.yandexcloud.net/space21/avatars/default/logo-discord.jpeg"
 
 type Repository struct {
-	conn *sqlx.DB
+	*sqlx.DB
 }
 
 type CheckUser struct {
@@ -40,7 +40,7 @@ func (r *Repository) GetPeerFollow(ctx context.Context, userUUID string) ([]stri
 	}
 
 	var follows []string
-	if err := r.conn.SelectContext(ctx, &follows, sqlString, args...); err != nil {
+	if err := r.Chk(ctx).SelectContext(ctx, &follows, sqlString, args...); err != nil {
 		return nil, fmt.Errorf("failed to fetch follows: %w", err)
 	}
 	return follows, nil
@@ -58,7 +58,7 @@ func (r *Repository) GetWhoFollowPeer(ctx context.Context, userUUID string) ([]s
 	}
 
 	var follows []string
-	if err := r.conn.SelectContext(ctx, &follows, sqlString, args...); err != nil {
+	if err := r.Chk(ctx).SelectContext(ctx, &follows, sqlString, args...); err != nil {
 		return nil, fmt.Errorf("failed to fetch follows: %w", err)
 	}
 	return follows, nil
@@ -76,7 +76,7 @@ func (r *Repository) GetSubscribersCount(ctx context.Context, userUUID string) (
 	}
 
 	var count int64
-	if err := r.conn.GetContext(ctx, &count, sqlString, args...); err != nil {
+	if err := r.Chk(ctx).GetContext(ctx, &count, sqlString, args...); err != nil {
 		return 0, fmt.Errorf("failed to get subscribers count: %w", err)
 	}
 
@@ -95,7 +95,7 @@ func (r *Repository) GetSubscriptionCount(ctx context.Context, userUUID string) 
 	}
 
 	var count int64
-	if err := r.conn.GetContext(ctx, &count, sqlString, args...); err != nil {
+	if err := r.Chk(ctx).GetContext(ctx, &count, sqlString, args...); err != nil {
 		return 0, fmt.Errorf("failed to get subscription count: %w", err)
 	}
 
@@ -112,7 +112,7 @@ func (r *Repository) SetFriends(ctx context.Context, peer1, peer2 string) error 
 		return fmt.Errorf("failed to build query string: %v", err)
 	}
 
-	_, err = r.conn.ExecContext(ctx, sqlString, args...)
+	_, err = r.Chk(ctx).ExecContext(ctx, sqlString, args...)
 	if err != nil {
 		return fmt.Errorf("failed to execute query: %v", err)
 	}
@@ -127,7 +127,7 @@ func (r *Repository) RemoveFriends(ctx context.Context, peer1, peer2 string) err
 	if err != nil {
 		return fmt.Errorf("failed to build query string: %v", err)
 	}
-	_, err = r.conn.ExecContext(ctx, sqlString, args...)
+	_, err = r.Chk(ctx).ExecContext(ctx, sqlString, args...)
 	if err != nil {
 		return fmt.Errorf("failed to execute query: %v", err)
 	}
@@ -146,7 +146,7 @@ func (r *Repository) CheckFriendship(ctx context.Context, peer1, peer2 string) (
 		return false, fmt.Errorf("failed to build SQL query: %w", err)
 	}
 
-	err = r.conn.GetContext(ctx, &exists, sqlString, args...)
+	err = r.Chk(ctx).GetContext(ctx, &exists, sqlString, args...)
 	if err != nil {
 		return false, fmt.Errorf("failed to check friends existence: %w", err)
 	}
@@ -156,7 +156,7 @@ func (r *Repository) CheckFriendship(ctx context.Context, peer1, peer2 string) (
 
 func (r *Repository) UpdateUserAvatar(uuid, link string) error {
 	query := `UPDATE users SET last_avatar_link = $1 WHERE uuid = $2`
-	_, err := r.conn.Exec(query, link, uuid)
+	_, err := r.Exec(query, link, uuid)
 	if err != nil {
 		return err
 	}
@@ -166,7 +166,7 @@ func (r *Repository) UpdateUserAvatar(uuid, link string) error {
 
 func (r *Repository) IsUserExistByUUID(uuid string) (bool, error) {
 	var exists bool
-	row := r.conn.QueryRow("SELECT 1 FROM users WHERE uuid=$1", uuid)
+	row := r.QueryRow("SELECT 1 FROM users WHERE uuid=$1", uuid)
 	if err := row.Scan(&exists); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			log.Printf("For user: %s - not found row in DB\n", uuid)
@@ -185,7 +185,7 @@ func (r *Repository) GetOrSetUserByLogin(email string) (*CheckUser, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error checking email: %v", err)
 	}
-	err = r.conn.Get(&userUuid, "SELECT uuid FROM users WHERE email=$1", email)
+	err = r.Get(&userUuid, "SELECT uuid FROM users WHERE email=$1", email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			uuid_, err := r.createUser(nickname, email)
@@ -217,7 +217,7 @@ func (r *Repository) createUser(nickname, email string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	tx, err := r.conn.Beginx()
+	tx, err := r.Beginx()
 	if err != nil {
 		return "", fmt.Errorf("failed to start transaction: %v", err)
 	}
@@ -256,7 +256,7 @@ func (r *Repository) GetUserInfoByUUID(ctx context.Context, uuid string) (model.
 		where u.uuid = $1
 	`
 	var result []model.UserInfo
-	err := r.conn.Select(&result, query, uuid)
+	err := r.Chk(ctx).SelectContext(ctx, &result, query, uuid)
 	if err != nil {
 		return model.UserInfo{}, fmt.Errorf("failed to get user info: %v", err)
 	}
@@ -272,7 +272,7 @@ func (r *Repository) GetUsersByUUID(uuid string) (model.UserInfoMin, error) {
 		"join data ON users.id = data.user_id " +
 		"where uuid = $1"
 	var result model.UserInfoMin
-	err := r.conn.Get(&result, query, uuid)
+	err := r.Get(&result, query, uuid)
 	if err != nil {
 		return model.UserInfoMin{}, fmt.Errorf("failed to get user info: %v", err)
 	}
@@ -282,7 +282,7 @@ func (r *Repository) GetUsersByUUID(uuid string) (model.UserInfoMin, error) {
 func (r *Repository) GetUserWithLimit(uuid, nickname string, limit int64, offset int64) ([]model.UserWithLimit, int64, error) {
 	var userWithLimit []model.UserWithLimit
 	likeNick := "%" + nickname + "%"
-	err := r.conn.Select(&userWithLimit, "SELECT users.login, users.uuid, users.last_avatar_link, COALESCE(data.name, '') as name, COALESCE(data.surname, '') as surname "+
+	err := r.Select(&userWithLimit, "SELECT users.login, users.uuid, users.last_avatar_link, COALESCE(data.name, '') as name, COALESCE(data.surname, '') as surname "+
 		"FROM users "+
 		"JOIN data on users.id = data.user_id "+
 		"WHERE users.uuid != $1 AND users.login LIKE $2 LIMIT $3 OFFSET $4;", uuid, likeNick, limit, offset)
@@ -296,7 +296,7 @@ func (r *Repository) GetUserWithLimit(uuid, nickname string, limit int64, offset
 		FROM users 
 		WHERE uuid != $1 AND login LIKE $2
 	`
-	err = r.conn.Get(&total, query, uuid, likeNick)
+	err = r.Get(&total, query, uuid, likeNick)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to get user total: %v", err)
 	}
@@ -311,7 +311,7 @@ func (r *Repository) GetLoginByUuid(ctx context.Context, uuid string) (string, e
 		WHERE uuid=$1
 	`
 	var result string
-	err := r.conn.Get(&result, query, uuid)
+	err := r.Get(&result, query, uuid)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", nil
@@ -322,7 +322,7 @@ func (r *Repository) GetLoginByUuid(ctx context.Context, uuid string) (string, e
 }
 
 func (r *Repository) UpdateProfile(ctx context.Context, data model.ProfileData, userUuid string) error {
-	tx, err := r.conn.Beginx()
+	tx, err := r.Beginx()
 	if err != nil {
 		return fmt.Errorf("failed to start transaction: %v", err)
 	}
@@ -369,8 +369,72 @@ func (r *Repository) UpdateProfile(ctx context.Context, data model.ProfileData, 
 	return nil
 }
 
+func (r *Repository) GetUserForCreation(ctx context.Context, email string) (*model.UserAuthInfo, error) {
+	query, args, err := sq.
+		Select(`uuid`, `login`).
+		From(`users`).
+		Where(sq.Eq{`email`: email}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %v", err)
+	}
+
+	var user model.UserAuthInfo
+	err = r.Chk(ctx).GetContext(ctx, &user, query, args...)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to query user by email: %v", err)
+	}
+
+	return &user, nil
+}
+
+func (r *Repository) CheckNicknameAvailability(ctx context.Context, nickname string) (bool, error) {
+	query, args, err := sq.Select(`login`).
+		From("users").
+		Where(sq.Eq{"login": nickname}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return false, fmt.Errorf("failed to build query: %v", err)
+	}
+
+	var login string
+	err = r.Chk(ctx).GetContext(ctx, &login, query, args...)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return true, nil
+		}
+		return false, fmt.Errorf("failed to execute query: %v", err)
+	}
+	return false, nil
+}
+
+func (r *Repository) CreateUser(ctx context.Context, userUUID string, email string, nickname string) error {
+	query, args, err := sq.
+		Insert(`users`).
+		Columns(`login`, `email`, `uuid`, `last_avatar_link`).
+		Values(nickname, email, userUUID, defaultAvatar).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return fmt.Errorf("failed to build query: %v", err)
+	}
+
+	_, err = r.Chk(ctx).ExecContext(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("failed to execute query: %v", err)
+	}
+	return nil
+}
+
 func (r *Repository) Close() {
-	_ = r.conn.Close()
+	_ = r.DB.Close()
 }
 
 func New(cfg *config.Config) *Repository {

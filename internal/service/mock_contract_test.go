@@ -51,6 +51,35 @@ func (mr *MockDbRepoMockRecorder) CheckFriendship(ctx, peer1, peer2 interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckFriendship", reflect.TypeOf((*MockDbRepo)(nil).CheckFriendship), ctx, peer1, peer2)
 }
 
+// CheckNicknameAvailability mocks base method.
+func (m *MockDbRepo) CheckNicknameAvailability(ctx context.Context, nickname string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckNicknameAvailability", ctx, nickname)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckNicknameAvailability indicates an expected call of CheckNicknameAvailability.
+func (mr *MockDbRepoMockRecorder) CheckNicknameAvailability(ctx, nickname interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckNicknameAvailability", reflect.TypeOf((*MockDbRepo)(nil).CheckNicknameAvailability), ctx, nickname)
+}
+
+// CreateUser mocks base method.
+func (m *MockDbRepo) CreateUser(ctx context.Context, userUUID, email, nickname string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUser", ctx, userUUID, email, nickname)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateUser indicates an expected call of CreateUser.
+func (mr *MockDbRepoMockRecorder) CreateUser(ctx, userUUID, email, nickname interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockDbRepo)(nil).CreateUser), ctx, userUUID, email, nickname)
+}
+
 // GetLoginByUuid mocks base method.
 func (m *MockDbRepo) GetLoginByUuid(ctx context.Context, uuid string) (string, error) {
 	m.ctrl.T.Helper()
@@ -124,6 +153,21 @@ func (m *MockDbRepo) GetSubscriptionCount(ctx context.Context, userUUID string) 
 func (mr *MockDbRepoMockRecorder) GetSubscriptionCount(ctx, userUUID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSubscriptionCount", reflect.TypeOf((*MockDbRepo)(nil).GetSubscriptionCount), ctx, userUUID)
+}
+
+// GetUserForCreation mocks base method.
+func (m *MockDbRepo) GetUserForCreation(ctx context.Context, email string) (*model.UserAuthInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserForCreation", ctx, email)
+	ret0, _ := ret[0].(*model.UserAuthInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserForCreation indicates an expected call of GetUserForCreation.
+func (mr *MockDbRepoMockRecorder) GetUserForCreation(ctx, email interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserForCreation", reflect.TypeOf((*MockDbRepo)(nil).GetUserForCreation), ctx, email)
 }
 
 // GetUserInfoByUUID mocks base method.
@@ -279,6 +323,43 @@ func (m *MockUserFriendsRegisterSrv) ProduceMessage(ctx context.Context, message
 func (mr *MockUserFriendsRegisterSrvMockRecorder) ProduceMessage(ctx, message, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProduceMessage", reflect.TypeOf((*MockUserFriendsRegisterSrv)(nil).ProduceMessage), ctx, message, key)
+}
+
+// MockUserCreatedProducer is a mock of UserCreatedProducer interface.
+type MockUserCreatedProducer struct {
+	ctrl     *gomock.Controller
+	recorder *MockUserCreatedProducerMockRecorder
+}
+
+// MockUserCreatedProducerMockRecorder is the mock recorder for MockUserCreatedProducer.
+type MockUserCreatedProducerMockRecorder struct {
+	mock *MockUserCreatedProducer
+}
+
+// NewMockUserCreatedProducer creates a new mock instance.
+func NewMockUserCreatedProducer(ctrl *gomock.Controller) *MockUserCreatedProducer {
+	mock := &MockUserCreatedProducer{ctrl: ctrl}
+	mock.recorder = &MockUserCreatedProducerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockUserCreatedProducer) EXPECT() *MockUserCreatedProducerMockRecorder {
+	return m.recorder
+}
+
+// ProduceMessage mocks base method.
+func (m *MockUserCreatedProducer) ProduceMessage(ctx context.Context, message, key any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ProduceMessage", ctx, message, key)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ProduceMessage indicates an expected call of ProduceMessage.
+func (mr *MockUserCreatedProducerMockRecorder) ProduceMessage(ctx, message, key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProduceMessage", reflect.TypeOf((*MockUserCreatedProducer)(nil).ProduceMessage), ctx, message, key)
 }
 
 // MockOptionhubS is a mock of OptionhubS interface.
