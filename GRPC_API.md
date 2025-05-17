@@ -24,7 +24,6 @@
     - [GetWhoFollowPeerOut](#-GetWhoFollowPeerOut)
     - [IsUserExistByUUIDIn](#-IsUserExistByUUIDIn)
     - [IsUserExistByUUIDOut](#-IsUserExistByUUIDOut)
-    - [NewNicknameRegister](#-NewNicknameRegister)
     - [Peer](#-Peer)
     - [RemoveFriendsIn](#-RemoveFriendsIn)
     - [RemoveFriendsOut](#-RemoveFriendsOut)
@@ -34,6 +33,7 @@
     - [UpdateProfileOut](#-UpdateProfileOut)
     - [User](#-User)
     - [UserInfoMin](#-UserInfoMin)
+    - [UserNicknameUpdated](#-UserNicknameUpdated)
     - [UsersUUID](#-UsersUUID)
   
     - [UserService](#-UserService)
@@ -365,22 +365,6 @@ Message for response
 
 
 
-<a name="-NewNicknameRegister"></a>
-
-### NewNicknameRegister
------- kafka messages
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| user_uuid | [string](#string) |  |  |
-| nickname | [string](#string) |  |  |
-
-
-
-
-
-
 <a name="-Peer"></a>
 
 ### Peer
@@ -522,6 +506,22 @@ Min user information structure
 | last_avatar | [string](#string) |  |  |
 | name | [string](#string) |  |  |
 | surname | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-UserNicknameUpdated"></a>
+
+### UserNicknameUpdated
+------ kafka messages
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_uuid | [string](#string) |  |  |
+| nickname | [string](#string) |  |  |
 
 
 

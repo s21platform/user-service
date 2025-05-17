@@ -1649,7 +1649,7 @@ func (x *GetWhoFollowPeerIn) GetUuid() string {
 }
 
 // ------ kafka messages
-type NewNicknameRegister struct {
+type UserNicknameUpdated struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -1658,20 +1658,20 @@ type NewNicknameRegister struct {
 	Nickname string `protobuf:"bytes,2,opt,name=nickname,proto3" json:"nickname,omitempty"`
 }
 
-func (x *NewNicknameRegister) Reset() {
-	*x = NewNicknameRegister{}
+func (x *UserNicknameUpdated) Reset() {
+	*x = UserNicknameUpdated{}
 	mi := &file_api_user_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *NewNicknameRegister) String() string {
+func (x *UserNicknameUpdated) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*NewNicknameRegister) ProtoMessage() {}
+func (*UserNicknameUpdated) ProtoMessage() {}
 
-func (x *NewNicknameRegister) ProtoReflect() protoreflect.Message {
+func (x *UserNicknameUpdated) ProtoReflect() protoreflect.Message {
 	mi := &file_api_user_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1683,19 +1683,19 @@ func (x *NewNicknameRegister) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use NewNicknameRegister.ProtoReflect.Descriptor instead.
-func (*NewNicknameRegister) Descriptor() ([]byte, []int) {
+// Deprecated: Use UserNicknameUpdated.ProtoReflect.Descriptor instead.
+func (*UserNicknameUpdated) Descriptor() ([]byte, []int) {
 	return file_api_user_proto_rawDescGZIP(), []int{30}
 }
 
-func (x *NewNicknameRegister) GetUserUuid() string {
+func (x *UserNicknameUpdated) GetUserUuid() string {
 	if x != nil {
 		return x.UserUuid
 	}
 	return ""
 }
 
-func (x *NewNicknameRegister) GetNickname() string {
+func (x *UserNicknameUpdated) GetNickname() string {
 	if x != nil {
 		return x.Nickname
 	}
@@ -1851,8 +1851,8 @@ var file_api_user_proto_rawDesc = []byte{
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x75, 0x75, 0x69, 0x64, 0x22, 0x28, 0x0a, 0x12,
 	0x47, 0x65, 0x74, 0x57, 0x68, 0x6f, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x50, 0x65, 0x65, 0x72,
 	0x49, 0x6e, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x04, 0x75, 0x75, 0x69, 0x64, 0x22, 0x4e, 0x0a, 0x13, 0x4e, 0x65, 0x77, 0x4e, 0x69, 0x63,
-	0x6b, 0x6e, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x12, 0x1b, 0x0a,
+	0x52, 0x04, 0x75, 0x75, 0x69, 0x64, 0x22, 0x4e, 0x0a, 0x13, 0x55, 0x73, 0x65, 0x72, 0x4e, 0x69,
+	0x63, 0x6b, 0x6e, 0x61, 0x6d, 0x65, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x12, 0x1b, 0x0a,
 	0x09, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
 	0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x55, 0x75, 0x69, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x6e, 0x69,
 	0x63, 0x6b, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6e, 0x69,
@@ -1950,7 +1950,7 @@ var file_api_user_proto_goTypes = []any{
 	(*GetWhoFollowPeerOut)(nil),     // 27: GetWhoFollowPeerOut
 	(*GetPeerFollowIn)(nil),         // 28: GetPeerFollowIn
 	(*GetWhoFollowPeerIn)(nil),      // 29: GetWhoFollowPeerIn
-	(*NewNicknameRegister)(nil),     // 30: NewNicknameRegister
+	(*UserNicknameUpdated)(nil),     // 30: UserNicknameUpdated
 }
 var file_api_user_proto_depIdxs = []int32{
 	6,  // 0: GetUserInfoByUUIDOut.os:type_name -> GetOs
