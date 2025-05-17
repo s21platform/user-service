@@ -18,7 +18,7 @@ func UnaryInterceptor(
 	handler grpc.UnaryHandler,
 ) (interface{}, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
-	if info.FullMethod == "/UserService/GetUserByLogin" {
+	if info.FullMethod == "/UserService/GetUserByLogin" || info.FullMethod == "/UserService/CreateUser" {
 		return handler(ctx, req)
 	}
 	if ok {

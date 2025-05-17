@@ -10,13 +10,14 @@ import (
 	kafkalib "github.com/s21platform/kafka-lib"
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
-	"github.com/s21platform/user-service/pkg/user"
 
 	optoinhub "github.com/s21platform/user-service/internal/clients/optionhub"
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/s21platform/user-service/internal/infra"
+	"github.com/s21platform/user-service/internal/pkg/tx"
 	"github.com/s21platform/user-service/internal/repository/postgres"
 	"github.com/s21platform/user-service/internal/service"
+	"github.com/s21platform/user-service/pkg/user"
 )
 
 func main() {
@@ -36,13 +37,17 @@ func main() {
 	producerNewFriendRegister := kafkalib.NewProducer(producerCfg)
 	optionhubClient := optoinhub.MustConnect(cfg)
 
-	server := service.New(db, producerNewFriendRegister, optionhubClient)
+	prcUserCreatedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.UserCreated)
+	prcUserCreated := kafkalib.NewProducer(prcUserCreatedCfg)
+
+	server := service.New(db, producerNewFriendRegister, optionhubClient, prcUserCreated)
 
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			infra.Logger(logger),
 			infra.UnaryInterceptor,
 			infra.MetricsInterceptor(metrics),
+			tx.TxMiddleWire(db),
 		),
 	)
 	user.RegisterUserServiceServer(s, server)

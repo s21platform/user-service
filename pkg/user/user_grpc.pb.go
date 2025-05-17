@@ -26,6 +26,7 @@ const (
 	UserService_GetUserWithOffset_FullMethodName = "/UserService/GetUserWithOffset"
 	UserService_UpdateProfile_FullMethodName     = "/UserService/UpdateProfile"
 	UserService_GetUsersByUUID_FullMethodName    = "/UserService/GetUsersByUUID"
+	UserService_CreateUser_FullMethodName        = "/UserService/CreateUser"
 	UserService_SetFriends_FullMethodName        = "/UserService/SetFriends"
 	UserService_RemoveFriends_FullMethodName     = "/UserService/RemoveFriends"
 	UserService_GetCountFriends_FullMethodName   = "/UserService/GetCountFriends"
@@ -37,9 +38,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// Service for friends
+// Service for user info
 type UserServiceClient interface {
-	// Add friends method
 	GetUserByLogin(ctx context.Context, in *GetUserByLoginIn, opts ...grpc.CallOption) (*GetUserByLoginOut, error)
 	IsUserExistByUUID(ctx context.Context, in *IsUserExistByUUIDIn, opts ...grpc.CallOption) (*IsUserExistByUUIDOut, error)
 	GetUserInfoByUUID(ctx context.Context, in *GetUserInfoByUUIDIn, opts ...grpc.CallOption) (*GetUserInfoByUUIDOut, error)
@@ -47,6 +47,7 @@ type UserServiceClient interface {
 	GetUserWithOffset(ctx context.Context, in *GetUserWithOffsetIn, opts ...grpc.CallOption) (*GetUserWithOffsetOut, error)
 	UpdateProfile(ctx context.Context, in *UpdateProfileIn, opts ...grpc.CallOption) (*UpdateProfileOut, error)
 	GetUsersByUUID(ctx context.Context, in *GetUsersByUUIDIn, opts ...grpc.CallOption) (*GetUsersByUUIDOut, error)
+	CreateUser(ctx context.Context, in *CreateUserIn, opts ...grpc.CallOption) (*CreateUserOut, error)
 	SetFriends(ctx context.Context, in *SetFriendsIn, opts ...grpc.CallOption) (*SetFriendsOut, error)
 	RemoveFriends(ctx context.Context, in *RemoveFriendsIn, opts ...grpc.CallOption) (*RemoveFriendsOut, error)
 	GetCountFriends(ctx context.Context, in *EmptyFriends, opts ...grpc.CallOption) (*GetCountFriendsOut, error)
@@ -132,6 +133,16 @@ func (c *userServiceClient) GetUsersByUUID(ctx context.Context, in *GetUsersByUU
 	return out, nil
 }
 
+func (c *userServiceClient) CreateUser(ctx context.Context, in *CreateUserIn, opts ...grpc.CallOption) (*CreateUserOut, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateUserOut)
+	err := c.cc.Invoke(ctx, UserService_CreateUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userServiceClient) SetFriends(ctx context.Context, in *SetFriendsIn, opts ...grpc.CallOption) (*SetFriendsOut, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SetFriendsOut)
@@ -186,9 +197,8 @@ func (c *userServiceClient) GetWhoFollowPeer(ctx context.Context, in *GetWhoFoll
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
 //
-// Service for friends
+// Service for user info
 type UserServiceServer interface {
-	// Add friends method
 	GetUserByLogin(context.Context, *GetUserByLoginIn) (*GetUserByLoginOut, error)
 	IsUserExistByUUID(context.Context, *IsUserExistByUUIDIn) (*IsUserExistByUUIDOut, error)
 	GetUserInfoByUUID(context.Context, *GetUserInfoByUUIDIn) (*GetUserInfoByUUIDOut, error)
@@ -196,6 +206,7 @@ type UserServiceServer interface {
 	GetUserWithOffset(context.Context, *GetUserWithOffsetIn) (*GetUserWithOffsetOut, error)
 	UpdateProfile(context.Context, *UpdateProfileIn) (*UpdateProfileOut, error)
 	GetUsersByUUID(context.Context, *GetUsersByUUIDIn) (*GetUsersByUUIDOut, error)
+	CreateUser(context.Context, *CreateUserIn) (*CreateUserOut, error)
 	SetFriends(context.Context, *SetFriendsIn) (*SetFriendsOut, error)
 	RemoveFriends(context.Context, *RemoveFriendsIn) (*RemoveFriendsOut, error)
 	GetCountFriends(context.Context, *EmptyFriends) (*GetCountFriendsOut, error)
@@ -231,6 +242,9 @@ func (UnimplementedUserServiceServer) UpdateProfile(context.Context, *UpdateProf
 }
 func (UnimplementedUserServiceServer) GetUsersByUUID(context.Context, *GetUsersByUUIDIn) (*GetUsersByUUIDOut, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUsersByUUID not implemented")
+}
+func (UnimplementedUserServiceServer) CreateUser(context.Context, *CreateUserIn) (*CreateUserOut, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
 func (UnimplementedUserServiceServer) SetFriends(context.Context, *SetFriendsIn) (*SetFriendsOut, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetFriends not implemented")
@@ -394,6 +408,24 @@ func _UserService_GetUsersByUUID_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserIn)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).CreateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_CreateUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).CreateUser(ctx, req.(*CreateUserIn))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserService_SetFriends_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SetFriendsIn)
 	if err := dec(in); err != nil {
@@ -518,6 +550,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUsersByUUID",
 			Handler:    _UserService_GetUsersByUUID_Handler,
+		},
+		{
+			MethodName: "CreateUser",
+			Handler:    _UserService_CreateUser_Handler,
 		},
 		{
 			MethodName: "SetFriends",

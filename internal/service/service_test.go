@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/docker/distribution/uuid"
 	"github.com/golang/mock/gomock"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/s21platform/user-service/internal/config"
@@ -24,9 +24,9 @@ func TestServer_GetUsersByUUID(t *testing.T) {
 	mockDBRepo := NewMockDbRepo(ctrl)
 
 	t.Run("should ok", func(t *testing.T) {
-		peer1 := uuid.Generate().String()
+		peer1 := uuid.New().String()
 		ctx = context.WithValue(ctx, config.KeyUUID, peer1)
-		peer2 := uuid.Generate().String()
+		peer2 := uuid.New().String()
 		mockInput := &user.GetUsersByUUIDIn{
 			UsersUuid: []*user.UsersUUID{
 				{Uuid: peer1},
@@ -72,7 +72,7 @@ func TestServer_GetUsersByUUID(t *testing.T) {
 		})
 	})
 	t.Run("should_return_nil_if_empty_UUID_provided", func(t *testing.T) {
-		peer1 := uuid.Generate().String()
+		peer1 := uuid.New().String()
 		ctx = context.WithValue(ctx, config.KeyUUID, peer1)
 		mockInput := &user.GetUsersByUUIDIn{}
 
@@ -82,9 +82,9 @@ func TestServer_GetUsersByUUID(t *testing.T) {
 		assert.Nil(t, result)
 	})
 	t.Run("should_return_if_uuid_is_empty", func(t *testing.T) {
-		peer1 := uuid.Generate().String()
+		peer1 := uuid.New().String()
 		ctx = context.WithValue(ctx, config.KeyUUID, peer1)
-		peer2 := uuid.Generate().String()
+		peer2 := uuid.New().String()
 		mockInput := &user.GetUsersByUUIDIn{
 			UsersUuid: []*user.UsersUUID{
 				{Uuid: peer1},
@@ -125,7 +125,7 @@ func TestServer_GetUsersByUUID(t *testing.T) {
 		})
 	})
 	t.Run("should_return_error_if_db_fails", func(t *testing.T) {
-		peer1 := uuid.Generate().String()
+		peer1 := uuid.New().String()
 		ctx = context.WithValue(ctx, config.KeyUUID, peer1)
 
 		mockInput := &user.GetUsersByUUIDIn{

@@ -4,6 +4,8 @@
 ## Table of Contents
 
 - [api/user.proto](#api_user-proto)
+    - [CreateUserIn](#-CreateUserIn)
+    - [CreateUserOut](#-CreateUserOut)
     - [EmptyFriends](#-EmptyFriends)
     - [GetCountFriendsOut](#-GetCountFriendsOut)
     - [GetLoginByUUIDIn](#-GetLoginByUUIDIn)
@@ -32,6 +34,7 @@
     - [UpdateProfileIn](#-UpdateProfileIn)
     - [UpdateProfileOut](#-UpdateProfileOut)
     - [User](#-User)
+    - [UserCreatedMessage](#-UserCreatedMessage)
     - [UserInfoMin](#-UserInfoMin)
     - [UserNicknameUpdated](#-UserNicknameUpdated)
     - [UsersUUID](#-UsersUUID)
@@ -46,6 +49,37 @@
 <p align="right"><a href="#top">Top</a></p>
 
 ## api/user.proto
+
+
+
+<a name="-CreateUserIn"></a>
+
+### CreateUserIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| email | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-CreateUserOut"></a>
+
+### CreateUserOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| nickname | [string](#string) |  |  |
+| user_uuid | [string](#string) |  |  |
+
+
+
 
 
 
@@ -493,6 +527,21 @@ Message for response
 
 
 
+<a name="-UserCreatedMessage"></a>
+
+### UserCreatedMessage
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_uuid | [string](#string) |  |  |
+
+
+
+
+
+
 <a name="-UserInfoMin"></a>
 
 ### UserInfoMin
@@ -515,7 +564,7 @@ Min user information structure
 <a name="-UserNicknameUpdated"></a>
 
 ### UserNicknameUpdated
------- kafka messages
+
 
 
 | Field | Type | Label | Description |
@@ -552,17 +601,18 @@ Message for UsersUUID
 <a name="-UserService"></a>
 
 ### UserService
-Service for friends
+Service for user info
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| GetUserByLogin | [.GetUserByLoginIn](#GetUserByLoginIn) | [.GetUserByLoginOut](#GetUserByLoginOut) | Add friends method |
+| GetUserByLogin | [.GetUserByLoginIn](#GetUserByLoginIn) | [.GetUserByLoginOut](#GetUserByLoginOut) |  |
 | IsUserExistByUUID | [.IsUserExistByUUIDIn](#IsUserExistByUUIDIn) | [.IsUserExistByUUIDOut](#IsUserExistByUUIDOut) |  |
 | GetUserInfoByUUID | [.GetUserInfoByUUIDIn](#GetUserInfoByUUIDIn) | [.GetUserInfoByUUIDOut](#GetUserInfoByUUIDOut) |  |
 | GetLoginByUUID | [.GetLoginByUUIDIn](#GetLoginByUUIDIn) | [.GetLoginByUUIDOut](#GetLoginByUUIDOut) |  |
 | GetUserWithOffset | [.GetUserWithOffsetIn](#GetUserWithOffsetIn) | [.GetUserWithOffsetOut](#GetUserWithOffsetOut) |  |
 | UpdateProfile | [.UpdateProfileIn](#UpdateProfileIn) | [.UpdateProfileOut](#UpdateProfileOut) |  |
 | GetUsersByUUID | [.GetUsersByUUIDIn](#GetUsersByUUIDIn) | [.GetUsersByUUIDOut](#GetUsersByUUIDOut) |  |
+| CreateUser | [.CreateUserIn](#CreateUserIn) | [.CreateUserOut](#CreateUserOut) |  |
 | SetFriends | [.SetFriendsIn](#SetFriendsIn) | [.SetFriendsOut](#SetFriendsOut) |  |
 | RemoveFriends | [.RemoveFriendsIn](#RemoveFriendsIn) | [.RemoveFriendsOut](#RemoveFriendsOut) |  |
 | GetCountFriends | [.EmptyFriends](#EmptyFriends) | [.GetCountFriendsOut](#GetCountFriendsOut) |  |

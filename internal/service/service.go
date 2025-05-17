@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"regexp"
+	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -17,6 +20,8 @@ import (
 
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/s21platform/user-service/internal/model"
+	"github.com/s21platform/user-service/internal/pkg/generator"
+	"github.com/s21platform/user-service/internal/pkg/tx"
 	"github.com/s21platform/user-service/pkg/user"
 )
 
@@ -25,13 +30,15 @@ type Server struct {
 	dbRepo     DbRepo
 	ufrR       UserFriendsRegisterSrv
 	optionhubS OptionhubS
+	ucP        UserCreatedProducer
 }
 
-func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS) *Server {
+func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS, ucP UserCreatedProducer) *Server {
 	return &Server{
 		dbRepo:     repo,
 		ufrR:       ufrR,
 		optionhubS: optionhubService,
+		ucP:        ucP,
 	}
 }
 
@@ -183,6 +190,71 @@ func (s *Server) UpdateProfile(ctx context.Context, in *user.UpdateProfileIn) (*
 	}
 	return &user.UpdateProfileOut{
 		Status: true,
+	}, nil
+}
+
+func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.CreateUserOut, error) {
+	email := strings.TrimSpace(in.Email)
+	if email == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "email is required")
+	}
+	if len(email) > 100 {
+		return nil, status.Errorf(codes.InvalidArgument, "email exceeds maximum length of 100 characters")
+	}
+	if !regexp.MustCompile(`^[a-zA-Z0-9.!#$%&'*+/=?^_{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$`).MatchString(email) {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid email format")
+	}
+
+	userInfo, err := s.dbRepo.GetUserForCreation(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	if userInfo != nil {
+		return &user.CreateUserOut{
+			UserUuid: userInfo.UUID,
+			Nickname: userInfo.Nickname,
+		}, nil
+	}
+
+	var nickname string
+	for {
+		nickname = generator.GenerateNickname()
+		isAvailable, err := s.dbRepo.CheckNicknameAvailability(ctx, nickname)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to check nickname availability: %v", err)
+		}
+		if isAvailable {
+			break
+		}
+	}
+
+	userUUID, err := uuid.NewRandom()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to generate user UUID: %v", err)
+	}
+	userUUIDStr := userUUID.String()
+
+	err = tx.TxExecute(ctx, func(ctx context.Context) error {
+		if err := s.dbRepo.CreateUser(ctx, userUUIDStr, email, nickname); err != nil {
+			return fmt.Errorf("failed to create user: %v", err)
+		}
+
+		err = s.ucP.ProduceMessage(ctx, user.UserCreatedMessage{
+			UserUuid: userUUIDStr,
+		}, userUUIDStr)
+		if err != nil {
+			return fmt.Errorf("failed to produce message: %v", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
+	}
+
+	return &user.CreateUserOut{
+		UserUuid: userUUIDStr,
+		Nickname: nickname,
 	}, nil
 }
 

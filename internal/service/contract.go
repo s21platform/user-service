@@ -23,9 +23,16 @@ type DbRepo interface {
 	GetSubscriptionCount(ctx context.Context, userUUID string) (int64, error)
 	GetPeerFollow(ctx context.Context, userUUID string) ([]string, error)
 	GetWhoFollowPeer(ctx context.Context, userUUID string) ([]string, error)
+	CheckNicknameAvailability(ctx context.Context, nickname string) (bool, error)
+	CreateUser(ctx context.Context, userUUID string, email string, nickname string) error
+	GetUserForCreation(ctx context.Context, email string) (*model.UserAuthInfo, error)
 }
 
 type UserFriendsRegisterSrv interface {
+	ProduceMessage(ctx context.Context, message any, key any) error
+}
+
+type UserCreatedProducer interface {
 	ProduceMessage(ctx context.Context, message any, key any) error
 }
 
