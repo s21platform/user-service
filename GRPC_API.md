@@ -36,6 +36,7 @@
     - [User](#-User)
     - [UserCreatedMessage](#-UserCreatedMessage)
     - [UserInfoMin](#-UserInfoMin)
+    - [UserNicknameUpdated](#-UserNicknameUpdated)
     - [UsersUUID](#-UsersUUID)
   
     - [UserService](#-UserService)
@@ -554,6 +555,22 @@ Min user information structure
 | last_avatar | [string](#string) |  |  |
 | name | [string](#string) |  |  |
 | surname | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-UserNicknameUpdated"></a>
+
+### UserNicknameUpdated
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_uuid | [string](#string) |  |  |
+| nickname | [string](#string) |  |  |
 
 
 
