@@ -261,11 +261,13 @@ func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.C
 func (s *Server) SetFriends(ctx context.Context, in *user.SetFriendsIn) (*user.SetFriendsOut, error) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("SetFriends")
-	userUUID := ctx.Value(config.KeyUUID).(string)
-	if userUUID == "" {
+	userUUID, ok := ctx.Value(config.KeyUUID).(string)
+
+	if !ok || userUUID == "" {
 		logger.Error("failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
+
 	areFriends, err := s.dbRepo.CheckFriendship(ctx, userUUID, in.Peer)
 	if err != nil {
 		logger.Error(" failed to check user friendship")
