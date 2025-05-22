@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS posts (
     origin      TEXT,
     created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMP,
-    is_deleted  BOOL DEFAULT false
+    deleted_at  BOOL DEFAULT false
 );
 
 -- +goose Down
