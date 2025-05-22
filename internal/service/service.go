@@ -290,11 +290,13 @@ func (s *Server) SetFriends(ctx context.Context, in *user.SetFriendsIn) (*user.S
 func (s *Server) RemoveFriends(ctx context.Context, in *user.RemoveFriendsIn) (*user.RemoveFriendsOut, error) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("RemoveFriends")
-	userUUID := ctx.Value(config.KeyUUID).(string)
-	if userUUID == "" {
+	userUUID, ok := ctx.Value(config.KeyUUID).(string)
+
+	if !ok || userUUID == "" {
 		logger.Error("failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
+
 	areFriends, err := s.dbRepo.CheckFriendship(ctx, userUUID, in.Peer)
 	if err != nil {
 		logger.Error(" failed to check user friendship")
@@ -316,11 +318,13 @@ func (s *Server) RemoveFriends(ctx context.Context, in *user.RemoveFriendsIn) (*
 func (s *Server) GetCountFriends(ctx context.Context, in *user.EmptyFriends) (*user.GetCountFriendsOut, error) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("GetCountFriends")
-	userUUID := ctx.Value(config.KeyUUID).(string)
-	if userUUID == "" {
+	userUUID, ok := ctx.Value(config.KeyUUID).(string)
+
+	if !ok || userUUID == "" {
 		logger.Error("failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
+
 	subscription, err := s.dbRepo.GetSubscriptionCount(ctx, userUUID)
 	if err != nil {
 		logger.Error("failed to get subscription count")
@@ -337,11 +341,13 @@ func (s *Server) GetCountFriends(ctx context.Context, in *user.EmptyFriends) (*u
 func (s *Server) GetPeerFollow(ctx context.Context, in *user.GetPeerFollowIn) (*user.GetPeerFollowOut, error) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("GetPeerFollow")
-	userUUID := ctx.Value(config.KeyUUID).(string)
-	if userUUID == "" {
+	userUUID, ok := ctx.Value(config.KeyUUID).(string)
+
+	if !ok || userUUID == "" {
 		logger.Error("failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
+
 	follow, err := s.dbRepo.GetPeerFollow(ctx, in.Uuid)
 	if err != nil {
 		logger.Error("failed to get peer follow")
@@ -359,11 +365,13 @@ func (s *Server) GetPeerFollow(ctx context.Context, in *user.GetPeerFollowIn) (*
 func (s *Server) GetWhoFollowPeer(ctx context.Context, in *user.GetWhoFollowPeerIn) (*user.GetWhoFollowPeerOut, error) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("GetWhoFollowPeer")
-	userUUID := ctx.Value(config.KeyUUID).(string)
-	if userUUID == "" {
+	userUUID, ok := ctx.Value(config.KeyUUID).(string)
+
+	if !ok || userUUID == "" {
 		logger.Error("failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
+
 	follow, err := s.dbRepo.GetWhoFollowPeer(ctx, in.Uuid)
 	if err != nil {
 		logger.Error("failed to get peer follow")
