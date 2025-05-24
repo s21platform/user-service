@@ -15,7 +15,7 @@ import (
 
 	model "github.com/s21platform/user-service/internal/model"
 	postgres "github.com/s21platform/user-service/internal/repository/postgres"
-	gomock "go.uber.org/mock/gomock"
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockDbRepo is a mock of DbRepo interface.

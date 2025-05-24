@@ -554,11 +554,11 @@ func TestServer_CreateUserPosts(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockRepo := NewMockDBRepo(ctrl)
-	s := New(mockRepo)
+	mockDBRepo := NewMockDbRepo(ctrl)
+	s := &Server{dbRepo: mockDBRepo}
 
 	t.Run("create_ok", func(t *testing.T) {
-		mockRepo.EXPECT().Post(ctx, userUUID, content).Return(expUUID, nil)
+		mockDBRepo.EXPECT().CreatePost(ctx, userUUID, content).Return(expUUID, nil)
 
 		_, err := s.CreatePost(ctx, &user.CreatePostIn{Content: content})
 
@@ -579,7 +579,7 @@ func TestServer_CreateUserPosts(t *testing.T) {
 	t.Run("create_err", func(t *testing.T) {
 		expectedErr := errors.New("get err")
 
-		mockRepo.EXPECT().Post(ctx, userUUID, content).Return("", expectedErr)
+		mockDBRepo.EXPECT().CreatePost(ctx, userUUID, content).Return("", expectedErr)
 
 		_, err := s.CreatePost(ctx, &user.CreatePostIn{Content: content})
 
