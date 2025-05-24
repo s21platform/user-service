@@ -383,3 +383,17 @@ func (s *Server) GetWhoFollowPeer(ctx context.Context, in *user.GetWhoFollowPeer
 	}
 	return &user.GetWhoFollowPeerOut{Subscribers: peers}, nil
 }
+
+func (s *Server) CreatePost(ctx context.Context, in *user.CreatePostIn) (*user.CreatePostOut, error) {
+	ownerUUID, ok := ctx.Value(config.KeyUUID).(string)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "failed to retrieve uuid")
+	}
+
+	newPostUUID, err := s.dbRepo.CreatePost(ctx, ownerUUID, in.Content)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to create post: %v", err)
+	}
+
+	return &user.CreatePostOut{PostUuid: newPostUUID}, nil
+}

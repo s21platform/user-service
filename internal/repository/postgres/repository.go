@@ -433,6 +433,28 @@ func (r *Repository) CreateUser(ctx context.Context, userUUID string, email stri
 	return nil
 }
 
+func (r *Repository) CreatePost(ctx context.Context, uuid, content string) (string, error) {
+	query, args, err := sq.Insert("posts").
+		Columns("user_id", "content").
+		Values(uuid, content).
+		Suffix("RETURNING uuid").
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return "", fmt.Errorf("failed to build insert query: %v", err)
+	}
+
+	var newPostUUID string
+	err = r.Chk(ctx).GetContext(ctx, &newPostUUID, query, args...)
+
+	if err != nil {
+		return "", fmt.Errorf("failed to create post: %v", err)
+	}
+
+	return newPostUUID, nil
+}
+
 func (r *Repository) Close() {
 	_ = r.DB.Close()
 }
