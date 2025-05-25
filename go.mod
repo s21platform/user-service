@@ -18,7 +18,6 @@ require (
 	github.com/s21platform/optionhub-proto v1.0.6
 	github.com/samber/lo v1.47.0
 	github.com/stretchr/testify v1.9.0
-	go.uber.org/mock v0.5.2
 	google.golang.org/grpc v1.71.1
 	google.golang.org/protobuf v1.36.6
 )
