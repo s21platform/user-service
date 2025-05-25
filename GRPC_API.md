@@ -4,6 +4,8 @@
 ## Table of Contents
 
 - [api/user.proto](#api_user-proto)
+    - [CreatePostIn](#-CreatePostIn)
+    - [CreatePostOut](#-CreatePostOut)
     - [CreateUserIn](#-CreateUserIn)
     - [CreateUserOut](#-CreateUserOut)
     - [EmptyFriends](#-EmptyFriends)
@@ -49,6 +51,36 @@
 <p align="right"><a href="#top">Top</a></p>
 
 ## api/user.proto
+
+
+
+<a name="-CreatePostIn"></a>
+
+### CreatePostIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| content | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-CreatePostOut"></a>
+
+### CreatePostOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| post_uuid | [string](#string) |  |  |
+
+
+
 
 
 
@@ -618,6 +650,7 @@ Service for user info
 | GetCountFriends | [.EmptyFriends](#EmptyFriends) | [.GetCountFriendsOut](#GetCountFriendsOut) |  |
 | GetPeerFollow | [.GetPeerFollowIn](#GetPeerFollowIn) | [.GetPeerFollowOut](#GetPeerFollowOut) |  |
 | GetWhoFollowPeer | [.GetWhoFollowPeerIn](#GetWhoFollowPeerIn) | [.GetWhoFollowPeerOut](#GetWhoFollowPeerOut) |  |
+| CreatePost | [.CreatePostIn](#CreatePostIn) | [.CreatePostOut](#CreatePostOut) |  |
 
  
 
