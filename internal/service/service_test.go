@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	logger_lib "github.com/s21platform/logger-lib"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
@@ -537,5 +539,53 @@ func TestServer_GetWhoFollowPeer(t *testing.T) {
 		s := &Server{dbRepo: mockDBRepo}
 		_, err := s.GetWhoFollowPeer(ctx, &user.GetWhoFollowPeerIn{Uuid: userUUID})
 		assert.Error(t, err, repoErr)
+	})
+}
+
+func TestServer_CreateUserPosts(t *testing.T) {
+	t.Parallel()
+
+	content := "test-content"
+	userUUID := uuid.New().String()
+	expUUID := uuid.New().String()
+
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, config.KeyUUID, userUUID)
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockDBRepo := NewMockDbRepo(ctrl)
+	s := &Server{dbRepo: mockDBRepo}
+
+	t.Run("create_ok", func(t *testing.T) {
+		mockDBRepo.EXPECT().CreatePost(ctx, userUUID, content).Return(expUUID, nil)
+
+		_, err := s.CreatePost(ctx, &user.CreatePostIn{Content: content})
+
+		assert.NoError(t, err)
+	})
+
+	t.Run("create_no_uuid", func(t *testing.T) {
+		ctx := context.Background()
+
+		_, err := s.CreatePost(ctx, &user.CreatePostIn{})
+
+		st, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, codes.Unauthenticated, st.Code())
+		assert.Contains(t, st.Message(), "failed to retrieve uuid")
+	})
+
+	t.Run("create_err", func(t *testing.T) {
+		expectedErr := errors.New("get err")
+
+		mockDBRepo.EXPECT().CreatePost(ctx, userUUID, content).Return("", expectedErr)
+
+		_, err := s.CreatePost(ctx, &user.CreatePostIn{Content: content})
+
+		st, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, codes.Internal, st.Code())
+		assert.Contains(t, st.Message(), "failed to create post: get err")
 	})
 }

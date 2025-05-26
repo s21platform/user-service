@@ -17,6 +17,7 @@ service UserService {
   rpc GetCountFriends(EmptyFriends) returns (GetCountFriendsOut){};
   rpc GetPeerFollow(GetPeerFollowIn) returns (GetPeerFollowOut){};
   rpc GetWhoFollowPeer(GetWhoFollowPeerIn) returns (GetWhoFollowPeerOut){};
+  rpc CreatePost(CreatePostIn) returns (CreatePostOut){};
 }
 
 message EmptyFriends {}
@@ -197,6 +198,14 @@ message CreateUserIn {
 message CreateUserOut {
   string nickname = 1;
   string user_uuid = 2;
+}
+
+message CreatePostIn {
+    string content = 1;
+}
+
+message CreatePostOut {
+    string post_uuid = 1;
 }
 
 // ------ kafka messages
