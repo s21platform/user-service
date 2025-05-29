@@ -384,6 +384,26 @@ func (s *Server) GetWhoFollowPeer(ctx context.Context, in *user.GetWhoFollowPeer
 	return &user.GetWhoFollowPeerOut{Subscribers: peers}, nil
 }
 
+func (s *Server) CheckFriendship(ctx context.Context, in *user.CheckFriendshipIn) (*user.CheckFriendshipOut, error) {
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("CheckFriendship")
+	userUUID, ok := ctx.Value(config.KeyUUID).(string)
+
+	if !ok || userUUID == "" {
+		logger.Error("failed to get user UUID from context")
+		return nil, fmt.Errorf("failed to get user UUID from context")
+	}
+
+	succses, err := s.dbRepo.CheckFriendship(ctx, userUUID, in.Uuid)
+	if err != nil {
+		logger.Error("failed to check user friendship")
+		return nil, err
+	}
+	return &user.CheckFriendshipOut{
+		Succses: succses,
+	}, nil
+}
+
 func (s *Server) CreatePost(ctx context.Context, in *user.CreatePostIn) (*user.CreatePostOut, error) {
 	ownerUUID, ok := ctx.Value(config.KeyUUID).(string)
 	if !ok {

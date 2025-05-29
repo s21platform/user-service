@@ -4,6 +4,8 @@
 ## Table of Contents
 
 - [api/user.proto](#api_user-proto)
+    - [CheckFriendshipIn](#-CheckFriendshipIn)
+    - [CheckFriendshipOut](#-CheckFriendshipOut)
     - [CreatePostIn](#-CreatePostIn)
     - [CreatePostOut](#-CreatePostOut)
     - [CreateUserIn](#-CreateUserIn)
@@ -51,6 +53,36 @@
 <p align="right"><a href="#top">Top</a></p>
 
 ## api/user.proto
+
+
+
+<a name="-CheckFriendshipIn"></a>
+
+### CheckFriendshipIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| uuid | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-CheckFriendshipOut"></a>
+
+### CheckFriendshipOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| succses | [bool](#bool) |  |  |
+
+
+
 
 
 
@@ -650,6 +682,7 @@ Service for user info
 | GetCountFriends | [.EmptyFriends](#EmptyFriends) | [.GetCountFriendsOut](#GetCountFriendsOut) |  |
 | GetPeerFollow | [.GetPeerFollowIn](#GetPeerFollowIn) | [.GetPeerFollowOut](#GetPeerFollowOut) |  |
 | GetWhoFollowPeer | [.GetWhoFollowPeerIn](#GetWhoFollowPeerIn) | [.GetWhoFollowPeerOut](#GetWhoFollowPeerOut) |  |
+| CheckFriendship | [.CheckFriendshipIn](#CheckFriendshipIn) | [.CheckFriendshipOut](#CheckFriendshipOut) |  |
 | CreatePost | [.CreatePostIn](#CreatePostIn) | [.CreatePostOut](#CreatePostOut) |  |
 
  
