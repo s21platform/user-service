@@ -17,6 +17,7 @@ service UserService {
   rpc GetCountFriends(EmptyFriends) returns (GetCountFriendsOut){};
   rpc GetPeerFollow(GetPeerFollowIn) returns (GetPeerFollowOut){};
   rpc GetWhoFollowPeer(GetWhoFollowPeerIn) returns (GetWhoFollowPeerOut){};
+  rpc CheckFriendship (CheckFriendshipIn) returns (CheckFriendshipOut);
   rpc CreatePost(CreatePostIn) returns (CreatePostOut){};
 }
 
@@ -189,6 +190,14 @@ message GetPeerFollowIn {
 message GetWhoFollowPeerIn {
   //Peer uuid
   string uuid = 1;
+}
+
+message CheckFriendshipIn {
+  string uuid = 1;
+}
+
+message CheckFriendshipOut {
+  bool succses = 1;
 }
 
 message CreateUserIn {

@@ -542,6 +542,59 @@ func TestServer_GetWhoFollowPeer(t *testing.T) {
 	})
 }
 
+func TestServer_CheckFriendship(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockDBRepo := NewMockDbRepo(ctrl)
+	mockLogger := logger_lib.NewMockLoggerInterface(ctrl)
+	t.Run("should_ok", func(t *testing.T) {
+		userUUID := uuid.New().String()
+		friendUUID := uuid.New().String()
+		ctx = context.WithValue(context.Background(), config.KeyUUID, userUUID)
+		ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
+
+		mockDBRepo.EXPECT().CheckFriendship(ctx, userUUID, friendUUID).Return(true, nil)
+		mockLogger.EXPECT().AddFuncName("CheckFriendship")
+
+		s := &Server{dbRepo: mockDBRepo}
+		res, err := s.CheckFriendship(ctx, &user.CheckFriendshipIn{Uuid: friendUUID})
+
+		assert.NoError(t, err)
+		assert.True(t, res.Succses)
+	})
+	t.Run("should_error_when_no_UUID_in_context", func(t *testing.T) {
+		ctx := context.WithValue(context.Background(), config.KeyLogger, mockLogger)
+
+		mockLogger.EXPECT().AddFuncName("CheckFriendship")
+		mockLogger.EXPECT().Error("failed to get user UUID from context")
+
+		s := &Server{dbRepo: mockDBRepo}
+		_, err := s.CheckFriendship(ctx, &user.CheckFriendshipIn{Uuid: uuid.New().String()})
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "failed to get user UUID from context")
+	})
+	t.Run("should_error_when_db_check_fails", func(t *testing.T) {
+		userUUID := uuid.New().String()
+		friendUUID := uuid.New().String()
+		dbError := errors.New("database error")
+		ctx := context.WithValue(context.Background(), config.KeyUUID, userUUID)
+		ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
+
+		mockDBRepo.EXPECT().CheckFriendship(ctx, userUUID, friendUUID).Return(false, dbError)
+		mockLogger.EXPECT().AddFuncName("CheckFriendship")
+		mockLogger.EXPECT().Error("failed to check user friendship")
+
+		s := &Server{dbRepo: mockDBRepo}
+		_, err := s.CheckFriendship(ctx, &user.CheckFriendshipIn{Uuid: friendUUID})
+
+		assert.Error(t, err)
+		assert.Equal(t, dbError, err)
+	})
+}
+
 func TestServer_CreateUserPosts(t *testing.T) {
 	t.Parallel()
 
