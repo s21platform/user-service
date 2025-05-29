@@ -397,3 +397,21 @@ func (s *Server) CreatePost(ctx context.Context, in *user.CreatePostIn) (*user.C
 
 	return &user.CreatePostOut{PostUuid: newPostUUID}, nil
 }
+
+func (s *Server) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn) (*user.GetPostsByIdsOut, error) {
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("GetPostsByIds")
+	userUUID, ok := ctx.Value(config.KeyUUID).(string)
+
+	if !ok || userUUID == "" {
+		logger.Error("failed to get user UUID from context")
+		return nil, fmt.Errorf("failed to get user UUID from context")
+	}
+
+	posts, err := s.dbRepo.GetPostsByIds(ctx, in)
+	if err != nil {
+		logger.Error("failed to get posts by ids")
+		return nil, err
+	}
+	return posts, nil
+}

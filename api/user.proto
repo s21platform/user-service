@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "pkg/user";
 
 // Service for user info
@@ -18,6 +20,7 @@ service UserService {
   rpc GetPeerFollow(GetPeerFollowIn) returns (GetPeerFollowOut){};
   rpc GetWhoFollowPeer(GetWhoFollowPeerIn) returns (GetWhoFollowPeerOut){};
   rpc CreatePost(CreatePostIn) returns (CreatePostOut){};
+  rpc GetPostsByIds(GetPostsByIdsIn) returns (GetPostsByIdsOut){};
 }
 
 message EmptyFriends {}
@@ -217,4 +220,22 @@ message UserCreatedMessage {
 message UserNicknameUpdated {
   string user_uuid = 1;
   string nickname = 2;
+}
+
+message PostInfo {
+  string post_uuid = 1;
+  string nickname = 2;
+  string full_name = 3;
+  string avatar_link = 4;
+  string content = 5;
+  google.protobuf.Timestamp created_at = 6;
+  bool is_edited = 7;
+}
+
+message GetPostsByIdsIn {
+  repeated string post_uuids = 1;
+}
+
+message GetPostsByIdsOut {
+  repeated PostInfo posts = 1;
 }

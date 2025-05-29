@@ -3,6 +3,7 @@ package service
 
 import (
 	"context"
+	"github.com/s21platform/user-service/pkg/user"
 
 	"github.com/s21platform/user-service/internal/model"
 	"github.com/s21platform/user-service/internal/repository/postgres"
@@ -27,6 +28,7 @@ type DbRepo interface {
 	CreateUser(ctx context.Context, userUUID string, email string, nickname string) error
 	GetUserForCreation(ctx context.Context, email string) (*model.UserAuthInfo, error)
 	CreatePost(ctx context.Context, uuid, content string) (string, error)
+	GetPostsByIds(context.Context, *user.GetPostsByIdsIn) (*model.PostInfoList, error)
 }
 
 type UserFriendsRegisterSrv interface {

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/s21platform/user-service/pkg/user"
 	"log"
 	"strings"
 
@@ -473,4 +474,32 @@ func New(cfg *config.Config) *Repository {
 		log.Fatal("error ping: ", err)
 	}
 	return &Repository{conn}
+}
+
+func (r *Repository) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn) (*model.PostInfoList, error) {
+	var posts model.PostInfoList
+
+	query, args, err := sq.
+		Select("posts.id", "users.login", "data.name", "data.last_name", "users.last_avatar_link", "posts.content", "posts.created_at", "posts.updated_at", "posts.deleted_at").
+		From("posts").
+		Join("users ON users.id = posts.user_id").
+		Join("data ON data.user_id = users.id").
+		Where(sq.And{
+			sq.Eq{"posts.id": in.PostUuids},
+			sq.Eq{"posts.deleted_at": nil}}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	print(query)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %v", err)
+	}
+
+	err = r.Chk(ctx).SelectContext(ctx, &posts, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %v", err)
+	}
+
+	return &posts, nil
 }
