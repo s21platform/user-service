@@ -437,7 +437,7 @@ func (r *Repository) CreatePost(ctx context.Context, uuid, content string) (stri
 	query, args, err := sq.Insert("posts").
 		Columns("user_id", "content").
 		Values(uuid, content).
-		Suffix("RETURNING uuid").
+		Suffix("RETURNING id").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 
