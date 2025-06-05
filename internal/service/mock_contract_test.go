@@ -414,3 +414,40 @@ func (mr *MockOptionhubSMockRecorder) GetOs(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOs", reflect.TypeOf((*MockOptionhubS)(nil).GetOs), ctx, id)
 }
+
+// MockUserUpdateProduser is a mock of UserUpdateProduser interface.
+type MockUserUpdateProduser struct {
+	ctrl     *gomock.Controller
+	recorder *MockUserUpdateProduserMockRecorder
+}
+
+// MockUserUpdateProduserMockRecorder is the mock recorder for MockUserUpdateProduser.
+type MockUserUpdateProduserMockRecorder struct {
+	mock *MockUserUpdateProduser
+}
+
+// NewMockUserUpdateProduser creates a new mock instance.
+func NewMockUserUpdateProduser(ctrl *gomock.Controller) *MockUserUpdateProduser {
+	mock := &MockUserUpdateProduser{ctrl: ctrl}
+	mock.recorder = &MockUserUpdateProduserMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockUserUpdateProduser) EXPECT() *MockUserUpdateProduserMockRecorder {
+	return m.recorder
+}
+
+// ProduceMessage mocks base method.
+func (m *MockUserUpdateProduser) ProduceMessage(ctx context.Context, message, key any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ProduceMessage", ctx, message, key)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ProduceMessage indicates an expected call of ProduceMessage.
+func (mr *MockUserUpdateProduserMockRecorder) ProduceMessage(ctx, message, key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProduceMessage", reflect.TypeOf((*MockUserUpdateProduser)(nil).ProduceMessage), ctx, message, key)
+}

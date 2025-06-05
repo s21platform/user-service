@@ -31,9 +31,10 @@ type Server struct {
 	ufrR       UserFriendsRegisterSrv
 	optionhubS OptionhubS
 	ucP        UserCreatedProducer
+	uuP        UserUpdateProduser
 }
 
-func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS, ucP UserCreatedProducer) *Server {
+func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS, ucP UserCreatedProducer, uuP UserUpdateProduser) *Server {
 	return &Server{
 		dbRepo:     repo,
 		ufrR:       ufrR,
@@ -188,6 +189,12 @@ func (s *Server) UpdateProfile(ctx context.Context, in *user.UpdateProfileIn) (*
 	if err != nil {
 		return nil, err
 	}
+
+	err = s.uuP.ProduceMessage(ctx, user.UserUpdateMessage{Uuid: uuid}, "uuid")
+	if err != nil {
+		return nil, fmt.Errorf("failed to produce message: %v", err)
+	}
+
 	return &user.UpdateProfileOut{
 		Status: true,
 	}, nil

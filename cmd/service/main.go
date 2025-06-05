@@ -39,8 +39,10 @@ func main() {
 
 	prcUserCreatedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.UserCreated)
 	prcUserCreated := kafkalib.NewProducer(prcUserCreatedCfg)
+	prcUserUpdateCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.UserUpdate)
+	prcUserUpdate := kafkalib.NewProducer(prcUserUpdateCfg)
 
-	server := service.New(db, producerNewFriendRegister, optionhubClient, prcUserCreated)
+	server := service.New(db, producerNewFriendRegister, optionhubClient, prcUserCreated, prcUserUpdate)
 
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
