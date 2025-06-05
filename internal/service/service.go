@@ -189,7 +189,8 @@ func (s *Server) UpdateProfile(ctx context.Context, in *user.UpdateProfileIn) (*
 	if err != nil {
 		return nil, err
 	}
-	err = s.uuP.ProduceMessage(ctx, uuid, "uuid")
+
+	err = s.uuP.ProduceMessage(ctx, user.UserUpdateMessage{Uuid: uuid}, "uuid")
 	if err != nil {
 		return nil, fmt.Errorf("failed to produce message: %v", err)
 	}

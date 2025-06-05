@@ -41,6 +41,7 @@
     - [UserCreatedMessage](#-UserCreatedMessage)
     - [UserInfoMin](#-UserInfoMin)
     - [UserNicknameUpdated](#-UserNicknameUpdated)
+    - [UserUpdateMessage](#-UserUpdateMessage)
     - [UsersUUID](#-UsersUUID)
   
     - [UserService](#-UserService)
@@ -635,6 +636,21 @@ Min user information structure
 | ----- | ---- | ----- | ----------- |
 | user_uuid | [string](#string) |  |  |
 | nickname | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-UserUpdateMessage"></a>
+
+### UserUpdateMessage
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| uuid | [string](#string) |  |  |
 
 
 
