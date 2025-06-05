@@ -40,3 +40,7 @@ type UserCreatedProducer interface {
 type OptionhubS interface {
 	GetOs(ctx context.Context, id *int64) (*model.OS, error)
 }
+
+type UserUpdateProduser interface {
+	ProduceMessage(ctx context.Context, message any, key any) error
+}
