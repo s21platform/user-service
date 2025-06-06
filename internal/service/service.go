@@ -31,14 +31,16 @@ type Server struct {
 	ufrR       UserFriendsRegisterSrv
 	optionhubS OptionhubS
 	ucP        UserCreatedProducer
+	upcP       UserPostCreatedProduser
 }
 
-func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS, ucP UserCreatedProducer) *Server {
+func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS, ucP UserCreatedProducer, upcP UserPostCreatedProduser) *Server {
 	return &Server{
 		dbRepo:     repo,
 		ufrR:       ufrR,
 		optionhubS: optionhubService,
 		ucP:        ucP,
+		upcP:       upcP,
 	}
 }
 
@@ -413,6 +415,16 @@ func (s *Server) CreatePost(ctx context.Context, in *user.CreatePostIn) (*user.C
 	newPostUUID, err := s.dbRepo.CreatePost(ctx, ownerUUID, in.Content)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create post: %v", err)
+	}
+
+	msg := &user.UserPostCreated{
+		UserUuid: ownerUUID,
+		PostId:   newPostUUID,
+	}
+
+	err = s.upcP.ProduceMessage(ctx, msg, ownerUUID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to produce message: %v", err)
 	}
 
 	return &user.CreatePostOut{PostUuid: newPostUUID}, nil
