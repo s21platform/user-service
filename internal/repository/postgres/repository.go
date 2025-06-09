@@ -438,7 +438,7 @@ func (r *Repository) CreatePost(ctx context.Context, uuid, content string) (stri
 	query, args, err := sq.Insert("posts").
 		Columns("user_id", "content").
 		Values(uuid, content).
-		Suffix("RETURNING uuid").
+		Suffix("RETURNING id").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 
@@ -482,8 +482,8 @@ func (r *Repository) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn
 	query, args, err := sq.
 		Select("posts.id", "users.login", "data.name", "data.last_name", "users.last_avatar_link", "posts.content", "posts.created_at", "posts.updated_at", "posts.deleted_at").
 		From("posts").
-		Join("users ON users.id = posts.user_id").
-		Join("data ON data.user_id = users.id").
+		Join("users ON users.uuid = posts.user_id").
+		Join("data ON data.user_id = users.uuid").
 		Where(sq.And{
 			sq.Eq{"posts.id": in.PostUuids},
 			sq.Eq{"posts.deleted_at": nil}}).

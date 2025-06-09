@@ -223,7 +223,7 @@ message UserNicknameUpdated {
 }
 
 message PostInfo {
-  string post_uuid = 1;
+  int64 post_uuid = 1;
   string nickname = 2;
   string full_name = 3;
   string avatar_link = 4;

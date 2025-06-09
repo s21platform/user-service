@@ -10,7 +10,7 @@ import (
 type PostInfoList []*PostInfo
 
 type PostInfo struct {
-	id         string    `db:"login"`
+	id         int64     `db:"login"`
 	Nickname   string    `db:"surname"`
 	FullName   string    `db:"name"`
 	AvatarLink string    `db:"last_avatar_link"`

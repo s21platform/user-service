@@ -487,7 +487,7 @@ Message for response
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| post_uuid | [string](#string) |  |  |
+| post_uuid | [int64](#int64) |  |  |
 | nickname | [string](#string) |  |  |
 | full_name | [string](#string) |  |  |
 | avatar_link | [string](#string) |  |  |
