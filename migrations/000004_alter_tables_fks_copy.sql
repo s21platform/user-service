@@ -78,5 +78,4 @@ ALTER TABLE posts
     ADD CONSTRAINT fk_post_user_uuid FOREIGN KEY (user_uuid) REFERENCES users(uuid);
 
 -- +goose Down
-DROP TABLE IF EXISTS posts;
 DROP EXTENSION IF EXISTS pgcrypto;

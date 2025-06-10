@@ -304,8 +304,7 @@ func (r *Repository) GetUserWithLimit(uuid, nickname string, limit int64, offset
 
 func (r *Repository) GetLoginByUuid(ctx context.Context, uuid string) (string, error) {
 	query := `
-		SELECT
-			login 
+		SELECT login 
 		FROM users 
 		WHERE uuid=$1
 	`
