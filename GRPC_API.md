@@ -41,6 +41,7 @@
     - [UserCreatedMessage](#-UserCreatedMessage)
     - [UserInfoMin](#-UserInfoMin)
     - [UserNicknameUpdated](#-UserNicknameUpdated)
+    - [UserPostCreated](#-UserPostCreated)
     - [UsersUUID](#-UsersUUID)
   
     - [UserService](#-UserService)
@@ -635,6 +636,22 @@ Min user information structure
 | ----- | ---- | ----- | ----------- |
 | user_uuid | [string](#string) |  |  |
 | nickname | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-UserPostCreated"></a>
+
+### UserPostCreated
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_uuid | [string](#string) |  |  |
+| post_id | [string](#string) |  |  |
 
 
 

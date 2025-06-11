@@ -601,6 +601,10 @@ func TestServer_CreateUserPosts(t *testing.T) {
 	content := "test-content"
 	userUUID := uuid.New().String()
 	expUUID := uuid.New().String()
+	msg := &user.UserPostCreated{
+		UserUuid: userUUID,
+		PostId:   expUUID,
+	}
 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, config.KeyUUID, userUUID)
@@ -608,10 +612,12 @@ func TestServer_CreateUserPosts(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockDBRepo := NewMockDbRepo(ctrl)
-	s := &Server{dbRepo: mockDBRepo}
+	mockKafka := NewMockUserPostCreatedProduser(ctrl)
+	s := &Server{dbRepo: mockDBRepo, upcP: mockKafka}
 
 	t.Run("create_ok", func(t *testing.T) {
 		mockDBRepo.EXPECT().CreatePost(ctx, userUUID, content).Return(expUUID, nil)
+		mockKafka.EXPECT().ProduceMessage(ctx, msg, userUUID).Return(nil)
 
 		_, err := s.CreatePost(ctx, &user.CreatePostIn{Content: content})
 
