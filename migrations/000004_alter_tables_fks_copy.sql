@@ -1,9 +1,8 @@
 -- +goose Up
--- Make users.uuid column unique
+
 ALTER TABLE users
     ADD CONSTRAINT unique_uuid UNIQUE (uuid);
 
--- Add temporary columns to hold the uuid values
 ALTER TABLE data
     ADD COLUMN temp_uuid UUID;
 
@@ -16,7 +15,6 @@ ALTER TABLE hobbies
 ALTER TABLE posts
     ADD COLUMN temp_uuid UUID;
 
--- Populate the temporary columns with the uuid values
 UPDATE data
 SET temp_uuid = (SELECT uuid FROM users WHERE users.id = data.user_id);
 
@@ -27,9 +25,8 @@ UPDATE hobbies
 SET temp_uuid = (SELECT uuid FROM users WHERE users.id = hobbies.user_id);
 
 UPDATE posts
-SET temp_uuid = (SELECT uuid FROM users WHERE users.id = posts.user_id);
+SET temp_uuid = (SELECT uuid FROM users WHERE users.uuid = posts.user_id);
 
--- Alter tables with user_id referencing users.id
 ALTER TABLE data
 DROP CONSTRAINT fk_data_user_id;
 ALTER TABLE data
@@ -64,7 +61,6 @@ ALTER TABLE posts
 ALTER TABLE posts
 DROP COLUMN temp_uuid;
 
--- Update foreign key constraints
 ALTER TABLE data
     ADD CONSTRAINT fk_data_user_uuid FOREIGN KEY (user_uuid) REFERENCES users(uuid);
 
@@ -76,6 +72,3 @@ ALTER TABLE hobbies
 
 ALTER TABLE posts
     ADD CONSTRAINT fk_post_user_uuid FOREIGN KEY (user_uuid) REFERENCES users(uuid);
-
--- +goose Down
-DROP EXTENSION IF EXISTS pgcrypto;

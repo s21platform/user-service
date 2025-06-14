@@ -48,7 +48,7 @@ func (s *Server) GetUserByLogin(ctx context.Context, in *user.GetUserByLoginIn) 
 	userData, err := s.dbRepo.GetOrSetUserByLogin(in.Login)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to get user: %v", err))
-		return nil, status.Error(codes.NotFound, "Ошибка создания пользователя")
+		return nil, status.Errorf(codes.NotFound, "Ошибка создания пользователя: %v", err)
 	}
 	if userData.IsNew {
 		mess := &new_friend_register.NewFriendRegister{
@@ -71,7 +71,7 @@ func (s *Server) IsUserExistByUUID(ctx context.Context, in *user.IsUserExistByUU
 	isExist, err := s.dbRepo.IsUserExistByUUID(in.Uuid)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to check user exist: %v", err))
-		return nil, status.Errorf(codes.Internal, "Невозможно найти пользователя")
+		return nil, status.Errorf(codes.Internal, "Невозможно найти пользователя: %v", err)
 	}
 	return &user.IsUserExistByUUIDOut{IsExist: isExist}, nil
 }
@@ -142,7 +142,7 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 	userInfo, err := s.dbRepo.GetUserInfoByUUID(ctx, in.Uuid)
 	if err != nil {
 		log.Println("failed to get user data from repo:", err)
-		return nil, status.Errorf(codes.Internal, "failed to get user data from repo")
+		return nil, status.Errorf(codes.Internal, "failed to get user data from repo: %v", err)
 	}
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("uuid", ctx.Value(config.KeyUUID).(string)))
 	osInfo, err := s.optionhubS.GetOs(ctx, userInfo.OSId)
@@ -240,12 +240,12 @@ func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.C
 			return fmt.Errorf("failed to create user: %v", err)
 		}
 
-		err = s.ucP.ProduceMessage(ctx, user.UserCreatedMessage{
-			UserUuid: userUUIDStr,
-		}, userUUIDStr)
-		if err != nil {
-			return fmt.Errorf("failed to produce message: %v", err)
-		}
+		//err = s.ucP.ProduceMessage(ctx, user.UserCreatedMessage{
+		//	UserUuid: userUUIDStr,
+		//}, userUUIDStr)
+		//if err != nil {
+		//	return fmt.Errorf("failed to produce message: %v", err)
+		//}
 		return nil
 	})
 	if err != nil {
