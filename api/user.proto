@@ -227,3 +227,8 @@ message UserNicknameUpdated {
   string user_uuid = 1;
   string nickname = 2;
 }
+
+message UserPostCreated {
+  string user_uuid = 1;
+  string post_id = 2;
+}
