@@ -33,6 +33,7 @@ type Kafka struct {
 	Port            string `env:"KAFKA_PORT"`
 	FriendsRegister string `env:"USER_FRIENDS_REGISTER"`
 	SetNewAvatar    string `env:"AVATAR_SET_NEW_USER"`
+	UserPostCreated string `env:"USER_POST_CREATED"`
 	UserCreated     string `env:"USER_CREATED"`
 }
 

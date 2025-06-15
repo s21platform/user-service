@@ -13,9 +13,9 @@ import (
 	context "context"
 	reflect "reflect"
 
+	gomock "github.com/golang/mock/gomock"
 	model "github.com/s21platform/user-service/internal/model"
 	postgres "github.com/s21platform/user-service/internal/repository/postgres"
-	gomock "github.com/golang/mock/gomock"
 )
 
 // MockDbRepo is a mock of DbRepo interface.
@@ -422,4 +422,42 @@ func (m *MockOptionhubS) GetOs(ctx context.Context, id *int64) (*model.OS, error
 func (mr *MockOptionhubSMockRecorder) GetOs(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOs", reflect.TypeOf((*MockOptionhubS)(nil).GetOs), ctx, id)
+}
+
+// MockUserPostCreatedProduser is a mock of UserPostCreatedProduser interface.
+type MockUserPostCreatedProduser struct {
+	ctrl     *gomock.Controller
+	recorder *MockUserPostCreatedProduserMockRecorder
+	isgomock struct{}
+}
+
+// MockUserPostCreatedProduserMockRecorder is the mock recorder for MockUserPostCreatedProduser.
+type MockUserPostCreatedProduserMockRecorder struct {
+	mock *MockUserPostCreatedProduser
+}
+
+// NewMockUserPostCreatedProduser creates a new mock instance.
+func NewMockUserPostCreatedProduser(ctrl *gomock.Controller) *MockUserPostCreatedProduser {
+	mock := &MockUserPostCreatedProduser{ctrl: ctrl}
+	mock.recorder = &MockUserPostCreatedProduserMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockUserPostCreatedProduser) EXPECT() *MockUserPostCreatedProduserMockRecorder {
+	return m.recorder
+}
+
+// ProduceMessage mocks base method.
+func (m *MockUserPostCreatedProduser) ProduceMessage(ctx context.Context, message, key any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ProduceMessage", ctx, message, key)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ProduceMessage indicates an expected call of ProduceMessage.
+func (mr *MockUserPostCreatedProduserMockRecorder) ProduceMessage(ctx, message, key any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProduceMessage", reflect.TypeOf((*MockUserPostCreatedProduser)(nil).ProduceMessage), ctx, message, key)
 }

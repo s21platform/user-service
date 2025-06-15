@@ -31,14 +31,16 @@ type Server struct {
 	ufrR       UserFriendsRegisterSrv
 	optionhubS OptionhubS
 	ucP        UserCreatedProducer
+	upcP       UserPostCreatedProduser
 }
 
-func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS, ucP UserCreatedProducer) *Server {
+func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS, ucP UserCreatedProducer, upcP UserPostCreatedProduser) *Server {
 	return &Server{
 		dbRepo:     repo,
 		ufrR:       ufrR,
 		optionhubS: optionhubService,
 		ucP:        ucP,
+		upcP:       upcP,
 	}
 }
 
@@ -48,7 +50,7 @@ func (s *Server) GetUserByLogin(ctx context.Context, in *user.GetUserByLoginIn) 
 	userData, err := s.dbRepo.GetOrSetUserByLogin(in.Login)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to get user: %v", err))
-		return nil, status.Error(codes.NotFound, "Ошибка создания пользователя")
+		return nil, status.Errorf(codes.NotFound, "Ошибка создания пользователя: %v", err)
 	}
 	if userData.IsNew {
 		mess := &new_friend_register.NewFriendRegister{
@@ -71,7 +73,7 @@ func (s *Server) IsUserExistByUUID(ctx context.Context, in *user.IsUserExistByUU
 	isExist, err := s.dbRepo.IsUserExistByUUID(in.Uuid)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to check user exist: %v", err))
-		return nil, status.Errorf(codes.Internal, "Невозможно найти пользователя")
+		return nil, status.Errorf(codes.Internal, "Невозможно найти пользователя: %v", err)
 	}
 	return &user.IsUserExistByUUIDOut{IsExist: isExist}, nil
 }
@@ -142,7 +144,7 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 	userInfo, err := s.dbRepo.GetUserInfoByUUID(ctx, in.Uuid)
 	if err != nil {
 		log.Println("failed to get user data from repo:", err)
-		return nil, status.Errorf(codes.Internal, "failed to get user data from repo")
+		return nil, status.Errorf(codes.Internal, "failed to get user data from repo: %v", err)
 	}
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("uuid", ctx.Value(config.KeyUUID).(string)))
 	osInfo, err := s.optionhubS.GetOs(ctx, userInfo.OSId)
@@ -240,12 +242,12 @@ func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.C
 			return fmt.Errorf("failed to create user: %v", err)
 		}
 
-		err = s.ucP.ProduceMessage(ctx, user.UserCreatedMessage{
-			UserUuid: userUUIDStr,
-		}, userUUIDStr)
-		if err != nil {
-			return fmt.Errorf("failed to produce message: %v", err)
-		}
+		//err = s.ucP.ProduceMessage(ctx, user.UserCreatedMessage{
+		//	UserUuid: userUUIDStr,
+		//}, userUUIDStr)
+		//if err != nil {
+		//	return fmt.Errorf("failed to produce message: %v", err)
+		//}
 		return nil
 	})
 	if err != nil {
@@ -384,6 +386,26 @@ func (s *Server) GetWhoFollowPeer(ctx context.Context, in *user.GetWhoFollowPeer
 	return &user.GetWhoFollowPeerOut{Subscribers: peers}, nil
 }
 
+func (s *Server) CheckFriendship(ctx context.Context, in *user.CheckFriendshipIn) (*user.CheckFriendshipOut, error) {
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("CheckFriendship")
+	userUUID, ok := ctx.Value(config.KeyUUID).(string)
+
+	if !ok || userUUID == "" {
+		logger.Error("failed to get user UUID from context")
+		return nil, fmt.Errorf("failed to get user UUID from context")
+	}
+
+	succses, err := s.dbRepo.CheckFriendship(ctx, userUUID, in.Uuid)
+	if err != nil {
+		logger.Error("failed to check user friendship")
+		return nil, err
+	}
+	return &user.CheckFriendshipOut{
+		Succses: succses,
+	}, nil
+}
+
 func (s *Server) CreatePost(ctx context.Context, in *user.CreatePostIn) (*user.CreatePostOut, error) {
 	ownerUUID, ok := ctx.Value(config.KeyUUID).(string)
 	if !ok {
@@ -393,6 +415,16 @@ func (s *Server) CreatePost(ctx context.Context, in *user.CreatePostIn) (*user.C
 	newPostUUID, err := s.dbRepo.CreatePost(ctx, ownerUUID, in.Content)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create post: %v", err)
+	}
+
+	msg := &user.UserPostCreated{
+		UserUuid: ownerUUID,
+		PostId:   newPostUUID,
+	}
+
+	err = s.upcP.ProduceMessage(ctx, msg, ownerUUID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to produce message: %v", err)
 	}
 
 	return &user.CreatePostOut{PostUuid: newPostUUID}, nil

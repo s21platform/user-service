@@ -30,7 +30,7 @@ type CheckUser struct {
 }
 
 func (r *Repository) GetPeerFollow(ctx context.Context, userUUID string) ([]string, error) {
-	sqlString, args, err := sq.Select("user_id").
+	sqlString, args, err := sq.Select("invited").
 		From("friends").
 		Where(sq.Eq{"initiator": userUUID}).
 		PlaceholderFormat(sq.Dollar).
@@ -50,7 +50,7 @@ func (r *Repository) GetPeerFollow(ctx context.Context, userUUID string) ([]stri
 func (r *Repository) GetWhoFollowPeer(ctx context.Context, userUUID string) ([]string, error) {
 	sqlString, args, err := sq.Select("initiator").
 		From("friends").
-		Where(sq.Eq{"user_id": userUUID}).
+		Where(sq.Eq{"invited": userUUID}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 
@@ -68,7 +68,7 @@ func (r *Repository) GetWhoFollowPeer(ctx context.Context, userUUID string) ([]s
 func (r *Repository) GetSubscribersCount(ctx context.Context, userUUID string) (int64, error) {
 	sqlString, args, err := sq.Select("COUNT(initiator)").
 		From("friends").
-		Where(sq.Eq{"user_id": userUUID}).
+		Where(sq.Eq{"invited": userUUID}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 
@@ -105,7 +105,7 @@ func (r *Repository) GetSubscriptionCount(ctx context.Context, userUUID string) 
 
 func (r *Repository) SetFriends(ctx context.Context, peer1, peer2 string) error {
 	sqlString, args, err := sq.Insert("friends").
-		Columns("initiator", "user_id").
+		Columns("initiator", "invited").
 		Values(peer1, peer2).
 		PlaceholderFormat(sq.Dollar).ToSql()
 
@@ -122,7 +122,7 @@ func (r *Repository) SetFriends(ctx context.Context, peer1, peer2 string) error 
 
 func (r *Repository) RemoveFriends(ctx context.Context, peer1, peer2 string) error {
 	sqlString, args, err := sq.Delete("friends").
-		Where(sq.Eq{"initiator": peer1, "user_id": peer2}).
+		Where(sq.Eq{"initiator": peer1, "invited": peer2}).
 		PlaceholderFormat(sq.Dollar).ToSql()
 
 	if err != nil {
@@ -140,7 +140,7 @@ func (r *Repository) CheckFriendship(ctx context.Context, peer1, peer2 string) (
 
 	sqlString, args, err := sq.Select("COUNT(1) > 0").
 		From("friends").
-		Where(sq.Eq{"initiator": peer1, "user_id": peer2}).
+		Where(sq.Eq{"initiator": peer1, "invited": peer2}).
 		PlaceholderFormat(sq.Dollar).ToSql()
 
 	if err != nil {
@@ -222,13 +222,12 @@ func (r *Repository) createUser(nickname, email string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to start transaction: %v", err)
 	}
-	var lastId int
-	err = tx.QueryRowx("INSERT INTO users (login, uuid, email, last_avatar_link) VALUES ($1, $2, $3, $4) RETURNING id", nickname, uuid_.String(), email, defaultAvatar).Scan(&lastId)
+	_, err = tx.Exec("INSERT INTO users (login, uuid, email, last_avatar_link) VALUES ($1, $2, $3, $4)", nickname, uuid_.String(), email, defaultAvatar)
 	if err != nil {
 		_ = tx.Rollback()
 		return "", fmt.Errorf("failed to get id of inserted row: %v", err)
 	}
-	_, err = tx.Exec("INSERT INTO data (user_id) VALUES ($1)", lastId)
+	_, err = tx.Exec("INSERT INTO data (user_uuid) VALUES ($1)", uuid_)
 	if err != nil {
 		_ = tx.Rollback()
 		return "", fmt.Errorf("failed to insert data: %v", err)
@@ -253,7 +252,7 @@ func (r *Repository) GetUserInfoByUUID(ctx context.Context, uuid string) (model.
 		    d.work_id,
 		    d.university_id
 		FROM users u 
-		JOIN data d ON d.user_id = u.id
+		JOIN data d ON d.user_uuid = u.uuid
 		where u.uuid = $1
 	`
 	var result []model.UserInfo
@@ -267,10 +266,10 @@ func (r *Repository) GetUserInfoByUUID(ctx context.Context, uuid string) (model.
 	return result[0], nil
 }
 
-func (r *Repository) GetUsersByUUID(uuid string) (model.UserInfoMin, error) {
+func (r *Repository) GetUsersByUUID(uuid string) (model.UserInfoMin, error) { // TODO: wrong naming, it gets 1 user info, not list
 	query := "select uuid, login, last_avatar_link, " +
 		"COALESCE(data.name, '') name, COALESCE(data.surname, '') as surname from users " +
-		"join data ON users.id = data.user_id " +
+		"join data ON users.uuid = data.user_uuid " +
 		"where uuid = $1"
 	var result model.UserInfoMin
 	err := r.Get(&result, query, uuid)
@@ -280,12 +279,12 @@ func (r *Repository) GetUsersByUUID(uuid string) (model.UserInfoMin, error) {
 	return result, nil
 }
 
-func (r *Repository) GetUserWithLimit(uuid, nickname string, limit int64, offset int64) ([]model.UserWithLimit, int64, error) {
+func (r *Repository) GetUserWithLimit(uuid, nickname string, limit int64, offset int64) ([]model.UserWithLimit, int64, error) { // TODO: wrong naming, it gets list of user, not 1 user
 	var userWithLimit []model.UserWithLimit
 	likeNick := "%" + nickname + "%"
 	err := r.Select(&userWithLimit, "SELECT users.login, users.uuid, users.last_avatar_link, COALESCE(data.name, '') as name, COALESCE(data.surname, '') as surname "+
 		"FROM users "+
-		"JOIN data on users.id = data.user_id "+
+		"JOIN data on users.uuid = data.user_uuid "+
 		"WHERE users.uuid != $1 AND users.login LIKE $2 LIMIT $3 OFFSET $4;", uuid, likeNick, limit, offset)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to get user info: %v", err)
@@ -306,8 +305,7 @@ func (r *Repository) GetUserWithLimit(uuid, nickname string, limit int64, offset
 
 func (r *Repository) GetLoginByUuid(ctx context.Context, uuid string) (string, error) {
 	query := `
-		SELECT
-			login 
+		SELECT login 
 		FROM users 
 		WHERE uuid=$1
 	`
@@ -328,28 +326,14 @@ func (r *Repository) UpdateProfile(ctx context.Context, data model.ProfileData, 
 		return fmt.Errorf("failed to start transaction: %v", err)
 	}
 
-	query, args, err := sq.Select("id").
-		From("users").Where(sq.Eq{"uuid": userUuid}).
-		PlaceholderFormat(sq.Dollar).
-		ToSql()
-	if err != nil {
-		_ = tx.Rollback()
-		return fmt.Errorf("failed to build query: %v", err)
-	}
-	var userId int64
-	err = tx.GetContext(ctx, &userId, query, args...)
-	if err != nil {
-		_ = tx.Rollback()
-		return fmt.Errorf("failed to get user id: %v", err)
-	}
 	log.Println(data.Birthdate)
-	query, args, err = sq.Update("data").
+	query, args, err := sq.Update("data").
 		Set("name", data.Name).
 		Set("birthdate", data.Birthdate).
 		Set("git", data.Git).
 		Set("telegram", data.Telegram).
 		Set("os_id", data.OsId).
-		Where(sq.Eq{"user_id": userId}).
+		Where(sq.Eq{"user_uuid": userUuid}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 
@@ -436,7 +420,7 @@ func (r *Repository) CreateUser(ctx context.Context, userUUID string, email stri
 
 func (r *Repository) CreatePost(ctx context.Context, uuid, content string) (string, error) {
 	query, args, err := sq.Insert("posts").
-		Columns("user_id", "content").
+		Columns("user_uuid", "content").
 		Values(uuid, content).
 		Suffix("RETURNING id").
 		PlaceholderFormat(sq.Dollar).

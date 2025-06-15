@@ -32,6 +32,7 @@ const (
 	UserService_GetCountFriends_FullMethodName   = "/UserService/GetCountFriends"
 	UserService_GetPeerFollow_FullMethodName     = "/UserService/GetPeerFollow"
 	UserService_GetWhoFollowPeer_FullMethodName  = "/UserService/GetWhoFollowPeer"
+	UserService_CheckFriendship_FullMethodName   = "/UserService/CheckFriendship"
 	UserService_CreatePost_FullMethodName        = "/UserService/CreatePost"
 	UserService_GetPostsByIds_FullMethodName     = "/UserService/GetPostsByIds"
 )
@@ -55,6 +56,7 @@ type UserServiceClient interface {
 	GetCountFriends(ctx context.Context, in *EmptyFriends, opts ...grpc.CallOption) (*GetCountFriendsOut, error)
 	GetPeerFollow(ctx context.Context, in *GetPeerFollowIn, opts ...grpc.CallOption) (*GetPeerFollowOut, error)
 	GetWhoFollowPeer(ctx context.Context, in *GetWhoFollowPeerIn, opts ...grpc.CallOption) (*GetWhoFollowPeerOut, error)
+	CheckFriendship(ctx context.Context, in *CheckFriendshipIn, opts ...grpc.CallOption) (*CheckFriendshipOut, error)
 	CreatePost(ctx context.Context, in *CreatePostIn, opts ...grpc.CallOption) (*CreatePostOut, error)
 	GetPostsByIds(ctx context.Context, in *GetPostsByIdsIn, opts ...grpc.CallOption) (*GetPostsByIdsOut, error)
 }
@@ -197,6 +199,16 @@ func (c *userServiceClient) GetWhoFollowPeer(ctx context.Context, in *GetWhoFoll
 	return out, nil
 }
 
+func (c *userServiceClient) CheckFriendship(ctx context.Context, in *CheckFriendshipIn, opts ...grpc.CallOption) (*CheckFriendshipOut, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckFriendshipOut)
+	err := c.cc.Invoke(ctx, UserService_CheckFriendship_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userServiceClient) CreatePost(ctx context.Context, in *CreatePostIn, opts ...grpc.CallOption) (*CreatePostOut, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreatePostOut)
@@ -236,6 +248,7 @@ type UserServiceServer interface {
 	GetCountFriends(context.Context, *EmptyFriends) (*GetCountFriendsOut, error)
 	GetPeerFollow(context.Context, *GetPeerFollowIn) (*GetPeerFollowOut, error)
 	GetWhoFollowPeer(context.Context, *GetWhoFollowPeerIn) (*GetWhoFollowPeerOut, error)
+	CheckFriendship(context.Context, *CheckFriendshipIn) (*CheckFriendshipOut, error)
 	CreatePost(context.Context, *CreatePostIn) (*CreatePostOut, error)
 	GetPostsByIds(context.Context, *GetPostsByIdsIn) (*GetPostsByIdsOut, error)
 	mustEmbedUnimplementedUserServiceServer()
@@ -286,6 +299,9 @@ func (UnimplementedUserServiceServer) GetPeerFollow(context.Context, *GetPeerFol
 }
 func (UnimplementedUserServiceServer) GetWhoFollowPeer(context.Context, *GetWhoFollowPeerIn) (*GetWhoFollowPeerOut, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWhoFollowPeer not implemented")
+}
+func (UnimplementedUserServiceServer) CheckFriendship(context.Context, *CheckFriendshipIn) (*CheckFriendshipOut, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckFriendship not implemented")
 }
 func (UnimplementedUserServiceServer) CreatePost(context.Context, *CreatePostIn) (*CreatePostOut, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePost not implemented")
@@ -548,6 +564,24 @@ func _UserService_GetWhoFollowPeer_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_CheckFriendship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckFriendshipIn)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).CheckFriendship(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_CheckFriendship_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).CheckFriendship(ctx, req.(*CheckFriendshipIn))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserService_CreatePost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreatePostIn)
 	if err := dec(in); err != nil {
@@ -642,6 +676,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetWhoFollowPeer",
 			Handler:    _UserService_GetWhoFollowPeer_Handler,
+		},
+		{
+			MethodName: "CheckFriendship",
+			Handler:    _UserService_CheckFriendship_Handler,
 		},
 		{
 			MethodName: "CreatePost",

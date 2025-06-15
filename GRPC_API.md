@@ -4,6 +4,8 @@
 ## Table of Contents
 
 - [api/user.proto](#api_user-proto)
+    - [CheckFriendshipIn](#-CheckFriendshipIn)
+    - [CheckFriendshipOut](#-CheckFriendshipOut)
     - [CreatePostIn](#-CreatePostIn)
     - [CreatePostOut](#-CreatePostOut)
     - [CreateUserIn](#-CreateUserIn)
@@ -42,6 +44,7 @@
     - [UserCreatedMessage](#-UserCreatedMessage)
     - [UserInfoMin](#-UserInfoMin)
     - [UserNicknameUpdated](#-UserNicknameUpdated)
+    - [UserPostCreated](#-UserPostCreated)
     - [UsersUUID](#-UsersUUID)
   
     - [UserService](#-UserService)
@@ -54,6 +57,36 @@
 <p align="right"><a href="#top">Top</a></p>
 
 ## api/user.proto
+
+
+
+<a name="-CheckFriendshipIn"></a>
+
+### CheckFriendshipIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| uuid | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-CheckFriendshipOut"></a>
+
+### CheckFriendshipOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| succses | [bool](#bool) |  |  |
+
+
+
 
 
 
@@ -663,6 +696,22 @@ Min user information structure
 
 
 
+<a name="-UserPostCreated"></a>
+
+### UserPostCreated
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_uuid | [string](#string) |  |  |
+| post_id | [string](#string) |  |  |
+
+
+
+
+
+
 <a name="-UsersUUID"></a>
 
 ### UsersUUID
@@ -704,6 +753,7 @@ Service for user info
 | GetCountFriends | [.EmptyFriends](#EmptyFriends) | [.GetCountFriendsOut](#GetCountFriendsOut) |  |
 | GetPeerFollow | [.GetPeerFollowIn](#GetPeerFollowIn) | [.GetPeerFollowOut](#GetPeerFollowOut) |  |
 | GetWhoFollowPeer | [.GetWhoFollowPeerIn](#GetWhoFollowPeerIn) | [.GetWhoFollowPeerOut](#GetWhoFollowPeerOut) |  |
+| CheckFriendship | [.CheckFriendshipIn](#CheckFriendshipIn) | [.CheckFriendshipOut](#CheckFriendshipOut) |  |
 | CreatePost | [.CreatePostIn](#CreatePostIn) | [.CreatePostOut](#CreatePostOut) |  |
 | GetPostsByIds | [.GetPostsByIdsIn](#GetPostsByIdsIn) | [.GetPostsByIdsOut](#GetPostsByIdsOut) |  |
 
