@@ -418,10 +418,14 @@ func (r *Repository) CreateUser(ctx context.Context, userUUID string, email stri
 	return nil
 }
 
-func (r *Repository) CreatePost(ctx context.Context, uuid, content string) (string, error) {
+func (r *Repository) CreatePost(ctx context.Context, uuidString, content string) (string, error) {
+	userUUID, err := uuid.Parse(uuidString)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse uuid: %v", err)
+	}
 	query, args, err := sq.Insert("posts").
 		Columns("user_uuid", "content").
-		Values(uuid, content).
+		Values(userUUID, content).
 		Suffix("RETURNING id").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -466,8 +470,8 @@ func (r *Repository) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn
 	query, args, err := sq.
 		Select("posts.id", "users.login", "data.name", "data.last_name", "users.last_avatar_link", "posts.content", "posts.created_at", "posts.updated_at", "posts.deleted_at").
 		From("posts").
-		Join("users ON users.uuid = posts.user_id").
-		Join("data ON data.user_id = users.uuid").
+		Join("users ON users.uuid = posts.user_uuid").
+		Join("data ON data.user_uuid = users.uuid").
 		Where(sq.And{
 			sq.Eq{"posts.id": in.PostUuids},
 			sq.Eq{"posts.deleted_at": nil}}).
