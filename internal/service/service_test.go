@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/guregu/null/v6"
 	"testing"
 	"time"
+
+	"github.com/guregu/null/v6"
 
 	logger_lib "github.com/s21platform/logger-lib"
 	"google.golang.org/grpc/codes"
@@ -667,7 +668,7 @@ func TestServer_GetUserPostsByIds(t *testing.T) {
 	surname1, surname2 := "Doe", "Doe"
 	avatarLink1, avatarLink2 := "avatar1", "avatar2"
 	content1, content2 := "post1", "post2"
-	createdAt1, createdAt2 := time.Now(), time.Now()
+	createdAt1, createdAt2 := time.Now(), time.Now() //nolint:all
 	editedAt1, editedAt2 := null.Time{sql.NullTime{Time: time.Now(), Valid: true}}, null.Time{sql.NullTime{Time: time.Now(), Valid: true}}
 
 	t.Run("should ok", func(t *testing.T) {

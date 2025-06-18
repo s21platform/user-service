@@ -3,6 +3,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/s21platform/user-service/pkg/user"
 
 	"github.com/s21platform/user-service/internal/model"

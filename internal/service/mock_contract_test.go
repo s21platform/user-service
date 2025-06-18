@@ -11,8 +11,9 @@ package service
 
 import (
 	context "context"
-	"github.com/s21platform/user-service/pkg/user"
 	reflect "reflect"
+
+	"github.com/s21platform/user-service/pkg/user"
 
 	gomock "github.com/golang/mock/gomock"
 	model "github.com/s21platform/user-service/internal/model"

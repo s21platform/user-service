@@ -5,10 +5,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	sq "github.com/Masterminds/squirrel"
-	"github.com/s21platform/user-service/pkg/user"
 	"log"
 	"strings"
+
+	sq "github.com/Masterminds/squirrel"
+	"github.com/s21platform/user-service/pkg/user"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"

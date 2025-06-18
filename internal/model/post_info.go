@@ -2,8 +2,9 @@ package model
 
 import (
 	"fmt"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/guregu/null/v6"
 	user_proto "github.com/s21platform/user-service/pkg/user"
