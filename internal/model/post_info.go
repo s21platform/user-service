@@ -1,36 +1,37 @@
 package model
 
 import (
+	"fmt"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 
+	"github.com/guregu/null/v6"
 	user_proto "github.com/s21platform/user-service/pkg/user"
 )
 
 type PostInfoList []*PostInfo
 
 type PostInfo struct {
-	id         int64     `db:"login"`
-	Nickname   string    `db:"surname"`
-	FullName   string    `db:"name"`
+	ID         string    `db:"post_id"`
+	Nickname   string    `db:"login"`
+	Name       string    `db:"name"`
+	Surname    string    `db:"surname"`
 	AvatarLink string    `db:"last_avatar_link"`
 	Content    string    `db:"content"`
 	CreatedAt  time.Time `db:"created_at"`
-	IsEdited   time.Time `db:"edited_at"`
+	EditedAt   null.Time `db:"updated_at"`
 }
 
 func (pd *PostInfo) FromDTO() *user_proto.PostInfo {
-	result := &user_proto.PostInfo{
-		PostUuid:   pd.id,
+	return &user_proto.PostInfo{
+		PostUuid:   pd.ID,
 		Nickname:   pd.Nickname,
-		FullName:   pd.FullName,
+		FullName:   pd.Name + " " + pd.Surname,
 		AvatarLink: pd.AvatarLink,
 		Content:    pd.Content,
 		CreatedAt:  timestamppb.New(pd.CreatedAt),
-		IsEdited:   pd.IsEdited != time.Time{},
+		IsEdited:   pd.EditedAt.Valid,
 	}
-
-	return result
 }
 
 func (pdl *PostInfoList) ListFromDTO() []*user_proto.PostInfo {
@@ -40,5 +41,6 @@ func (pdl *PostInfoList) ListFromDTO() []*user_proto.PostInfo {
 		result = append(result, post.FromDTO())
 	}
 
+	fmt.Println(result)
 	return result
 }

@@ -237,7 +237,7 @@ message UserPostCreated {
 }
 
 message PostInfo {
-  int64 post_uuid = 1;
+  string post_uuid = 1;
   string nickname = 2;
   string full_name = 3;
   string avatar_link = 4;

@@ -2,9 +2,12 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/guregu/null/v6"
 	"testing"
+	"time"
 
 	logger_lib "github.com/s21platform/logger-lib"
 	"google.golang.org/grpc/codes"
@@ -646,5 +649,114 @@ func TestServer_CreateUserPosts(t *testing.T) {
 		assert.True(t, ok)
 		assert.Equal(t, codes.Internal, st.Code())
 		assert.Contains(t, st.Message(), "failed to create post: get err")
+	})
+}
+
+func TestServer_GetUserPostsByIds(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+
+	ctrl := gomock.NewController(t)
+	ctrl.Finish()
+	mockDBRepo := NewMockDbRepo(ctrl)
+
+	post1, post2 := uuid.New().String(), uuid.New().String()
+	nickname1, nickname2 := "JohnDoe", "JaneDoe"
+	name1, name2 := "John", "Jane"
+	surname1, surname2 := "Doe", "Doe"
+	avatarLink1, avatarLink2 := "avatar1", "avatar2"
+	content1, content2 := "post1", "post2"
+	createdAt1, createdAt2 := time.Now(), time.Now()
+	editedAt1, editedAt2 := null.Time{sql.NullTime{Time: time.Now(), Valid: true}}, null.Time{sql.NullTime{Time: time.Now(), Valid: true}}
+
+	t.Run("should ok", func(t *testing.T) {
+		defer ctrl.Finish()
+
+		ctx = context.WithValue(ctx, config.KeyUUID, []string{post1, post2})
+
+		mockInput := &user.GetPostsByIdsIn{
+			PostUuids: []string{post1, post2},
+		}
+
+		expectedPosts := model.PostInfoList{
+			{
+				ID:         post1,
+				Nickname:   nickname1,
+				Name:       name1,
+				Surname:    surname1,
+				AvatarLink: avatarLink1,
+				Content:    content1,
+				CreatedAt:  createdAt1,
+				EditedAt:   editedAt1,
+			},
+			{
+				ID:         post2,
+				Nickname:   nickname2,
+				Name:       name2,
+				Surname:    surname2,
+				AvatarLink: avatarLink2,
+				Content:    content2,
+				CreatedAt:  createdAt2,
+				EditedAt:   editedAt2,
+			},
+		}
+
+		mockDBRepo.EXPECT().GetPostsByIds(ctx, mockInput).Return(&expectedPosts, nil)
+		//mockLogger.EXPECT().AddFuncName("GetPostsByIds")
+
+		s := &Server{dbRepo: mockDBRepo}
+		result, err := s.GetPostsByIds(ctx, mockInput)
+		assert.NoError(t, err)
+		assert.Equal(t, result, &user.GetPostsByIdsOut{Posts: (&expectedPosts).ListFromDTO()})
+	})
+
+	t.Run("should_return_nil_if_empty_UUID_provided", func(t *testing.T) {
+		defer ctrl.Finish()
+
+		ctx = context.WithValue(ctx, config.KeyUUID, []string{})
+
+		mockInput := &user.GetPostsByIdsIn{
+			PostUuids: []string{},
+		}
+
+		s := &Server{dbRepo: mockDBRepo}
+		result, err := s.GetPostsByIds(ctx, mockInput)
+		assert.NoError(t, err)
+		assert.Nil(t, result)
+	})
+
+	t.Run("should_return_if_uuid_is_empty", func(t *testing.T) {
+		defer ctrl.Finish()
+
+		ctx = context.WithValue(ctx, config.KeyUUID, []string{post1, ""})
+
+		mockInput := &user.GetPostsByIdsIn{
+			PostUuids: []string{post1, ""},
+		}
+
+		s := &Server{dbRepo: mockDBRepo}
+		result, err := s.GetPostsByIds(ctx, mockInput)
+		assert.NoError(t, err)
+		assert.Nil(t, result)
+	})
+
+	t.Run("should_return_error_if_db_fails", func(t *testing.T) {
+		defer ctrl.Finish()
+
+		ctx = context.WithValue(ctx, config.KeyUUID, []string{post1, post2})
+
+		mockInput := &user.GetPostsByIdsIn{
+			PostUuids: []string{post1, post2},
+		}
+
+		expectedErr := errors.New("get err")
+		mockDBRepo.EXPECT().GetPostsByIds(ctx, mockInput).Return(nil, expectedErr)
+		//mockLogger.EXPECT().AddFuncName("GetPostsByIds")
+
+		s := &Server{dbRepo: mockDBRepo}
+		result, err := s.GetPostsByIds(ctx, mockInput)
+		assert.Error(t, err)
+		assert.Nil(t, result)
 	})
 }
