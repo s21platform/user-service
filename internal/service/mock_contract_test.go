@@ -13,6 +13,8 @@ import (
 	context "context"
 	reflect "reflect"
 
+	"github.com/s21platform/user-service/pkg/user"
+
 	gomock "github.com/golang/mock/gomock"
 	model "github.com/s21platform/user-service/internal/model"
 	postgres "github.com/s21platform/user-service/internal/repository/postgres"
@@ -460,4 +462,16 @@ func (m *MockUserPostCreatedProduser) ProduceMessage(ctx context.Context, messag
 func (mr *MockUserPostCreatedProduserMockRecorder) ProduceMessage(ctx, message, key any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProduceMessage", reflect.TypeOf((*MockUserPostCreatedProduser)(nil).ProduceMessage), ctx, message, key)
+}
+
+func (m *MockDbRepo) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn) (*model.PostInfoList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPostsByIds", ctx, in)
+	ret0, _ := ret[0].(*model.PostInfoList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+func (mr *MockDbRepoMockRecorder) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPostsByIds", reflect.TypeOf((*MockDbRepo)(nil).GetPostsByIds), ctx, in)
 }

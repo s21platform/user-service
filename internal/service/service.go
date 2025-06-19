@@ -242,12 +242,12 @@ func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.C
 			return fmt.Errorf("failed to create user: %v", err)
 		}
 
-		//err = s.ucP.ProduceMessage(ctx, user.UserCreatedMessage{
-		//	UserUuid: userUUIDStr,
-		//}, userUUIDStr)
-		//if err != nil {
-		//	return fmt.Errorf("failed to produce message: %v", err)
-		//}
+		err = s.ucP.ProduceMessage(ctx, user.UserCreatedMessage{
+			UserUuid: userUUIDStr,
+		}, userUUIDStr)
+		if err != nil {
+			return fmt.Errorf("failed to produce message: %v", err)
+		}
 		return nil
 	})
 	if err != nil {
@@ -428,4 +428,23 @@ func (s *Server) CreatePost(ctx context.Context, in *user.CreatePostIn) (*user.C
 	}
 
 	return &user.CreatePostOut{PostUuid: newPostUUID}, nil
+}
+
+func (s *Server) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn) (*user.GetPostsByIdsOut, error) {
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("GetPostsByIds")
+	userUUID, ok := ctx.Value(config.KeyUUID).(string)
+
+	if !ok || userUUID == "" {
+		logger.Error("failed to get user UUID from context")
+		return nil, fmt.Errorf("failed to get user UUID from context")
+	}
+
+	posts, err := s.dbRepo.GetPostsByIds(ctx, in)
+	if err != nil {
+		logger.Error("failed to get posts by ids")
+		return nil, err
+	}
+	//fmt.Println(posts.ListFromDTO())
+	return &user.GetPostsByIdsOut{Posts: posts.ListFromDTO()}, nil
 }

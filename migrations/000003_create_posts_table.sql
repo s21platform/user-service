@@ -1,8 +1,8 @@
 -- +goose Up
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE TABLE IF NOT EXISTS posts (
-    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id     UUID NOT NULL,
+    id          serial PRIMARY KEY,
+    user_id     integer NOT NULL,
     content     TEXT,
     external_id TEXT,
     origin      TEXT,

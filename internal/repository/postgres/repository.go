@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/s21platform/user-service/pkg/user"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -414,13 +415,34 @@ func (r *Repository) CreateUser(ctx context.Context, userUUID string, email stri
 	if err != nil {
 		return fmt.Errorf("failed to execute query: %v", err)
 	}
+
+	query, args, err = sq.
+		Insert(`data`).
+		Columns(`user_uuid`).
+		Values(userUUID).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return fmt.Errorf("failed to build query: %v", err)
+	}
+
+	_, err = r.Chk(ctx).ExecContext(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("failed to execute query: %v", err)
+	}
+
 	return nil
 }
 
-func (r *Repository) CreatePost(ctx context.Context, uuid, content string) (string, error) {
+func (r *Repository) CreatePost(ctx context.Context, uuidString, content string) (string, error) {
+	userUUID, err := uuid.Parse(uuidString)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse uuid: %v", err)
+	}
 	query, args, err := sq.Insert("posts").
 		Columns("user_uuid", "content").
-		Values(uuid, content).
+		Values(userUUID, content).
 		Suffix("RETURNING id").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -457,4 +479,38 @@ func New(cfg *config.Config) *Repository {
 		log.Fatal("error ping: ", err)
 	}
 	return &Repository{conn}
+}
+
+func (r *Repository) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn) (*model.PostInfoList, error) {
+	var posts model.PostInfoList
+
+	query, args, err := sq.
+		Select(
+			"cast(posts.id as varchar) as post_id",
+			"coalesce(users.login, '') as login",
+			"coalesce(data.name, '') as name",
+			"coalesce(data.surname, '') as surname",
+			"coalesce(users.last_avatar_link, '') as last_avatar_link",
+			"coalesce(posts.content, '') as content",
+			"posts.created_at as created_at",
+			"posts.updated_at as updated_at").
+		From("posts").
+		Join("users ON users.uuid = posts.user_uuid").
+		Join("data ON data.user_uuid = users.uuid").
+		Where(sq.And{
+			sq.Eq{"posts.id": in.PostUuids},
+			sq.Eq{"posts.deleted_at": nil}}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %v", err)
+	}
+
+	err = r.SelectContext(ctx, &posts, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %v", err)
+	}
+
+	return &posts, nil
 }
