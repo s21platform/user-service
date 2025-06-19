@@ -668,8 +668,8 @@ func TestServer_GetUserPostsByIds(t *testing.T) {
 	surname1, surname2 := "Doe", "Doe"
 	avatarLink1, avatarLink2 := "avatar1", "avatar2"
 	content1, content2 := "post1", "post2"
-	createdAt1, createdAt2 := time.Now(), time.Now() //nolint:all
-	editedAt1, editedAt2 := null.Time{sql.NullTime{Time: time.Now(), Valid: true}}, null.Time{sql.NullTime{Time: time.Now(), Valid: true}}
+	createdAt1, createdAt2 := time.Now(), time.Now()                                                                                       //nolint:all
+	editedAt1, editedAt2 := null.Time{sql.NullTime{Time: time.Now(), Valid: true}}, null.Time{sql.NullTime{Time: time.Now(), Valid: true}} //nolint:all
 
 	t.Run("should ok", func(t *testing.T) {
 		defer ctrl.Finish()
