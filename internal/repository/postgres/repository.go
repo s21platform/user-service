@@ -9,8 +9,6 @@ import (
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/s21platform/user-service/pkg/user"
-
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -481,7 +479,7 @@ func New(cfg *config.Config) *Repository {
 	return &Repository{conn}
 }
 
-func (r *Repository) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn) (*model.PostInfoList, error) {
+func (r *Repository) GetPostsByIds(ctx context.Context, uuids []string) (*model.PostInfoList, error) {
 	var posts model.PostInfoList
 
 	query, args, err := sq.
@@ -498,7 +496,7 @@ func (r *Repository) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn
 		Join("users ON users.uuid = posts.user_uuid").
 		Join("data ON data.user_uuid = users.uuid").
 		Where(sq.And{
-			sq.Eq{"posts.id": in.PostUuids},
+			sq.Eq{"posts.id": uuids},
 			sq.Eq{"posts.deleted_at": nil}}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()

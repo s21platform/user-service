@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/guregu/null/v6"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/guregu/null/v6"
 	user_proto "github.com/s21platform/user-service/pkg/user"
 )
 

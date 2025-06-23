@@ -440,11 +440,10 @@ func (s *Server) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn) (*
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
 
-	posts, err := s.dbRepo.GetPostsByIds(ctx, in)
+	posts, err := s.dbRepo.GetPostsByIds(ctx, in.PostUuids)
 	if err != nil {
 		logger.Error("failed to get posts by ids")
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "failed to get posts from db: %v", err)
 	}
-	//fmt.Println(posts.ListFromDTO())
 	return &user.GetPostsByIdsOut{Posts: posts.ListFromDTO()}, nil
 }
