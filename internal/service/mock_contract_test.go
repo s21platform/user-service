@@ -9,6 +9,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	uuid "github.com/google/uuid"
 	model "github.com/s21platform/user-service/internal/model"
 	postgres "github.com/s21platform/user-service/internal/repository/postgres"
 )
@@ -67,7 +68,7 @@ func (mr *MockDbRepoMockRecorder) CheckNicknameAvailability(ctx, nickname interf
 }
 
 // CreatePost mocks base method.
-func (m *MockDbRepo) CreatePost(ctx context.Context, uuid, content string) (string, error) {
+func (m *MockDbRepo) CreatePost(ctx context.Context, uuid uuid.UUID, content string) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreatePost", ctx, uuid, content)
 	ret0, _ := ret[0].(string)

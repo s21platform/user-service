@@ -603,15 +603,15 @@ func TestServer_CreateUserPosts(t *testing.T) {
 	t.Parallel()
 
 	content := "test-content"
-	userUUID := uuid.New().String()
+	userUUID := uuid.New()
 	expUUID := uuid.New().String()
 	msg := &user.UserPostCreated{
-		UserUuid: userUUID,
+		UserUuid: userUUID.String(),
 		PostId:   expUUID,
 	}
 
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, config.KeyUUID, userUUID)
+	ctx = context.WithValue(ctx, config.KeyUUID, userUUID.String())
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()

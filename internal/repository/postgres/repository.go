@@ -434,7 +434,6 @@ func (r *Repository) CreateUser(ctx context.Context, userUUID string, email stri
 }
 
 func (r *Repository) CreatePost(ctx context.Context, ownerUUID uuid.UUID, content string) (string, error) {
-
 	query, args, err := sq.Insert("posts").
 		Columns("user_uuid", "content").
 		Values(ownerUUID, content).
