@@ -433,14 +433,11 @@ func (r *Repository) CreateUser(ctx context.Context, userUUID string, email stri
 	return nil
 }
 
-func (r *Repository) CreatePost(ctx context.Context, uuidString, content string) (string, error) {
-	userUUID, err := uuid.Parse(uuidString)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse uuid: %v", err)
-	}
+func (r *Repository) CreatePost(ctx context.Context, ownerUUID uuid.UUID, content string) (string, error) {
+
 	query, args, err := sq.Insert("posts").
 		Columns("user_uuid", "content").
-		Values(userUUID, content).
+		Values(ownerUUID, content).
 		Suffix("RETURNING id").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -485,10 +482,10 @@ func (r *Repository) GetPostsByIds(ctx context.Context, uuids []string) (*model.
 	query, args, err := sq.
 		Select(
 			"cast(posts.id as varchar) as post_id",
-			"coalesce(users.login, '') as login",
+			"users.login as login",
 			"coalesce(data.name, '') as name",
 			"coalesce(data.surname, '') as surname",
-			"coalesce(users.last_avatar_link, '') as last_avatar_link",
+			"users.last_avatar_linkas last_avatar_link",
 			"coalesce(posts.content, '') as content",
 			"posts.created_at as created_at",
 			"posts.updated_at as updated_at").
@@ -505,7 +502,7 @@ func (r *Repository) GetPostsByIds(ctx context.Context, uuids []string) (*model.
 		return nil, fmt.Errorf("failed to build query: %v", err)
 	}
 
-	err = r.SelectContext(ctx, &posts, query, args...)
+	err = r.Chk(ctx).SelectContext(ctx, &posts, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %v", err)
 	}

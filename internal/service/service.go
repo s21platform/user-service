@@ -407,9 +407,14 @@ func (s *Server) CheckFriendship(ctx context.Context, in *user.CheckFriendshipIn
 }
 
 func (s *Server) CreatePost(ctx context.Context, in *user.CreatePostIn) (*user.CreatePostOut, error) {
-	ownerUUID, ok := ctx.Value(config.KeyUUID).(string)
+	uuidString, ok := ctx.Value(config.KeyUUID).(string)
 	if !ok {
 		return nil, status.Errorf(codes.Unauthenticated, "failed to retrieve uuid")
+	}
+
+	ownerUUID, err := uuid.Parse(uuidString)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse uuid: %v", err)
 	}
 
 	newPostUUID, err := s.dbRepo.CreatePost(ctx, ownerUUID, in.Content)
@@ -418,7 +423,7 @@ func (s *Server) CreatePost(ctx context.Context, in *user.CreatePostIn) (*user.C
 	}
 
 	msg := &user.UserPostCreated{
-		UserUuid: ownerUUID,
+		UserUuid: uuidString,
 		PostId:   newPostUUID,
 	}
 
