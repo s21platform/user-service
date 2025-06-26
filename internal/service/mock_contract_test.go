@@ -96,6 +96,20 @@ func (mr *MockDbRepoMockRecorder) CreateUser(ctx, userUUID, email, nickname inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockDbRepo)(nil).CreateUser), ctx, userUUID, email, nickname)
 }
 
+// CreateUserMeta mocks base method.
+func (m *MockDbRepo) CreateUserMeta(ctx context.Context, userUUID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUserMeta", ctx, userUUID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateUserMeta indicates an expected call of CreateUserMeta.
+func (mr *MockDbRepoMockRecorder) CreateUserMeta(ctx, userUUID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserMeta", reflect.TypeOf((*MockDbRepo)(nil).CreateUserMeta), ctx, userUUID)
+}
+
 // GetLoginByUuid mocks base method.
 func (m *MockDbRepo) GetLoginByUuid(ctx context.Context, uuid string) (string, error) {
 	m.ctrl.T.Helper()

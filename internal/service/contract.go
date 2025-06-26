@@ -26,6 +26,7 @@ type DbRepo interface {
 	GetWhoFollowPeer(ctx context.Context, userUUID string) ([]string, error)
 	CheckNicknameAvailability(ctx context.Context, nickname string) (bool, error)
 	CreateUser(ctx context.Context, userUUID string, email string, nickname string) error
+	CreateUserMeta(ctx context.Context, userUUID string) error
 	GetUserForCreation(ctx context.Context, email string) (*model.UserAuthInfo, error)
 	CreatePost(ctx context.Context, uuid uuid.UUID, content string) (string, error)
 	GetPostsByIds(context.Context, []string) (*model.PostInfoList, error)

@@ -227,7 +227,7 @@ func TestServer_SetFriends(t *testing.T) {
 		mockDBRepo.EXPECT().CheckFriendship(ctx, peer1, peer2).Return(false, nil)
 		mockDBRepo.EXPECT().SetFriends(ctx, peer1, peer2).Return(repoErr)
 		mockLogger.EXPECT().AddFuncName("SetFriends")
-		mockLogger.EXPECT().Error("failed to SetFriends from dbRepo")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to SetFriends from dbRepo: %v", repoErr))
 
 		s := &Server{dbRepo: mockDBRepo}
 		_, err := s.SetFriends(ctx, &user.SetFriendsIn{Peer: peer2})
@@ -246,7 +246,7 @@ func TestServer_SetFriends(t *testing.T) {
 
 		mockDBRepo.EXPECT().CheckFriendship(ctx, peer1, peer2).Return(false, checkErr)
 		mockLogger.EXPECT().AddFuncName("SetFriends")
-		mockLogger.EXPECT().Error(" failed to check user friendship")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to check user friendship: %v", checkErr))
 
 		s := &Server{dbRepo: mockDBRepo}
 		_, err := s.SetFriends(ctx, &user.SetFriendsIn{Peer: peer2})
@@ -341,7 +341,7 @@ func TestServer_RemoveFriends(t *testing.T) {
 		mockDBRepo.EXPECT().CheckFriendship(ctx, peer1, peer2).Return(true, nil)
 		mockDBRepo.EXPECT().RemoveFriends(ctx, peer1, peer2).Return(expectedErr)
 		mockLogger.EXPECT().AddFuncName("RemoveFriends")
-		mockLogger.EXPECT().Error("failed to RemoveFriends from dbRepo")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to RemoveFriends from dbRepo: %v", expectedErr))
 
 		s := &Server{dbRepo: mockDBRepo}
 		_, err := s.RemoveFriends(ctx, &user.RemoveFriendsIn{Peer: peer2})
@@ -400,7 +400,7 @@ func TestServer_GetCountFriends(t *testing.T) {
 
 		mockDBRepo.EXPECT().GetSubscriptionCount(ctx, peer).Return(int64(0), expectedErr)
 		mockLogger.EXPECT().AddFuncName("GetCountFriends")
-		mockLogger.EXPECT().Error("failed to get subscription count")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to get subscription count: %v", expectedErr))
 
 		s := &Server{dbRepo: mockDBRepo}
 		_, err := s.GetCountFriends(ctx, &user.EmptyFriends{})
@@ -417,7 +417,7 @@ func TestServer_GetCountFriends(t *testing.T) {
 		mockDBRepo.EXPECT().GetSubscriptionCount(ctx, peer).Return(int64(10), nil)
 		mockDBRepo.EXPECT().GetSubscribersCount(ctx, peer).Return(int64(0), expectedErr)
 		mockLogger.EXPECT().AddFuncName("GetCountFriends")
-		mockLogger.EXPECT().Error("failed to get subscribers count")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to get subscribers count: %v", expectedErr))
 
 		s := &Server{dbRepo: mockDBRepo}
 		_, err := s.GetCountFriends(ctx, &user.EmptyFriends{})
@@ -478,7 +478,7 @@ func TestServer_GetPeerFollow(t *testing.T) {
 		ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
 
 		mockDBRepo.EXPECT().GetPeerFollow(ctx, userUUID).Return(nil, repoErr)
-		mockLogger.EXPECT().Error("failed to get peer follow")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to get peer follow: %v", repoErr))
 		mockLogger.EXPECT().AddFuncName("GetPeerFollow")
 
 		s := &Server{dbRepo: mockDBRepo}
@@ -537,7 +537,7 @@ func TestServer_GetWhoFollowPeer(t *testing.T) {
 		ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
 
 		mockDBRepo.EXPECT().GetWhoFollowPeer(ctx, userUUID).Return(nil, repoErr)
-		mockLogger.EXPECT().Error("failed to get peer follow")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to get peer follow: %v", repoErr))
 		mockLogger.EXPECT().AddFuncName("GetWhoFollowPeer")
 
 		s := &Server{dbRepo: mockDBRepo}
@@ -589,7 +589,7 @@ func TestServer_CheckFriendship(t *testing.T) {
 
 		mockDBRepo.EXPECT().CheckFriendship(ctx, userUUID, friendUUID).Return(false, dbError)
 		mockLogger.EXPECT().AddFuncName("CheckFriendship")
-		mockLogger.EXPECT().Error("failed to check user friendship")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to check user friendship: %v", dbError))
 
 		s := &Server{dbRepo: mockDBRepo}
 		_, err := s.CheckFriendship(ctx, &user.CheckFriendshipIn{Uuid: friendUUID})

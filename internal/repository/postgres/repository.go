@@ -27,6 +27,26 @@ type CheckUser struct {
 	IsNew bool
 }
 
+func New(cfg *config.Config) *Repository {
+	//Connect db
+	conStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable",
+		cfg.Postgres.User, cfg.Postgres.Password, cfg.Postgres.Database, cfg.Postgres.Host, cfg.Postgres.Port)
+
+	conn, err := sqlx.Connect("postgres", conStr)
+	if err != nil {
+		log.Fatal("error connect: ", err)
+	}
+
+	if err := conn.Ping(); err != nil {
+		log.Fatal("error ping: ", err)
+	}
+	return &Repository{conn}
+}
+
+func (r *Repository) Close() {
+	_ = r.DB.Close()
+}
+
 func (r *Repository) GetPeerFollow(ctx context.Context, userUUID string) ([]string, error) {
 	sqlString, args, err := sq.Select("invited").
 		From("friends").
@@ -414,7 +434,11 @@ func (r *Repository) CreateUser(ctx context.Context, userUUID string, email stri
 		return fmt.Errorf("failed to execute query: %v", err)
 	}
 
-	query, args, err = sq.
+	return nil
+}
+
+func (r *Repository) CreateUserMeta(ctx context.Context, userUUID string) error {
+	query, args, err := sq.
 		Insert(`data`).
 		Columns(`user_uuid`).
 		Values(userUUID).
@@ -455,26 +479,6 @@ func (r *Repository) CreatePost(ctx context.Context, ownerUUID uuid.UUID, conten
 	return newPostUUID, nil
 }
 
-func (r *Repository) Close() {
-	_ = r.DB.Close()
-}
-
-func New(cfg *config.Config) *Repository {
-	//Connect db
-	conStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable",
-		cfg.Postgres.User, cfg.Postgres.Password, cfg.Postgres.Database, cfg.Postgres.Host, cfg.Postgres.Port)
-
-	conn, err := sqlx.Connect("postgres", conStr)
-	if err != nil {
-		log.Fatal("error connect: ", err)
-	}
-
-	if err := conn.Ping(); err != nil {
-		log.Fatal("error ping: ", err)
-	}
-	return &Repository{conn}
-}
-
 func (r *Repository) GetPostsByIds(ctx context.Context, uuids []string) (*model.PostInfoList, error) {
 	var posts model.PostInfoList
 
@@ -484,8 +488,8 @@ func (r *Repository) GetPostsByIds(ctx context.Context, uuids []string) (*model.
 			"users.login as login",
 			"coalesce(data.name, '') as name",
 			"coalesce(data.surname, '') as surname",
-			"users.last_avatar_linkas last_avatar_link",
-			"coalesce(posts.content, '') as content",
+			"users.last_avatar_link as last_avatar_link",
+			"posts.content as content",
 			"posts.created_at as created_at",
 			"posts.updated_at as updated_at").
 		From("posts").

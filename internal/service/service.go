@@ -242,6 +242,10 @@ func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.C
 			return fmt.Errorf("failed to create user: %v", err)
 		}
 
+		if err := s.dbRepo.CreateUserMeta(ctx, userUUIDStr); err != nil {
+			return fmt.Errorf("failed to create user: %v", err)
+		}
+
 		err = s.ucP.ProduceMessage(ctx, user.UserCreatedMessage{
 			UserUuid: userUUIDStr,
 		}, userUUIDStr)
@@ -272,7 +276,7 @@ func (s *Server) SetFriends(ctx context.Context, in *user.SetFriendsIn) (*user.S
 
 	areFriends, err := s.dbRepo.CheckFriendship(ctx, userUUID, in.Peer)
 	if err != nil {
-		logger.Error(" failed to check user friendship")
+		logger.Error(fmt.Sprintf("failed to check user friendship: %v", err))
 		return nil, fmt.Errorf(" failed to check user friendship: %v", err)
 	}
 	if areFriends {
@@ -282,7 +286,7 @@ func (s *Server) SetFriends(ctx context.Context, in *user.SetFriendsIn) (*user.S
 
 	err = s.dbRepo.SetFriends(ctx, userUUID, in.Peer)
 	if err != nil {
-		logger.Error("failed to SetFriends from dbRepo")
+		logger.Error(fmt.Sprintf("failed to SetFriends from dbRepo: %v", err))
 		return nil, err
 	}
 
@@ -311,7 +315,7 @@ func (s *Server) RemoveFriends(ctx context.Context, in *user.RemoveFriendsIn) (*
 
 	err = s.dbRepo.RemoveFriends(ctx, userUUID, in.Peer)
 	if err != nil {
-		logger.Error("failed to RemoveFriends from dbRepo")
+		logger.Error(fmt.Sprintf("failed to RemoveFriends from dbRepo: %v", err))
 		return nil, err
 	}
 	return &user.RemoveFriendsOut{Success: true}, nil
@@ -329,12 +333,12 @@ func (s *Server) GetCountFriends(ctx context.Context, in *user.EmptyFriends) (*u
 
 	subscription, err := s.dbRepo.GetSubscriptionCount(ctx, userUUID)
 	if err != nil {
-		logger.Error("failed to get subscription count")
+		logger.Error(fmt.Sprintf("failed to get subscription count: %v", err))
 		return nil, err
 	}
 	subscribers, err := s.dbRepo.GetSubscribersCount(ctx, userUUID)
 	if err != nil {
-		logger.Error("failed to get subscribers count")
+		logger.Error(fmt.Sprintf("failed to get subscribers count: %v", err))
 		return nil, err
 	}
 	return &user.GetCountFriendsOut{Subscription: subscription, Subscribers: subscribers}, nil
@@ -343,8 +347,8 @@ func (s *Server) GetCountFriends(ctx context.Context, in *user.EmptyFriends) (*u
 func (s *Server) GetPeerFollow(ctx context.Context, in *user.GetPeerFollowIn) (*user.GetPeerFollowOut, error) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("GetPeerFollow")
-	userUUID, ok := ctx.Value(config.KeyUUID).(string)
 
+	userUUID, ok := ctx.Value(config.KeyUUID).(string)
 	if !ok || userUUID == "" {
 		logger.Error("failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
@@ -352,13 +356,13 @@ func (s *Server) GetPeerFollow(ctx context.Context, in *user.GetPeerFollowIn) (*
 
 	follow, err := s.dbRepo.GetPeerFollow(ctx, in.Uuid)
 	if err != nil {
-		logger.Error("failed to get peer follow")
+		logger.Error(fmt.Sprintf("failed to get peer follow: %v", err))
 		return nil, err
 	}
 	peers := make([]*user.Peer, 0)
 
-	for _, uuid := range follow {
-		peers = append(peers, &user.Peer{Uuid: uuid})
+	for _, peerUuid := range follow {
+		peers = append(peers, &user.Peer{Uuid: peerUuid})
 	}
 
 	return &user.GetPeerFollowOut{Subscription: peers}, nil
@@ -376,7 +380,7 @@ func (s *Server) GetWhoFollowPeer(ctx context.Context, in *user.GetWhoFollowPeer
 
 	follow, err := s.dbRepo.GetWhoFollowPeer(ctx, in.Uuid)
 	if err != nil {
-		logger.Error("failed to get peer follow")
+		logger.Error(fmt.Sprintf("failed to get peer follow: %v", err))
 		return nil, err
 	}
 	peers := make([]*user.Peer, 0)
@@ -398,7 +402,7 @@ func (s *Server) CheckFriendship(ctx context.Context, in *user.CheckFriendshipIn
 
 	succses, err := s.dbRepo.CheckFriendship(ctx, userUUID, in.Uuid)
 	if err != nil {
-		logger.Error("failed to check user friendship")
+		logger.Error(fmt.Sprintf("failed to check user friendship: %v", err))
 		return nil, err
 	}
 	return &user.CheckFriendshipOut{
@@ -407,12 +411,12 @@ func (s *Server) CheckFriendship(ctx context.Context, in *user.CheckFriendshipIn
 }
 
 func (s *Server) CreatePost(ctx context.Context, in *user.CreatePostIn) (*user.CreatePostOut, error) {
-	uuidString, ok := ctx.Value(config.KeyUUID).(string)
+	ownerUUIDStr, ok := ctx.Value(config.KeyUUID).(string)
 	if !ok {
 		return nil, status.Errorf(codes.Unauthenticated, "failed to retrieve uuid")
 	}
 
-	ownerUUID, err := uuid.Parse(uuidString)
+	ownerUUID, err := uuid.Parse(ownerUUIDStr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse uuid: %v", err)
 	}
@@ -423,7 +427,7 @@ func (s *Server) CreatePost(ctx context.Context, in *user.CreatePostIn) (*user.C
 	}
 
 	msg := &user.UserPostCreated{
-		UserUuid: uuidString,
+		UserUuid: ownerUUIDStr,
 		PostId:   newPostUUID,
 	}
 
@@ -438,8 +442,8 @@ func (s *Server) CreatePost(ctx context.Context, in *user.CreatePostIn) (*user.C
 func (s *Server) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn) (*user.GetPostsByIdsOut, error) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("GetPostsByIds")
-	userUUID, ok := ctx.Value(config.KeyUUID).(string)
 
+	userUUID, ok := ctx.Value(config.KeyUUID).(string)
 	if !ok || userUUID == "" {
 		logger.Error("failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
@@ -447,7 +451,7 @@ func (s *Server) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn) (*
 
 	posts, err := s.dbRepo.GetPostsByIds(ctx, in.PostUuids)
 	if err != nil {
-		logger.Error("failed to get posts by ids")
+		logger.Error(fmt.Sprintf("failed to get posts by ids: %v", err))
 		return nil, status.Errorf(codes.Internal, "failed to get posts from db: %v", err)
 	}
 	return &user.GetPostsByIdsOut{Posts: posts.ListFromDTO()}, nil

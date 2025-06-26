@@ -2,8 +2,8 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE TABLE IF NOT EXISTS posts (
     id          serial PRIMARY KEY,
-    user_uuid     integer NOT NULL,
-    content     TEXT,
+    user_uuid   UUID NOT NULL,
+    content     TEXT NOT NULL,
     external_id TEXT,
     origin      TEXT,
     created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
