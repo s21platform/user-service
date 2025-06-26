@@ -12,9 +12,6 @@ ALTER TABLE skills
 ALTER TABLE hobbies
     ADD COLUMN temp_uuid UUID;
 
-ALTER TABLE posts
-    ADD COLUMN temp_uuid UUID;
-
 UPDATE data
 SET temp_uuid = (SELECT uuid FROM users WHERE users.id = data.user_id);
 
@@ -23,9 +20,6 @@ SET temp_uuid = (SELECT uuid FROM users WHERE users.id = skills.user_id);
 
 UPDATE hobbies
 SET temp_uuid = (SELECT uuid FROM users WHERE users.id = hobbies.user_id);
-
-UPDATE posts
-SET temp_uuid = (SELECT uuid FROM users WHERE users.uuid = posts.user_id);
 
 ALTER TABLE data
 DROP CONSTRAINT fk_data_user_id;
@@ -54,13 +48,6 @@ ALTER TABLE hobbies
 ALTER TABLE hobbies
 DROP COLUMN temp_uuid;
 
-ALTER TABLE posts
-ALTER COLUMN user_id TYPE UUID USING temp_uuid;
-ALTER TABLE posts
-    RENAME COLUMN user_id TO user_uuid;
-ALTER TABLE posts
-DROP COLUMN temp_uuid;
-
 ALTER TABLE data
     ADD CONSTRAINT fk_data_user_uuid FOREIGN KEY (user_uuid) REFERENCES users(uuid);
 
@@ -69,6 +56,3 @@ ALTER TABLE skills
 
 ALTER TABLE hobbies
     ADD CONSTRAINT fk_hobby_user_uuid FOREIGN KEY (user_uuid) REFERENCES users(uuid);
-
-ALTER TABLE posts
-    ADD CONSTRAINT fk_post_user_uuid FOREIGN KEY (user_uuid) REFERENCES users(uuid);

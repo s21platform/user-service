@@ -28,4 +28,4 @@ issues:
   max-same-issues: 0
 
 formatters:
-  - name: colored-line-number
+  name: colored-line-number
