@@ -139,7 +139,9 @@ func (s *Server) GetUserWithOffset(ctx context.Context, in *user.GetUserWithOffs
 }
 
 func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUUIDIn) (*user.GetUserInfoByUUIDOut, error) {
-	_ = ctx.Value(config.KeyUUID).(string)
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	ctxUuid := ctx.Value(config.KeyUUID).(string)
+	logger.Info(fmt.Sprintf("get user info by uuid: ctx: %s; requested: %s", ctxUuid, in.Uuid))
 	// TODO перейти на использование контекстного значения
 	userInfo, err := s.dbRepo.GetUserInfoByUUID(ctx, in.Uuid)
 	if err != nil {
