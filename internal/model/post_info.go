@@ -13,7 +13,7 @@ import (
 type PostInfoList []*PostInfo
 
 type PostInfo struct {
-	ID         string    `db:"post_id"`
+	ID         string    `db:"id"`
 	Nickname   string    `db:"login"`
 	Name       string    `db:"name"`
 	Surname    string    `db:"surname"`
@@ -35,7 +35,7 @@ func (pd *PostInfo) FromDTO() *user_proto.PostInfo {
 	}
 }
 
-func (pdl *PostInfoList) ListFromDTO() []*user_proto.PostInfo {
+func (pdl *PostInfoList) FromDTO() []*user_proto.PostInfo {
 	result := make([]*user_proto.PostInfo, 0, len(*pdl))
 
 	for _, post := range *pdl {

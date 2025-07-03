@@ -454,5 +454,5 @@ func (s *Server) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn) (*
 		logger.Error(fmt.Sprintf("failed to get posts by ids: %v", err))
 		return nil, status.Errorf(codes.Internal, "failed to get posts from db: %v", err)
 	}
-	return &user.GetPostsByIdsOut{Posts: posts.ListFromDTO()}, nil
+	return &user.GetPostsByIdsOut{Posts: posts.FromDTO()}, nil
 }

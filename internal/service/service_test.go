@@ -709,7 +709,7 @@ func TestServer_GetUserPostsByIds(t *testing.T) {
 		s := &Server{dbRepo: mockDBRepo}
 		result, err := s.GetPostsByIds(ctx, mockInput)
 		assert.NoError(t, err)
-		assert.Equal(t, result, &user.GetPostsByIdsOut{Posts: (&expectedPosts).ListFromDTO()})
+		assert.Equal(t, result, &user.GetPostsByIdsOut{Posts: (&expectedPosts).FromDTO()})
 	})
 
 	t.Run("should_return_nil_if_empty_UUID_provided", func(t *testing.T) {

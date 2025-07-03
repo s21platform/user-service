@@ -28,18 +28,14 @@ type CheckUser struct {
 }
 
 func New(cfg *config.Config) *Repository {
-	//Connect db
 	conStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable",
 		cfg.Postgres.User, cfg.Postgres.Password, cfg.Postgres.Database, cfg.Postgres.Host, cfg.Postgres.Port)
 
 	conn, err := sqlx.Connect("postgres", conStr)
 	if err != nil {
-		log.Fatal("error connect: ", err)
+		log.Fatal("Failed to connect: ", err)
 	}
 
-	if err := conn.Ping(); err != nil {
-		log.Fatal("error ping: ", err)
-	}
 	return &Repository{conn}
 }
 
@@ -484,7 +480,7 @@ func (r *Repository) GetPostsByIds(ctx context.Context, uuids []string) (*model.
 
 	query, args, err := sq.
 		Select(
-			"cast(posts.id as varchar) as post_id",
+			"cast(posts.id as varchar) as id",
 			"users.login as login",
 			"coalesce(data.name, '') as name",
 			"coalesce(data.surname, '') as surname",
