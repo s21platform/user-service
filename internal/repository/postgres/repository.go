@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
-
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -26,6 +25,22 @@ type Repository struct {
 type CheckUser struct {
 	Uuid  string
 	IsNew bool
+}
+
+func New(cfg *config.Config) *Repository {
+	conStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable",
+		cfg.Postgres.User, cfg.Postgres.Password, cfg.Postgres.Database, cfg.Postgres.Host, cfg.Postgres.Port)
+
+	conn, err := sqlx.Connect("postgres", conStr)
+	if err != nil {
+		log.Fatal("Failed to connect: ", err)
+	}
+
+	return &Repository{conn}
+}
+
+func (r *Repository) Close() {
+	_ = r.DB.Close()
 }
 
 func (r *Repository) GetPeerFollow(ctx context.Context, userUUID string) ([]string, error) {
@@ -414,13 +429,34 @@ func (r *Repository) CreateUser(ctx context.Context, userUUID string, email stri
 	if err != nil {
 		return fmt.Errorf("failed to execute query: %v", err)
 	}
+
 	return nil
 }
 
-func (r *Repository) CreatePost(ctx context.Context, uuid, content string) (string, error) {
+func (r *Repository) CreateUserMeta(ctx context.Context, userUUID string) error {
+	query, args, err := sq.
+		Insert(`data`).
+		Columns(`user_uuid`).
+		Values(userUUID).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return fmt.Errorf("failed to build query: %v", err)
+	}
+
+	_, err = r.Chk(ctx).ExecContext(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("failed to execute query: %v", err)
+	}
+
+	return nil
+}
+
+func (r *Repository) CreatePost(ctx context.Context, ownerUUID uuid.UUID, content string) (string, error) {
 	query, args, err := sq.Insert("posts").
 		Columns("user_uuid", "content").
-		Values(uuid, content).
+		Values(ownerUUID, content).
 		Suffix("RETURNING id").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -439,22 +475,36 @@ func (r *Repository) CreatePost(ctx context.Context, uuid, content string) (stri
 	return newPostUUID, nil
 }
 
-func (r *Repository) Close() {
-	_ = r.DB.Close()
-}
+func (r *Repository) GetPostsByIds(ctx context.Context, uuids []string) (*model.PostInfoList, error) {
+	var posts model.PostInfoList
 
-func New(cfg *config.Config) *Repository {
-	//Connect db
-	conStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable",
-		cfg.Postgres.User, cfg.Postgres.Password, cfg.Postgres.Database, cfg.Postgres.Host, cfg.Postgres.Port)
+	query, args, err := sq.
+		Select(
+			"cast(posts.id as varchar) as id",
+			"users.login as login",
+			"coalesce(data.name, '') as name",
+			"coalesce(data.surname, '') as surname",
+			"users.last_avatar_link as last_avatar_link",
+			"posts.content as content",
+			"posts.created_at as created_at",
+			"posts.updated_at as updated_at").
+		From("posts").
+		Join("users ON users.uuid = posts.user_uuid").
+		Join("data ON data.user_uuid = users.uuid").
+		Where(sq.And{
+			sq.Eq{"posts.id": uuids},
+			sq.Eq{"posts.deleted_at": nil}}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
 
-	conn, err := sqlx.Connect("postgres", conStr)
 	if err != nil {
-		log.Fatal("error connect: ", err)
+		return nil, fmt.Errorf("failed to build query: %v", err)
 	}
 
-	if err := conn.Ping(); err != nil {
-		log.Fatal("error ping: ", err)
+	err = r.Chk(ctx).SelectContext(ctx, &posts, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %v", err)
 	}
-	return &Repository{conn}
+
+	return &posts, nil
 }

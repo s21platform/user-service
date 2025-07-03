@@ -17,6 +17,8 @@
     - [GetOs](#-GetOs)
     - [GetPeerFollowIn](#-GetPeerFollowIn)
     - [GetPeerFollowOut](#-GetPeerFollowOut)
+    - [GetPostsByIdsIn](#-GetPostsByIdsIn)
+    - [GetPostsByIdsOut](#-GetPostsByIdsOut)
     - [GetUserByLoginIn](#-GetUserByLoginIn)
     - [GetUserByLoginOut](#-GetUserByLoginOut)
     - [GetUserInfoByUUIDIn](#-GetUserInfoByUUIDIn)
@@ -31,6 +33,7 @@
     - [IsUserExistByUUIDIn](#-IsUserExistByUUIDIn)
     - [IsUserExistByUUIDOut](#-IsUserExistByUUIDOut)
     - [Peer](#-Peer)
+    - [PostInfo](#-PostInfo)
     - [RemoveFriendsIn](#-RemoveFriendsIn)
     - [RemoveFriendsOut](#-RemoveFriendsOut)
     - [SetFriendsIn](#-SetFriendsIn)
@@ -244,6 +247,36 @@ Request for subscription
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | subscription | [Peer](#Peer) | repeated |  |
+
+
+
+
+
+
+<a name="-GetPostsByIdsIn"></a>
+
+### GetPostsByIdsIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| post_uuids | [string](#string) | repeated |  |
+
+
+
+
+
+
+<a name="-GetPostsByIdsOut"></a>
+
+### GetPostsByIdsOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| posts | [PostInfo](#PostInfo) | repeated |  |
 
 
 
@@ -479,6 +512,27 @@ Message for response
 
 
 
+<a name="-PostInfo"></a>
+
+### PostInfo
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| post_uuid | [string](#string) |  |  |
+| nickname | [string](#string) |  |  |
+| full_name | [string](#string) |  |  |
+| avatar_link | [string](#string) |  |  |
+| content | [string](#string) |  |  |
+| created_at | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |
+| is_edited | [bool](#bool) |  |  |
+
+
+
+
+
+
 <a name="-RemoveFriendsIn"></a>
 
 ### RemoveFriendsIn
@@ -701,6 +755,7 @@ Service for user info
 | GetWhoFollowPeer | [.GetWhoFollowPeerIn](#GetWhoFollowPeerIn) | [.GetWhoFollowPeerOut](#GetWhoFollowPeerOut) |  |
 | CheckFriendship | [.CheckFriendshipIn](#CheckFriendshipIn) | [.CheckFriendshipOut](#CheckFriendshipOut) |  |
 | CreatePost | [.CreatePostIn](#CreatePostIn) | [.CreatePostOut](#CreatePostOut) |  |
+| GetPostsByIds | [.GetPostsByIdsIn](#GetPostsByIdsIn) | [.GetPostsByIdsOut](#GetPostsByIdsOut) |  |
 
  
 

@@ -2,9 +2,13 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"testing"
+	"time"
+
+	"github.com/guregu/null/v6"
 
 	logger_lib "github.com/s21platform/logger-lib"
 	"google.golang.org/grpc/codes"
@@ -223,7 +227,7 @@ func TestServer_SetFriends(t *testing.T) {
 		mockDBRepo.EXPECT().CheckFriendship(ctx, peer1, peer2).Return(false, nil)
 		mockDBRepo.EXPECT().SetFriends(ctx, peer1, peer2).Return(repoErr)
 		mockLogger.EXPECT().AddFuncName("SetFriends")
-		mockLogger.EXPECT().Error("failed to SetFriends from dbRepo")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to SetFriends from dbRepo: %v", repoErr))
 
 		s := &Server{dbRepo: mockDBRepo}
 		_, err := s.SetFriends(ctx, &user.SetFriendsIn{Peer: peer2})
@@ -242,7 +246,7 @@ func TestServer_SetFriends(t *testing.T) {
 
 		mockDBRepo.EXPECT().CheckFriendship(ctx, peer1, peer2).Return(false, checkErr)
 		mockLogger.EXPECT().AddFuncName("SetFriends")
-		mockLogger.EXPECT().Error(" failed to check user friendship")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to check user friendship: %v", checkErr))
 
 		s := &Server{dbRepo: mockDBRepo}
 		_, err := s.SetFriends(ctx, &user.SetFriendsIn{Peer: peer2})
@@ -337,7 +341,7 @@ func TestServer_RemoveFriends(t *testing.T) {
 		mockDBRepo.EXPECT().CheckFriendship(ctx, peer1, peer2).Return(true, nil)
 		mockDBRepo.EXPECT().RemoveFriends(ctx, peer1, peer2).Return(expectedErr)
 		mockLogger.EXPECT().AddFuncName("RemoveFriends")
-		mockLogger.EXPECT().Error("failed to RemoveFriends from dbRepo")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to RemoveFriends from dbRepo: %v", expectedErr))
 
 		s := &Server{dbRepo: mockDBRepo}
 		_, err := s.RemoveFriends(ctx, &user.RemoveFriendsIn{Peer: peer2})
@@ -396,7 +400,7 @@ func TestServer_GetCountFriends(t *testing.T) {
 
 		mockDBRepo.EXPECT().GetSubscriptionCount(ctx, peer).Return(int64(0), expectedErr)
 		mockLogger.EXPECT().AddFuncName("GetCountFriends")
-		mockLogger.EXPECT().Error("failed to get subscription count")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to get subscription count: %v", expectedErr))
 
 		s := &Server{dbRepo: mockDBRepo}
 		_, err := s.GetCountFriends(ctx, &user.EmptyFriends{})
@@ -413,7 +417,7 @@ func TestServer_GetCountFriends(t *testing.T) {
 		mockDBRepo.EXPECT().GetSubscriptionCount(ctx, peer).Return(int64(10), nil)
 		mockDBRepo.EXPECT().GetSubscribersCount(ctx, peer).Return(int64(0), expectedErr)
 		mockLogger.EXPECT().AddFuncName("GetCountFriends")
-		mockLogger.EXPECT().Error("failed to get subscribers count")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to get subscribers count: %v", expectedErr))
 
 		s := &Server{dbRepo: mockDBRepo}
 		_, err := s.GetCountFriends(ctx, &user.EmptyFriends{})
@@ -474,7 +478,7 @@ func TestServer_GetPeerFollow(t *testing.T) {
 		ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
 
 		mockDBRepo.EXPECT().GetPeerFollow(ctx, userUUID).Return(nil, repoErr)
-		mockLogger.EXPECT().Error("failed to get peer follow")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to get peer follow: %v", repoErr))
 		mockLogger.EXPECT().AddFuncName("GetPeerFollow")
 
 		s := &Server{dbRepo: mockDBRepo}
@@ -533,7 +537,7 @@ func TestServer_GetWhoFollowPeer(t *testing.T) {
 		ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
 
 		mockDBRepo.EXPECT().GetWhoFollowPeer(ctx, userUUID).Return(nil, repoErr)
-		mockLogger.EXPECT().Error("failed to get peer follow")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to get peer follow: %v", repoErr))
 		mockLogger.EXPECT().AddFuncName("GetWhoFollowPeer")
 
 		s := &Server{dbRepo: mockDBRepo}
@@ -585,7 +589,7 @@ func TestServer_CheckFriendship(t *testing.T) {
 
 		mockDBRepo.EXPECT().CheckFriendship(ctx, userUUID, friendUUID).Return(false, dbError)
 		mockLogger.EXPECT().AddFuncName("CheckFriendship")
-		mockLogger.EXPECT().Error("failed to check user friendship")
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to check user friendship: %v", dbError))
 
 		s := &Server{dbRepo: mockDBRepo}
 		_, err := s.CheckFriendship(ctx, &user.CheckFriendshipIn{Uuid: friendUUID})
@@ -599,15 +603,15 @@ func TestServer_CreateUserPosts(t *testing.T) {
 	t.Parallel()
 
 	content := "test-content"
-	userUUID := uuid.New().String()
+	userUUID := uuid.New()
 	expUUID := uuid.New().String()
 	msg := &user.UserPostCreated{
-		UserUuid: userUUID,
+		UserUuid: userUUID.String(),
 		PostId:   expUUID,
 	}
 
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, config.KeyUUID, userUUID)
+	ctx = context.WithValue(ctx, config.KeyUUID, userUUID.String())
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -646,5 +650,114 @@ func TestServer_CreateUserPosts(t *testing.T) {
 		assert.True(t, ok)
 		assert.Equal(t, codes.Internal, st.Code())
 		assert.Contains(t, st.Message(), "failed to create post: get err")
+	})
+}
+
+func TestServer_GetUserPostsByIds(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+
+	ctrl := gomock.NewController(t)
+	ctrl.Finish()
+	mockDBRepo := NewMockDbRepo(ctrl)
+
+	post1, post2 := uuid.New().String(), uuid.New().String()
+	nickname1, nickname2 := "JohnDoe", "JaneDoe"
+	name1, name2 := "John", "Jane"
+	surname1, surname2 := "Doe", "Doe"
+	avatarLink1, avatarLink2 := "avatar1", "avatar2"
+	content1, content2 := "post1", "post2"
+	createdAt1, createdAt2 := time.Now(), time.Now()                                                                                       //nolint:all
+	editedAt1, editedAt2 := null.Time{sql.NullTime{Time: time.Now(), Valid: true}}, null.Time{sql.NullTime{Time: time.Now(), Valid: true}} //nolint:all
+
+	t.Run("should ok", func(t *testing.T) {
+		defer ctrl.Finish()
+
+		ctx = context.WithValue(ctx, config.KeyUUID, []string{post1, post2})
+
+		mockInput := &user.GetPostsByIdsIn{
+			PostUuids: []string{post1, post2},
+		}
+
+		expectedPosts := model.PostInfoList{
+			{
+				ID:         post1,
+				Nickname:   nickname1,
+				Name:       name1,
+				Surname:    surname1,
+				AvatarLink: avatarLink1,
+				Content:    content1,
+				CreatedAt:  createdAt1,
+				EditedAt:   editedAt1,
+			},
+			{
+				ID:         post2,
+				Nickname:   nickname2,
+				Name:       name2,
+				Surname:    surname2,
+				AvatarLink: avatarLink2,
+				Content:    content2,
+				CreatedAt:  createdAt2,
+				EditedAt:   editedAt2,
+			},
+		}
+
+		mockDBRepo.EXPECT().GetPostsByIds(ctx, mockInput).Return(&expectedPosts, nil)
+		//mockLogger.EXPECT().AddFuncName("GetPostsByIds")
+
+		s := &Server{dbRepo: mockDBRepo}
+		result, err := s.GetPostsByIds(ctx, mockInput)
+		assert.NoError(t, err)
+		assert.Equal(t, result, &user.GetPostsByIdsOut{Posts: (&expectedPosts).FromDTO()})
+	})
+
+	t.Run("should_return_nil_if_empty_UUID_provided", func(t *testing.T) {
+		defer ctrl.Finish()
+
+		ctx = context.WithValue(ctx, config.KeyUUID, []string{})
+
+		mockInput := &user.GetPostsByIdsIn{
+			PostUuids: []string{},
+		}
+
+		s := &Server{dbRepo: mockDBRepo}
+		result, err := s.GetPostsByIds(ctx, mockInput)
+		assert.NoError(t, err)
+		assert.Nil(t, result)
+	})
+
+	t.Run("should_return_if_uuid_is_empty", func(t *testing.T) {
+		defer ctrl.Finish()
+
+		ctx = context.WithValue(ctx, config.KeyUUID, []string{post1, ""})
+
+		mockInput := &user.GetPostsByIdsIn{
+			PostUuids: []string{post1, ""},
+		}
+
+		s := &Server{dbRepo: mockDBRepo}
+		result, err := s.GetPostsByIds(ctx, mockInput)
+		assert.NoError(t, err)
+		assert.Nil(t, result)
+	})
+
+	t.Run("should_return_error_if_db_fails", func(t *testing.T) {
+		defer ctrl.Finish()
+
+		ctx = context.WithValue(ctx, config.KeyUUID, []string{post1, post2})
+
+		mockInput := &user.GetPostsByIdsIn{
+			PostUuids: []string{post1, post2},
+		}
+
+		expectedErr := errors.New("get err")
+		mockDBRepo.EXPECT().GetPostsByIds(ctx, mockInput).Return(nil, expectedErr)
+		//mockLogger.EXPECT().AddFuncName("GetPostsByIds")
+
+		s := &Server{dbRepo: mockDBRepo}
+		result, err := s.GetPostsByIds(ctx, mockInput)
+		assert.Error(t, err)
+		assert.Nil(t, result)
 	})
 }
