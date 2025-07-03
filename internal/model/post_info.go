@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/guregu/null/v6"
@@ -42,6 +41,5 @@ func (pdl *PostInfoList) FromDTO() []*user_proto.PostInfo {
 		result = append(result, post.FromDTO())
 	}
 
-	fmt.Println(result)
 	return result
 }

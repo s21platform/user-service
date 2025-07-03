@@ -445,7 +445,7 @@ func (s *Server) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn) (*
 
 	userUUID, ok := ctx.Value(config.KeyUUID).(string)
 	if !ok || userUUID == "" {
-		logger.Error("failed to get user UUID from context")
+		logger.Error("user UUID required")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
 
