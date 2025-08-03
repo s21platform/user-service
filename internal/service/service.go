@@ -140,12 +140,11 @@ func (s *Server) GetUserWithOffset(ctx context.Context, in *user.GetUserWithOffs
 
 func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUUIDIn) (*user.GetUserInfoByUUIDOut, error) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	ctxUuid := ctx.Value(config.KeyUUID).(string)
-	logger.Info(fmt.Sprintf("get user info by uuid: ctx: %s; requested: %s", ctxUuid, in.Uuid))
+	logger.AddFuncName("GetUserInfoByUUID")
 	// TODO перейти на использование контекстного значения
 	userInfo, err := s.dbRepo.GetUserInfoByUUID(ctx, in.Uuid)
 	if err != nil {
-		log.Println("failed to get user data from repo:", err)
+		logger.Error(fmt.Sprintf("failed to get user data from repo: %v", err))
 		return nil, status.Errorf(codes.Internal, "failed to get user data from repo: %v", err)
 	}
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("uuid", ctx.Value(config.KeyUUID).(string)))
