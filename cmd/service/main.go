@@ -67,17 +67,10 @@ func main() {
 	)
 	user.RegisterUserServiceServer(s, server)
 
-	h := rest.New()
+	handler := rest.New()
 	r := chi.NewRouter()
-	r.Use(func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			log.Println("Request URI:", r.RequestURI)
-			log.Println(r.URL.Path)
-			log.Println(r.URL.RawPath)
-			next.ServeHTTP(w, r)
-		})
-	})
-	api.HandlerFromMux(h, r)
+
+	api.HandlerFromMux(handler, r)
 	httpServer := &http.Server{
 		Handler: r,
 	}
