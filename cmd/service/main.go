@@ -32,12 +32,6 @@ func main() {
 	cfg := config.MustLoad()
 	logger := logger_lib.New(cfg.Logger.Host, cfg.Logger.Port, cfg.Service.Name, cfg.Platform.Env)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Service.Port))
-	if err != nil {
-		logger.Error(fmt.Sprintf("cannnot listen port; error: %s", err))
-		log.Fatalf("Cannnot listen port: %s; Error: %s", cfg.Service.Port, err)
-	}
-
 	db := postgres.New(cfg)
 	defer db.Close()
 
@@ -77,6 +71,12 @@ func main() {
 		Handler: router,
 	}
 
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Service.Port))
+	if err != nil {
+		logger.Error(fmt.Sprintf("cannnot listen port; error: %s", err))
+		log.Fatalf("Cannnot listen port: %s; Error: %s", cfg.Service.Port, err)
+	}
+
 	m := cmux.New(lis)
 
 	grpcListener := m.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
@@ -108,7 +108,7 @@ func main() {
 	})
 
 	if err := g.Wait(); err != nil {
-		logger.Error(fmt.Sprintf("server error: %s", err))
+		logger.Error(fmt.Sprintf("server error: %v", err))
 		log.Fatalf("Server error: %v", err)
 	}
 }
