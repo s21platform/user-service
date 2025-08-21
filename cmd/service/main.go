@@ -1,10 +1,16 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/soheilhy/cmux"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 
 	kafkalib "github.com/s21platform/kafka-lib"
@@ -13,9 +19,11 @@ import (
 
 	optoinhub "github.com/s21platform/user-service/internal/clients/optionhub"
 	"github.com/s21platform/user-service/internal/config"
+	api "github.com/s21platform/user-service/internal/generated"
 	"github.com/s21platform/user-service/internal/infra"
 	"github.com/s21platform/user-service/internal/pkg/tx"
 	"github.com/s21platform/user-service/internal/repository/postgres"
+	"github.com/s21platform/user-service/internal/rest"
 	"github.com/s21platform/user-service/internal/service"
 	"github.com/s21platform/user-service/pkg/user"
 )
@@ -45,7 +53,7 @@ func main() {
 
 	server := service.New(db, producerNewFriendRegister, optionhubClient, prcUserCreated, UserPostCreatedProduser)
 
-	s := grpc.NewServer(
+	grpcSrv := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			infra.Logger(logger),
 			infra.UnaryInterceptor,
@@ -53,16 +61,54 @@ func main() {
 			tx.TxMiddleWire(db),
 		),
 	)
-	user.RegisterUserServiceServer(s, server)
+	user.RegisterUserServiceServer(grpcSrv, server)
 
-	log.Println("starting server", cfg.Service.Port)
+	handler := rest.New()
+	router := chi.NewRouter()
+
+	api.HandlerFromMux(handler, router)
+	httpServer := &http.Server{
+		Handler: router,
+	}
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Service.Port))
 	if err != nil {
 		logger.Error(fmt.Sprintf("cannnot listen port; error: %s", err))
 		log.Fatalf("Cannnot listen port: %s; Error: %s", cfg.Service.Port, err)
 	}
-	if err := s.Serve(lis); err != nil {
-		logger.Error(fmt.Sprintf("cannot start service; error: %s", err))
-		log.Fatalf("Cannnot start service: %s; Error: %s", cfg.Service.Port, err)
+
+	m := cmux.New(lis)
+
+	grpcListener := m.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
+	httpListener := m.Match(cmux.HTTP1Fast())
+
+	g, _ := errgroup.WithContext(context.Background())
+
+	logger.Info("starting server")
+
+	g.Go(func() error {
+		if err := grpcSrv.Serve(grpcListener); err != nil && !errors.Is(err, grpc.ErrServerStopped) {
+			return fmt.Errorf("gRPC server error: %v", err)
+		}
+		return nil
+	})
+
+	g.Go(func() error {
+		if err := httpServer.Serve(httpListener); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			return fmt.Errorf("HTTP server error: %v", err)
+		}
+		return nil
+	})
+
+	g.Go(func() error {
+		if err := m.Serve(); err != nil {
+			return fmt.Errorf("cannot start service: %v", err)
+		}
+		return nil
+	})
+
+	if err := g.Wait(); err != nil {
+		logger.Error(fmt.Sprintf("server error: %v", err))
+		log.Fatalf("Server error: %v", err)
 	}
 }

@@ -1,0 +1,49 @@
+openapi: 3.0.3
+info:
+  title: User Service
+  version: 1.0.0
+
+paths:
+  /api/user/profile/{user_identity}:
+    get:
+      summary: Handle Open Dialog window for birthday poll
+      operationId: Profile
+      parameters:
+        - name: user_identity
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+
+components:
+  schemas:
+    Profile:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            required:
+              - title
+              - type
+            properties:
+              title:
+                type: string
+              type:
+                type: string
+              value:
+                type: string
+              enum_values:
+                type: array
+                items:
+                  type: string
