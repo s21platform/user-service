@@ -2,13 +2,14 @@ package infra
 
 import (
 	"context"
-
-	"github.com/s21platform/user-service/internal/config"
+	"net/http"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+
+	"github.com/s21platform/user-service/internal/config"
 )
 
 func UnaryInterceptor(
@@ -31,4 +32,18 @@ func UnaryInterceptor(
 		return nil, status.Errorf(codes.Unauthenticated, "no uuid found in metadata")
 	}
 	return handler(ctx, req)
+}
+
+func AuthRequest(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		requestID := r.Header.Get("X-User-Uuid")
+		if requestID == "" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		ctx = context.WithValue(ctx, config.KeyUUID, requestID)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	}
+	return http.HandlerFunc(fn)
 }

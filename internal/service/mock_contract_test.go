@@ -111,9 +111,9 @@ func (mr *MockDbRepoMockRecorder) CreateUserMeta(ctx, userUUID interface{}) *gom
 }
 
 // GetLoginByUuid mocks base method.
-func (m *MockDbRepo) GetLoginByUuid(ctx context.Context, uuid string) (string, error) {
+func (m *MockDbRepo) GetNicknameByUuid(ctx context.Context, uuid string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetLoginByUuid", ctx, uuid)
+	ret := m.ctrl.Call(m, "GetNicknameByUuid", ctx, uuid)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -122,7 +122,7 @@ func (m *MockDbRepo) GetLoginByUuid(ctx context.Context, uuid string) (string, e
 // GetLoginByUuid indicates an expected call of GetLoginByUuid.
 func (mr *MockDbRepoMockRecorder) GetLoginByUuid(ctx, uuid interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLoginByUuid", reflect.TypeOf((*MockDbRepo)(nil).GetLoginByUuid), ctx, uuid)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNicknameByUuid", reflect.TypeOf((*MockDbRepo)(nil).GetNicknameByUuid), ctx, uuid)
 }
 
 // GetOrSetUserByLogin mocks base method.
