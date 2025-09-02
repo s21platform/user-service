@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/json"
+	logger_lib "github.com/s21platform/logger-lib"
 	"net/http"
 
 	api "github.com/s21platform/user-service/internal/generated"
@@ -22,16 +23,18 @@ func New(dbR DbRepo, ohC OptionhubClient) *Handler {
 
 func (h *Handler) MyPersonality(w http.ResponseWriter, r *http.Request, params api.MyPersonalityParams) {
 	w.Header().Set("Content-Type", "application/json")
-	ctx := r.Context()
+	ctx := logger_lib.WithField(r.Context(), "user_uuid", params.XUserUuid)
 
 	personality, err := h.dbR.GetPersonalityByUuid(ctx, params.XUserUuid)
 	if err != nil {
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to get personality data")
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}
 
 	options, err := h.ohC.GetAttributesMeta(ctx, model.PersonalityForm)
 	if err != nil {
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to get options metadata")
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}
@@ -40,6 +43,7 @@ func (h *Handler) MyPersonality(w http.ResponseWriter, r *http.Request, params a
 
 	resp, err := json.Marshal(result)
 	if err != nil {
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to marshal data")
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}
