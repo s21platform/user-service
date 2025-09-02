@@ -2,8 +2,9 @@ package rest
 
 import (
 	"encoding/json"
-	logger_lib "github.com/s21platform/logger-lib"
 	"net/http"
+
+	logger_lib "github.com/s21platform/logger-lib"
 
 	api "github.com/s21platform/user-service/internal/generated"
 	"github.com/s21platform/user-service/internal/model"
