@@ -31,13 +31,14 @@ import (
 func main() {
 	cfg := config.MustLoad()
 	logger := logger_lib.New(cfg.Logger.Host, cfg.Logger.Port, cfg.Service.Name, cfg.Platform.Env)
+	ctx := logger_lib.NewContext(context.Background(), logger)
 
 	db := postgres.New(cfg)
 	defer db.Close()
 
 	metrics, err := pkg.NewMetrics(cfg.Metrics.Host, cfg.Metrics.Port, "user", cfg.Platform.Env)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to create metrics object: %v", err))
+		logger_lib.Error(ctx, fmt.Sprintf("failed to create metrics object: %v", err))
 		log.Fatalf("failed to create metrics object: %v", err)
 	}
 
@@ -48,10 +49,10 @@ func main() {
 	prcUserCreatedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.UserCreated)
 	prcUserCreated := kafkalib.NewProducer(prcUserCreatedCfg)
 
-	UserPostCreatedProduserConfig := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.UserPostCreated)
-	UserPostCreatedProduser := kafkalib.NewProducer(UserPostCreatedProduserConfig)
+	UserPostCreatedProducerConfig := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.UserPostCreated)
+	UserPostCreatedProducer := kafkalib.NewProducer(UserPostCreatedProducerConfig)
 
-	server := service.New(db, producerNewFriendRegister, optionhubClient, prcUserCreated, UserPostCreatedProduser)
+	server := service.New(db, producerNewFriendRegister, prcUserCreated, UserPostCreatedProducer)
 
 	grpcSrv := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
@@ -63,8 +64,9 @@ func main() {
 	)
 	user.RegisterUserServiceServer(grpcSrv, server)
 
-	handler := rest.New()
+	handler := rest.New(db, optionhubClient)
 	router := chi.NewRouter()
+	router.Use(infra.AuthRequest)
 
 	api.HandlerFromMux(handler, router)
 	httpServer := &http.Server{
@@ -73,7 +75,7 @@ func main() {
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Service.Port))
 	if err != nil {
-		logger.Error(fmt.Sprintf("cannnot listen port; error: %s", err))
+		logger_lib.Error(ctx, fmt.Sprintf("cannnot listen port; error: %s", err))
 		log.Fatalf("Cannnot listen port: %s; Error: %s", cfg.Service.Port, err)
 	}
 
@@ -84,7 +86,7 @@ func main() {
 
 	g, _ := errgroup.WithContext(context.Background())
 
-	logger.Info("starting server")
+	logger_lib.Info(ctx, "starting server")
 
 	g.Go(func() error {
 		if err := grpcSrv.Serve(grpcListener); err != nil && !errors.Is(err, grpc.ErrServerStopped) {
@@ -108,7 +110,7 @@ func main() {
 	})
 
 	if err := g.Wait(); err != nil {
-		logger.Error(fmt.Sprintf("server error: %v", err))
+		logger_lib.Error(ctx, fmt.Sprintf("server error: %v", err))
 		log.Fatalf("Server error: %v", err)
 	}
 }

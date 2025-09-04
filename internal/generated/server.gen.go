@@ -13,18 +13,18 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Handle Open Dialog window for birthday poll
-	// (GET /api/user/profile/{user_identity})
-	Profile(w http.ResponseWriter, r *http.Request, userIdentity string)
+	// Ручка для получения данных для своей странички
+	// (GET /api/user/me/personality)
+	MyPersonality(w http.ResponseWriter, r *http.Request, params MyPersonalityParams)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
 
-// Handle Open Dialog window for birthday poll
-// (GET /api/user/profile/{user_identity})
-func (_ Unimplemented) Profile(w http.ResponseWriter, r *http.Request, userIdentity string) {
+// Ручка для получения данных для своей странички
+// (GET /api/user/me/personality)
+func (_ Unimplemented) MyPersonality(w http.ResponseWriter, r *http.Request, params MyPersonalityParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -37,22 +37,41 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(http.Handler) http.Handler
 
-// Profile operation middleware
-func (siw *ServerInterfaceWrapper) Profile(w http.ResponseWriter, r *http.Request) {
+// MyPersonality operation middleware
+func (siw *ServerInterfaceWrapper) MyPersonality(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 
-	// ------------- Path parameter "user_identity" -------------
-	var userIdentity string
+	// Parameter object where we will unmarshal all parameters from the context
+	var params MyPersonalityParams
 
-	err = runtime.BindStyledParameterWithOptions("simple", "user_identity", chi.URLParam(r, "user_identity"), &userIdentity, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "user_identity", Err: err})
+	headers := r.Header
+
+	// ------------- Required header parameter "X-User-Uuid" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-User-Uuid")]; found {
+		var XUserUuid string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "X-User-Uuid", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-User-Uuid", valueList[0], &XUserUuid, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "X-User-Uuid", Err: err})
+			return
+		}
+
+		params.XUserUuid = XUserUuid
+
+	} else {
+		err := fmt.Errorf("Header parameter X-User-Uuid is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "X-User-Uuid", Err: err})
 		return
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.Profile(w, r, userIdentity)
+		siw.Handler.MyPersonality(w, r, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -176,7 +195,7 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/user/profile/{user_identity}", wrapper.Profile)
+		r.Get(options.BaseURL+"/api/user/me/personality", wrapper.MyPersonality)
 	})
 
 	return r

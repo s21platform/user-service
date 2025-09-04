@@ -14,7 +14,7 @@ type DbRepo interface {
 	GetOrSetUserByLogin(email string) (*postgres.CheckUser, error)
 	GetUserInfoByUUID(ctx context.Context, uuid string) (model.UserInfo, error)
 	GetUserWithLimit(uuid, nickname string, limit int64, offset int64) ([]model.UserWithLimit, int64, error)
-	GetLoginByUuid(ctx context.Context, uuid string) (string, error)
+	GetNicknameByUuid(ctx context.Context, uuid string) (string, error)
 	UpdateProfile(ctx context.Context, data model.ProfileData, userUuid string) error
 	GetUsersByUUID(uuid string) (model.UserInfoMin, error)
 	SetFriends(ctx context.Context, peer1, peer2 string) error

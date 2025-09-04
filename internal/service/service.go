@@ -11,7 +11,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
 	"github.com/s21platform/friends-proto/friends-proto/new_friend_register"
@@ -27,29 +26,26 @@ import (
 
 type Server struct {
 	user.UnimplementedUserServiceServer
-	dbRepo     DbRepo
-	ufrR       UserFriendsRegisterSrv
-	optionhubS OptionhubS
-	ucP        UserCreatedProducer
-	upcP       UserPostCreatedProduser
+	dbRepo DbRepo
+	ufrR   UserFriendsRegisterSrv
+	ucP    UserCreatedProducer
+	upcP   UserPostCreatedProduser
 }
 
-func New(repo DbRepo, ufrR UserFriendsRegisterSrv, optionhubService OptionhubS, ucP UserCreatedProducer, upcP UserPostCreatedProduser) *Server {
+func New(repo DbRepo, ufrR UserFriendsRegisterSrv, ucP UserCreatedProducer, upcP UserPostCreatedProduser) *Server {
 	return &Server{
-		dbRepo:     repo,
-		ufrR:       ufrR,
-		optionhubS: optionhubService,
-		ucP:        ucP,
-		upcP:       upcP,
+		dbRepo: repo,
+		ufrR:   ufrR,
+		ucP:    ucP,
+		upcP:   upcP,
 	}
 }
 
 func (s *Server) GetUserByLogin(ctx context.Context, in *user.GetUserByLoginIn) (*user.GetUserByLoginOut, error) {
 	m := pkg.FromContext(ctx, config.KeyMetrics)
-	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	userData, err := s.dbRepo.GetOrSetUserByLogin(in.Login)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to get user: %v", err))
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to get user")
 		return nil, status.Errorf(codes.NotFound, "Ошибка создания пользователя: %v", err)
 	}
 	if userData.IsNew {
@@ -69,10 +65,9 @@ func (s *Server) GetUserByLogin(ctx context.Context, in *user.GetUserByLoginIn) 
 }
 
 func (s *Server) IsUserExistByUUID(ctx context.Context, in *user.IsUserExistByUUIDIn) (*user.IsUserExistByUUIDOut, error) {
-	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	isExist, err := s.dbRepo.IsUserExistByUUID(in.Uuid)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to check user exist: %v", err))
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to check user exist")
 		return nil, status.Errorf(codes.Internal, "Невозможно найти пользователя: %v", err)
 	}
 	return &user.IsUserExistByUUIDOut{IsExist: isExist}, nil
@@ -109,7 +104,7 @@ func (s *Server) GetUsersByUUID(ctx context.Context, in *user.GetUsersByUUIDIn) 
 }
 
 func (s *Server) GetLoginByUUID(ctx context.Context, in *user.GetLoginByUUIDIn) (*user.GetLoginByUUIDOut, error) {
-	login, err := s.dbRepo.GetLoginByUuid(ctx, in.Uuid)
+	login, err := s.dbRepo.GetNicknameByUuid(ctx, in.Uuid)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot get login by uuid: %v", err)
 	}
@@ -139,18 +134,11 @@ func (s *Server) GetUserWithOffset(ctx context.Context, in *user.GetUserWithOffs
 }
 
 func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUUIDIn) (*user.GetUserInfoByUUIDOut, error) {
-	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	logger.AddFuncName("GetUserInfoByUUID")
 	// TODO перейти на использование контекстного значения
 	userInfo, err := s.dbRepo.GetUserInfoByUUID(ctx, in.Uuid)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to get user data from repo: %v", err))
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to get user data from repo")
 		return nil, status.Errorf(codes.Internal, "failed to get user data from repo: %v", err)
-	}
-	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("uuid", ctx.Value(config.KeyUUID).(string)))
-	osInfo, err := s.optionhubS.GetOs(ctx, userInfo.OSId)
-	if err != nil {
-		log.Printf("cannot get os, err: %v\n", err)
 	}
 
 	var birthday *string
@@ -159,13 +147,6 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 	}
 
 	var os *user.GetOs
-	if osInfo != nil {
-		os = &user.GetOs{
-			Id:    osInfo.Id,
-			Label: osInfo.Label,
-		}
-	}
-
 	resp := &user.GetUserInfoByUUIDOut{
 		Nickname:   userInfo.Nickname,
 		Avatar:     userInfo.LastAvatarLink,
@@ -266,28 +247,26 @@ func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.C
 }
 
 func (s *Server) SetFriends(ctx context.Context, in *user.SetFriendsIn) (*user.SetFriendsOut, error) {
-	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	logger.AddFuncName("SetFriends")
 	userUUID, ok := ctx.Value(config.KeyUUID).(string)
 
 	if !ok || userUUID == "" {
-		logger.Error("failed to get user UUID from context")
+		logger_lib.Error(ctx, "failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
 
 	areFriends, err := s.dbRepo.CheckFriendship(ctx, userUUID, in.Peer)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to check user friendship: %v", err))
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to check user friendship")
 		return nil, fmt.Errorf(" failed to check user friendship: %v", err)
 	}
 	if areFriends {
-		logger.Error("user already in friends")
+		logger_lib.Error(ctx, "user already in friends")
 		return &user.SetFriendsOut{Success: true}, nil
 	}
 
 	err = s.dbRepo.SetFriends(ctx, userUUID, in.Peer)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to SetFriends from dbRepo: %v", err))
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to SetFriends from dbRepo")
 		return nil, err
 	}
 
@@ -295,69 +274,62 @@ func (s *Server) SetFriends(ctx context.Context, in *user.SetFriendsIn) (*user.S
 }
 
 func (s *Server) RemoveFriends(ctx context.Context, in *user.RemoveFriendsIn) (*user.RemoveFriendsOut, error) {
-	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	logger.AddFuncName("RemoveFriends")
 	userUUID, ok := ctx.Value(config.KeyUUID).(string)
 
 	if !ok || userUUID == "" {
-		logger.Error("failed to get user UUID from context")
+		logger_lib.Error(ctx, "failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
 
 	areFriends, err := s.dbRepo.CheckFriendship(ctx, userUUID, in.Peer)
 	if err != nil {
-		logger.Error(" failed to check user friendship")
-		return nil, fmt.Errorf(" failed to check user friendshipt: %v", err)
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to check user friendship")
+		return nil, fmt.Errorf("failed to check user friendshipt: %v", err)
 	}
 	if !areFriends {
-		logger.Error("user already not friends")
+		logger_lib.Error(ctx, "user already not friends")
 		return &user.RemoveFriendsOut{Success: false}, nil
 	}
 
 	err = s.dbRepo.RemoveFriends(ctx, userUUID, in.Peer)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to RemoveFriends from dbRepo: %v", err))
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to RemoveFriends from dbRepo")
 		return nil, err
 	}
 	return &user.RemoveFriendsOut{Success: true}, nil
 }
 
 func (s *Server) GetCountFriends(ctx context.Context, in *user.EmptyFriends) (*user.GetCountFriendsOut, error) {
-	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	logger.AddFuncName("GetCountFriends")
 	userUUID, ok := ctx.Value(config.KeyUUID).(string)
 
 	if !ok || userUUID == "" {
-		logger.Error("failed to get user UUID from context")
+		logger_lib.Error(ctx, "failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
 
 	subscription, err := s.dbRepo.GetSubscriptionCount(ctx, userUUID)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to get subscription count: %v", err))
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to get subscription count")
 		return nil, err
 	}
 	subscribers, err := s.dbRepo.GetSubscribersCount(ctx, userUUID)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to get subscribers count: %v", err))
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to get subscribers count")
 		return nil, err
 	}
 	return &user.GetCountFriendsOut{Subscription: subscription, Subscribers: subscribers}, nil
 }
 
 func (s *Server) GetPeerFollow(ctx context.Context, in *user.GetPeerFollowIn) (*user.GetPeerFollowOut, error) {
-	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	logger.AddFuncName("GetPeerFollow")
-
 	userUUID, ok := ctx.Value(config.KeyUUID).(string)
 	if !ok || userUUID == "" {
-		logger.Error("failed to get user UUID from context")
+		logger_lib.Error(ctx, "failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
 
 	follow, err := s.dbRepo.GetPeerFollow(ctx, in.Uuid)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to get peer follow: %v", err))
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to get peer follow")
 		return nil, err
 	}
 	peers := make([]*user.Peer, 0)
@@ -370,18 +342,16 @@ func (s *Server) GetPeerFollow(ctx context.Context, in *user.GetPeerFollowIn) (*
 }
 
 func (s *Server) GetWhoFollowPeer(ctx context.Context, in *user.GetWhoFollowPeerIn) (*user.GetWhoFollowPeerOut, error) {
-	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	logger.AddFuncName("GetWhoFollowPeer")
 	userUUID, ok := ctx.Value(config.KeyUUID).(string)
 
 	if !ok || userUUID == "" {
-		logger.Error("failed to get user UUID from context")
+		logger_lib.Error(ctx, "failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
 
 	follow, err := s.dbRepo.GetWhoFollowPeer(ctx, in.Uuid)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to get peer follow: %v", err))
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to get peer follow")
 		return nil, err
 	}
 	peers := make([]*user.Peer, 0)
@@ -392,22 +362,20 @@ func (s *Server) GetWhoFollowPeer(ctx context.Context, in *user.GetWhoFollowPeer
 }
 
 func (s *Server) CheckFriendship(ctx context.Context, in *user.CheckFriendshipIn) (*user.CheckFriendshipOut, error) {
-	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	logger.AddFuncName("CheckFriendship")
 	userUUID, ok := ctx.Value(config.KeyUUID).(string)
 
 	if !ok || userUUID == "" {
-		logger.Error("failed to get user UUID from context")
+		logger_lib.Error(ctx, "failed to get user UUID from context")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
 
-	succses, err := s.dbRepo.CheckFriendship(ctx, userUUID, in.Uuid)
+	success, err := s.dbRepo.CheckFriendship(ctx, userUUID, in.Uuid)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to check user friendship: %v", err))
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to check user friendship")
 		return nil, err
 	}
 	return &user.CheckFriendshipOut{
-		Succses: succses,
+		Succses: success,
 	}, nil
 }
 
@@ -441,18 +409,15 @@ func (s *Server) CreatePost(ctx context.Context, in *user.CreatePostIn) (*user.C
 }
 
 func (s *Server) GetPostsByIds(ctx context.Context, in *user.GetPostsByIdsIn) (*user.GetPostsByIdsOut, error) {
-	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	logger.AddFuncName("GetPostsByIds")
-
 	userUUID, ok := ctx.Value(config.KeyUUID).(string)
 	if !ok || userUUID == "" {
-		logger.Error("user UUID required")
+		logger_lib.Error(ctx, "user UUID required")
 		return nil, fmt.Errorf("failed to get user UUID from context")
 	}
 
 	posts, err := s.dbRepo.GetPostsByIds(ctx, in.PostUuids)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to get posts by ids: %v", err))
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to get posts by ids")
 		return nil, status.Errorf(codes.Internal, "failed to get posts from db: %v", err)
 	}
 	return &user.GetPostsByIdsOut{Posts: posts.FromDTO()}, nil

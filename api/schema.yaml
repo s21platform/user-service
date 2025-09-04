@@ -4,27 +4,35 @@ info:
   version: 1.0.0
 
 paths:
-  /api/user/profile/{user_identity}:
+  /api/user/me/personality:
     get:
-      summary: Handle Open Dialog window for birthday poll
-      operationId: Profile
+      summary: Ручка для получения данных для своей странички
+      operationId: MyPersonality
       parameters:
-        - name: user_identity
-          in: path
+        - name: X-User-Uuid
+          in: header
           required: true
           schema:
             type: string
       responses:
-        '200':
+        200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Profile'
+                $ref: '#/components/schemas/MyPersonality'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/InternalError'
 
 components:
   schemas:
-    Profile:
+    MyPersonality:
       type: object
       required:
         - data
@@ -32,18 +40,59 @@ components:
         data:
           type: array
           items:
-            type: object
-            required:
-              - title
-              - type
-            properties:
-              title:
-                type: string
-              type:
-                type: string
-              value:
-                type: string
-              enum_values:
-                type: array
-                items:
-                  type: string
+            $ref: '#/components/schemas/ProfileItem'
+    ProfileItem:
+      type: object
+      required:
+        - title
+        - type
+      properties:
+        title:
+          type: string
+        type:
+          type: string
+        value:
+          type: string
+        enum_values:
+          type: array
+          items:
+            type: string
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: Internal Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource is not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

@@ -317,21 +317,48 @@ func (r *Repository) GetUserWithLimit(uuid, nickname string, limit int64, offset
 	return userWithLimit, total, nil
 }
 
-func (r *Repository) GetLoginByUuid(ctx context.Context, uuid string) (string, error) {
-	query := `
-		SELECT login 
-		FROM users 
-		WHERE uuid=$1
-	`
-	var result string
-	err := r.Get(&result, query, uuid)
+// GetNicknameByUuid Method returns nickname by user_uuid
+func (r *Repository) GetNicknameByUuid(ctx context.Context, uuid string) (string, error) {
+	query, args, err := sq.Select("login").
+		From("users").
+		Where(sq.Eq{"uuid": uuid}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return "", nil
-		}
+		return "", fmt.Errorf("failed to build sql query: %v", err)
+	}
+
+	var result string
+	err = r.Chk(ctx).GetContext(ctx, &result, query, args...)
+	if err != nil {
 		return "", fmt.Errorf("failed to get login by uuid: %v", err)
 	}
 	return result, nil
+}
+
+// GetPersonalityByUuid method returns data of user named profile. For profile block
+func (r *Repository) GetPersonalityByUuid(ctx context.Context, uuid string) (model.Personality, error) {
+	query, args, err := sq.Select(
+		"name",
+		"surname",
+		"birthdate",
+	).From("data").
+		Where(sq.Eq{"user_uuid": uuid}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return model.Personality{}, fmt.Errorf("failed to build sql query: %v", err)
+	}
+
+	var res model.Personality
+	err = r.Chk(ctx).GetContext(ctx, &res, query, args...)
+	if err != nil {
+		return model.Personality{}, fmt.Errorf("failed to get profile by uuid: %v", err)
+	}
+
+	return res, nil
 }
 
 func (r *Repository) UpdateProfile(ctx context.Context, data model.ProfileData, userUuid string) error {
