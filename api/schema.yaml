@@ -30,6 +30,42 @@ paths:
         500:
           $ref: '#/components/responses/InternalError'
 
+  /api/user/attributes:
+    get:
+      summary: Ручка для получения атрибутов пользователя по их ID
+      operationId: GetUserAttributes
+      parameters:
+        - name: X-User-Uuid
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: attribute_ids
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+          style: form
+          explode: false
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAttributesResponse'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/InternalError'
+
 components:
   schemas:
     MyPersonality:
@@ -57,6 +93,38 @@ components:
           type: array
           items:
             type: string
+
+    UserAttributesResponse:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttributeItem'
+    AttributeItem:
+      type: object
+      required:
+        - title
+        - attribute_id
+        - type
+      properties:
+        title:
+          type: string
+        attribute_id:
+          type: integer
+          format: int64
+        type:
+          type: string
+        value_string:
+          type: string
+        value_int:
+          type: integer
+          format: int64
+        value_date:
+          type: string
+          format: date
     Error:
       type: object
       properties:

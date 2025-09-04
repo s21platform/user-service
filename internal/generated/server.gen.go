@@ -13,6 +13,9 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Ручка для получения атрибутов пользователя по их ID
+	// (GET /api/user/attributes)
+	GetUserAttributes(w http.ResponseWriter, r *http.Request, params GetUserAttributesParams)
 	// Ручка для получения данных для своей странички
 	// (GET /api/user/me/personality)
 	MyPersonality(w http.ResponseWriter, r *http.Request, params MyPersonalityParams)
@@ -21,6 +24,12 @@ type ServerInterface interface {
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// Ручка для получения атрибутов пользователя по их ID
+// (GET /api/user/attributes)
+func (_ Unimplemented) GetUserAttributes(w http.ResponseWriter, r *http.Request, params GetUserAttributesParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // Ручка для получения данных для своей странички
 // (GET /api/user/me/personality)
@@ -36,6 +45,65 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// GetUserAttributes operation middleware
+func (siw *ServerInterfaceWrapper) GetUserAttributes(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetUserAttributesParams
+
+	// ------------- Required query parameter "attribute_ids" -------------
+
+	if paramValue := r.URL.Query().Get("attribute_ids"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "attribute_ids"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", false, true, "attribute_ids", r.URL.Query(), &params.AttributeIds)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "attribute_ids", Err: err})
+		return
+	}
+
+	headers := r.Header
+
+	// ------------- Required header parameter "X-User-Uuid" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-User-Uuid")]; found {
+		var XUserUuid string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "X-User-Uuid", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-User-Uuid", valueList[0], &XUserUuid, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "X-User-Uuid", Err: err})
+			return
+		}
+
+		params.XUserUuid = XUserUuid
+
+	} else {
+		err := fmt.Errorf("Header parameter X-User-Uuid is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "X-User-Uuid", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetUserAttributes(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // MyPersonality operation middleware
 func (siw *ServerInterfaceWrapper) MyPersonality(w http.ResponseWriter, r *http.Request) {
@@ -194,6 +262,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		ErrorHandlerFunc:   options.ErrorHandlerFunc,
 	}
 
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/user/attributes", wrapper.GetUserAttributes)
+	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/user/me/personality", wrapper.MyPersonality)
 	})

@@ -30,6 +30,8 @@ import (
 
 func main() {
 	cfg := config.MustLoad()
+	log.Println(cfg.Service)
+	log.Println(cfg.Postgres)
 	logger := logger_lib.New(cfg.Logger.Host, cfg.Logger.Port, cfg.Service.Name, cfg.Platform.Env)
 	ctx := logger_lib.NewContext(context.Background(), logger)
 

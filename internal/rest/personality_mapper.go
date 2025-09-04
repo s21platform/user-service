@@ -8,6 +8,7 @@ import (
 
 // mapPersonalityToProfileItems преобразует данные о личности в профильные элементы
 func mapPersonalityToProfileItems(personality model.Personality, options model.AttributeMetaMap) []api.ProfileItem {
+
 	items := make([]api.ProfileItem, 0)
 
 	// Name

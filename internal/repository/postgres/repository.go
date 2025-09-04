@@ -361,6 +361,32 @@ func (r *Repository) GetPersonalityByUuid(ctx context.Context, uuid string) (mod
 	return res, nil
 }
 
+// GetUserAttributesByUuid method returns user attributes data for attributes mapping
+func (r *Repository) GetUserAttributesByUuid(ctx context.Context, uuid string) (model.UserAttributes, error) {
+	query, args, err := sq.Select(
+		"name",
+		"surname",
+		"birthdate",
+		"city_id",
+		"telegram",
+	).From("data").
+		Where(sq.Eq{"user_uuid": uuid}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return model.UserAttributes{}, fmt.Errorf("failed to build sql query: %v", err)
+	}
+
+	var res model.UserAttributes
+	err = r.Chk(ctx).GetContext(ctx, &res, query, args...)
+	if err != nil {
+		return model.UserAttributes{}, fmt.Errorf("failed to get user attributes by uuid: %v", err)
+	}
+
+	return res, nil
+}
+
 func (r *Repository) UpdateProfile(ctx context.Context, data model.ProfileData, userUuid string) error {
 	tx, err := r.Beginx()
 	if err != nil {

@@ -52,6 +52,56 @@ func (h *Handler) MyPersonality(w http.ResponseWriter, r *http.Request, params a
 	_, _ = w.Write(resp)
 }
 
+func (h *Handler) GetUserAttributes(w http.ResponseWriter, r *http.Request, params api.GetUserAttributesParams) {
+	w.Header().Set("Content-Type", "application/json")
+	ctx := logger_lib.WithField(r.Context(), "user_uuid", params.XUserUuid)
+
+	// Валидируем параметры
+	if len(params.AttributeIds) == 0 {
+		logger_lib.Error(ctx, "attribute_ids parameter is empty")
+		resolveError(&w, http.StatusBadRequest)
+		return
+	}
+
+	// Получаем данные пользователя из БД
+	userAttributes, err := h.dbR.GetUserAttributesByUuid(ctx, params.XUserUuid)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to get user attributes data")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+
+	// Преобразуем IDs в модельные атрибуты
+	attributeIds := make([]model.Attribute, len(params.AttributeIds))
+	for i, id := range params.AttributeIds {
+		attributeIds[i] = model.Attribute(id)
+	}
+
+	// Получаем метаданные атрибутов
+	options, err := h.ohC.GetAttributesMeta(ctx, attributeIds)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to get attributes metadata")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+
+	// Маппируем данные в ответ
+	result := mapUserAttributesToAttributeItems(userAttributes, options, params.AttributeIds)
+
+	response := api.UserAttributesResponse{
+		Data: result,
+	}
+
+	resp, err := json.Marshal(response)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to marshal data")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+
+	_, _ = w.Write(resp)
+}
+
 func resolveError(w *http.ResponseWriter, status int) {
 	var message string
 	switch status {

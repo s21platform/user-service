@@ -45,6 +45,14 @@ type Personality struct {
 	Birthdate *time.Time `db:"birthdate"`
 }
 
+type UserAttributes struct {
+	Name      *string    `db:"name"`
+	Surname   *string    `db:"surname"`
+	Birthdate *time.Time `db:"birthdate"`
+	CityId    *int64     `db:"city_id"`
+	Telegram  *string    `db:"telegram"`
+}
+
 func (pd *ProfileData) ToDTO(in *user.UpdateProfileIn) {
 	birthdate, err := time.Parse(time.RFC3339, in.Birthday)
 	bd := lo.Ternary(err != nil, nil, &birthdate)
