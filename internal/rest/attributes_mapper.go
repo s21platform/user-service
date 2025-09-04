@@ -2,6 +2,7 @@ package rest
 
 import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
+
 	api "github.com/s21platform/user-service/internal/generated"
 	"github.com/s21platform/user-service/internal/model"
 )

@@ -1,14 +1,14 @@
 package rest
 
 import (
+	"github.com/samber/lo"
+
 	api "github.com/s21platform/user-service/internal/generated"
 	"github.com/s21platform/user-service/internal/model"
-	"github.com/samber/lo"
 )
 
 // mapPersonalityToProfileItems преобразует данные о личности в профильные элементы
 func mapPersonalityToProfileItems(personality model.Personality, options model.AttributeMetaMap) []api.ProfileItem {
-
 	items := make([]api.ProfileItem, 0)
 
 	// Name
