@@ -655,6 +655,8 @@ Message for response
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | user_uuid | [string](#string) |  |  |
+| user_nickname | [string](#string) |  |  |
+| user_email | [string](#string) |  |  |
 
 
 

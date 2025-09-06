@@ -229,7 +229,9 @@ func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.C
 		}
 
 		err = s.ucP.ProduceMessage(ctx, user.UserCreatedMessage{
-			UserUuid: userUUIDStr,
+			UserUuid:     userUUIDStr,
+			UserNickname: nickname,
+			UserEmail:    email,
 		}, userUUIDStr)
 		if err != nil {
 			return fmt.Errorf("failed to produce message: %v", err)

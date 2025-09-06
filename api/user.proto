@@ -224,6 +224,8 @@ message CreatePostOut {
 
 message UserCreatedMessage {
   string user_uuid = 1;
+  string user_nickname = 2;
+  string user_email = 3;
 }
 
 message UserNicknameUpdated {
