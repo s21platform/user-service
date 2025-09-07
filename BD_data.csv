@@ -1,0 +1,18 @@
+INSERT INTO profiles (id, user_id, name, surname, birthdate, phone, telegram, city_id) VALUES
+(28, 28, 'Оля', '', '2024-12-25', '', '', NULL),
+(36, 36, '', '', NULL, '', '', NULL),
+(4, 4, 'Мишаня', '', '2005-10-30', '', 'saint_pencil', NULL),
+(34, 34, 'Артемий Корсунский', '', NULL, '', 'Lyk_Repchatiy', NULL),
+(25, 25, 'Алексей Попов', '', '1995-09-16', '', 'alexsei_popov', NULL),
+(11, 11, 'Полина', '', NULL, '', 'what_s_the_point', NULL),
+(12, 12, 'Юлиана', '', '1996-11-11', '', 'yuliana111', NULL),
+(22, 22, '', '', NULL, '', '', NULL),
+(26, 26, '', '', NULL, '', '', NULL),
+(27, 27, '', '', NULL, '', '', NULL),
+(21, 21, 'Алексей', '', '8767-02-23', '', 'njohanne', NULL),
+(29, 29, 'Sega MEGA', '', '2024-12-20', '', 'segam2222', NULL),
+(30, 30, '', '', NULL, '', '', NULL),
+(31, 31, '', '', NULL, '', '', NULL),
+(32, 32, '', '', NULL, '', '', NULL),
+(33, 33, '', '', NULL, '', '', NULL),
+(35, 35, 'Богдан Осотов', '', '2002-02-02', '', 'sllaaggtwtv', NULL);
