@@ -1,7 +1,11 @@
 package rest
 
 import (
+	"context"
 	openapi_types "github.com/oapi-codegen/runtime/types"
+	logger_lib "github.com/s21platform/logger-lib"
+	optionhub_lib "github.com/s21platform/optionhub-lib"
+	attrs "github.com/s21platform/optionhub-lib/users"
 
 	api "github.com/s21platform/user-service/internal/generated"
 	"github.com/s21platform/user-service/internal/model"
@@ -47,4 +51,25 @@ func mapUserAttributesToAttributeItems(userAttributes model.UserAttributes, opti
 	}
 
 	return result
+}
+
+func mapAttributeToFields(ctx context.Context, value []optionhub_lib.AttributeValue) model.ProfileData {
+	var res model.ProfileData
+	for _, attr := range value {
+		switch attr.AttributeId {
+		case attrs.Attribute_Name_2:
+			res.Name = attr.ValueString
+		case attrs.Attribute_Surname_3:
+			res.Surname = attr.ValueString
+		case attrs.Attribute_Birthday_4:
+			res.Birthday = attr.ValueDate
+		case attrs.Attribute_City_5:
+			res.CityId = attr.ValueInt
+		case attrs.Attribute_Telegram_6:
+			res.Telegram = attr.ValueString
+		default:
+			logger_lib.Error(ctx, "non-existent attribute received")
+		}
+	}
+	return res
 }

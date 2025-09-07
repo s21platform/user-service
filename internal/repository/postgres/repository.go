@@ -388,36 +388,24 @@ func (r *Repository) GetUserAttributesByUuid(ctx context.Context, uuid string) (
 }
 
 func (r *Repository) UpdateProfile(ctx context.Context, data model.ProfileData, userUuid string) error {
-	tx, err := r.Beginx()
-	if err != nil {
-		return fmt.Errorf("failed to start transaction: %v", err)
-	}
-
-	log.Println(data.Birthdate)
 	query, args, err := sq.Update("data").
 		Set("name", data.Name).
-		Set("birthdate", data.Birthdate).
-		Set("git", data.Git).
+		Set("surname", data.Surname).
+		Set("birthdate", data.Birthday).
+		Set("city_id", data.CityId).
 		Set("telegram", data.Telegram).
-		Set("os_id", data.OsId).
 		Where(sq.Eq{"user_uuid": userUuid}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
-
 	if err != nil {
-		_ = tx.Rollback()
-		return fmt.Errorf("failed to update user: %v", err)
-	}
-	_, err = tx.ExecContext(ctx, query, args...)
-	if err != nil {
-		_ = tx.Rollback()
 		return fmt.Errorf("failed to update user: %v", err)
 	}
 
-	err = tx.Commit()
+	_, err = r.Chk(ctx).ExecContext(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf("failed to commit transaction: %v", err)
+		return fmt.Errorf("failed to update user: %v", err)
 	}
+
 	return nil
 }
 

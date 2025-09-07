@@ -2,6 +2,9 @@ package rest
 
 import (
 	"encoding/json"
+	optionhub_lib "github.com/s21platform/optionhub-lib"
+	"io"
+	"log"
 	"net/http"
 
 	logger_lib "github.com/s21platform/logger-lib"
@@ -100,6 +103,40 @@ func (h *Handler) GetUserAttributes(w http.ResponseWriter, r *http.Request, para
 	}
 
 	_, _ = w.Write(resp)
+}
+
+func (h *Handler) UpdateProfile(w http.ResponseWriter, r *http.Request, params api.UpdateProfileParams) {
+	ctx := r.Context()
+	t, err := io.ReadAll(r.Body)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to read body")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+	var body api.AttributesValues
+	err = json.Unmarshal(t, &body)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to unmarshal data")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+	res, err := optionhub_lib.ParseAttributes(ctx, body.Attributes)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to unmarshal data")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+
+	data := mapAttributeToFields(ctx, res)
+	err = h.dbR.UpdateProfile(ctx, data, params.XUserUuid)
+	if err != nil {
+		log.Println(err)
+		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to update profile")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+
+	return
 }
 
 func resolveError(w *http.ResponseWriter, status int) {

@@ -2,10 +2,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/samber/lo"
-
-	"github.com/s21platform/user-service/pkg/user"
 )
 
 type UserInfo struct {
@@ -32,11 +28,11 @@ type UserInfoMin struct {
 }
 
 type ProfileData struct {
-	Name      string     `db:"name"`
-	Birthdate *time.Time `db:"birthdate"`
-	Telegram  string     `db:"telegram"`
-	Git       string     `db:"git"`
-	OsId      int64      `db:"os_id"`
+	Name     *string    `db:"name"`
+	Surname  *string    `db:"surname"`
+	Birthday *time.Time `db:"birthdate"`
+	CityId   *int64     `db:"city_id"`
+	Telegram *string    `db:"telegram"`
 }
 
 type Personality struct {
@@ -51,16 +47,6 @@ type UserAttributes struct {
 	Birthdate *time.Time `db:"birthdate"`
 	CityId    *int64     `db:"city_id"`
 	Telegram  *string    `db:"telegram"`
-}
-
-func (pd *ProfileData) ToDTO(in *user.UpdateProfileIn) {
-	birthdate, err := time.Parse(time.RFC3339, in.Birthday)
-	bd := lo.Ternary(err != nil, nil, &birthdate)
-	pd.Name = in.Name
-	pd.Birthdate = bd
-	pd.Telegram = in.Telegram
-	pd.Git = in.Github
-	pd.OsId = in.OsId
 }
 
 type UserWithLimit struct {

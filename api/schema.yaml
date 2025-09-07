@@ -29,7 +29,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         500:
           $ref: '#/components/responses/InternalError'
-
   /api/user/attributes:
     get:
       summary: Ручка для получения атрибутов пользователя по их ID
@@ -65,6 +64,28 @@ paths:
           $ref: '#/components/responses/Forbidden'
         500:
           $ref: '#/components/responses/InternalError'
+  /api/user/update:
+    put:
+      summary: Ручка для обновления данных пользователя
+      operationId: UpdateProfile
+      parameters:
+        - name: X-User-Uuid
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttributesValues'
+      responses:
+        200:
+         description: OK
+         content:
+           application/json:
+             schema:
+               $ref: '#/components/schemas/UpdateProfileResponse'
 
 components:
   schemas:
@@ -93,7 +114,13 @@ components:
           type: array
           items:
             type: string
-
+    AttributesValues:
+      type: object
+      required:
+        - attributes
+      properties:
+        attributes:
+          x-go-type: json.RawMessage
     UserAttributesResponse:
       type: object
       required:
@@ -125,6 +152,11 @@ components:
         value_date:
           type: string
           format: date
+    UpdateProfileResponse:
+      type: object
+      properties:
+        message:
+          type: string
     Error:
       type: object
       properties:

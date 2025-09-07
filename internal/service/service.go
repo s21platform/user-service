@@ -165,10 +165,9 @@ func (s *Server) GetUserInfoByUUID(ctx context.Context, in *user.GetUserInfoByUU
 }
 
 func (s *Server) UpdateProfile(ctx context.Context, in *user.UpdateProfileIn) (*user.UpdateProfileOut, error) {
-	uuid := ctx.Value(config.KeyUUID).(string)
+	uid := ctx.Value(config.KeyUUID).(string)
 	var data model.ProfileData
-	data.ToDTO(in)
-	err := s.dbRepo.UpdateProfile(ctx, data, uuid)
+	err := s.dbRepo.UpdateProfile(ctx, data, uid)
 	if err != nil {
 		return nil, err
 	}
