@@ -2,12 +2,12 @@ package rest
 
 import (
 	"encoding/json"
-	optionhub_lib "github.com/s21platform/optionhub-lib"
 	"io"
 	"log"
 	"net/http"
 
 	logger_lib "github.com/s21platform/logger-lib"
+	optionhub_lib "github.com/s21platform/optionhub-lib"
 
 	api "github.com/s21platform/user-service/internal/generated"
 	"github.com/s21platform/user-service/internal/model"
@@ -135,8 +135,6 @@ func (h *Handler) UpdateProfile(w http.ResponseWriter, r *http.Request, params a
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}
-
-	return
 }
 
 func resolveError(w *http.ResponseWriter, status int) {

@@ -2,6 +2,7 @@ package rest
 
 import (
 	"context"
+
 	openapi_types "github.com/oapi-codegen/runtime/types"
 	logger_lib "github.com/s21platform/logger-lib"
 	optionhub_lib "github.com/s21platform/optionhub-lib"
