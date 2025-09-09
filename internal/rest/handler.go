@@ -3,7 +3,6 @@ package rest
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 
 	logger_lib "github.com/s21platform/logger-lib"
@@ -106,7 +105,7 @@ func (h *Handler) GetUserAttributes(w http.ResponseWriter, r *http.Request, para
 }
 
 func (h *Handler) UpdateProfile(w http.ResponseWriter, r *http.Request, params api.UpdateProfileParams) {
-	ctx := r.Context()
+	ctx := logger_lib.WithField(r.Context(), "user_uuid", params.XUserUuid)
 	t, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to read body")
@@ -126,15 +125,16 @@ func (h *Handler) UpdateProfile(w http.ResponseWriter, r *http.Request, params a
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}
+	ctx = logger_lib.WithField(ctx, "parsed len", len(res))
 
 	data := mapAttributeToFields(ctx, res)
 	err = h.dbR.UpdateProfile(ctx, data, params.XUserUuid)
 	if err != nil {
-		log.Println(err)
 		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to update profile")
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}
+	logger_lib.Info(ctx, "update profile data")
 }
 
 func resolveError(w *http.ResponseWriter, status int) {
