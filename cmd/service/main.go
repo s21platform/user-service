@@ -67,6 +67,7 @@ func main() {
 	handler := rest.New(db, optionhubClient)
 	router := chi.NewRouter()
 	router.Use(infra.AuthRequest)
+	router.Use(infra.LoggerRequest(logger))
 
 	api.HandlerFromMux(handler, router)
 	httpServer := &http.Server{
