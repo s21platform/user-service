@@ -31,7 +31,7 @@ func mapPersonalityToProfileItems(personality model.Personality, options model.A
 
 	// Birthday
 	if meta, ok := options[model.AttributeBirthday_4.Int64()]; ok && personality.Birthdate != nil {
-		birthdateStr := lo.ToPtr(personality.Birthdate.String())
+		birthdateStr := lo.ToPtr(personality.Birthdate.Format("02 01 2006"))
 		items = append(items, api.ProfileItem{
 			Title: meta.Label,
 			Type:  meta.Type,
