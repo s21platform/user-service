@@ -29,8 +29,6 @@ func mapUserAttributesToAttributeItems(userAttributes model.UserAttributes, opti
 			Type:        meta.Type,
 		}
 
-		// Маппим значения в зависимости от типа атрибута
-		// Всегда создаем структуру, даже если значение nil
 		switch model.Attribute(attrId) {
 		case model.AttributeName_2:
 			item.ValueString = userAttributes.Name
@@ -38,7 +36,6 @@ func mapUserAttributesToAttributeItems(userAttributes model.UserAttributes, opti
 			item.ValueString = userAttributes.Surname
 		case model.AttributeBirthday_4:
 			if userAttributes.Birthdate != nil {
-				// Преобразуем time.Time в openapi_types.Date
 				date := openapi_types.Date{Time: *userAttributes.Birthdate}
 				item.ValueDate = &date
 			}

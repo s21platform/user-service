@@ -56,38 +56,33 @@ func (h *Handler) MyPersonality(w http.ResponseWriter, r *http.Request, params a
 
 func (h *Handler) GetUserAttributes(w http.ResponseWriter, r *http.Request, params api.GetUserAttributesParams) {
 	w.Header().Set("Content-Type", "application/json")
-	ctx := logger_lib.WithField(r.Context(), "user_uuid", params.XUserUuid)
+	ctx := logger_lib.WithUserUuid(r.Context(), params.XUserUuid)
 
-	// Валидируем параметры
 	if len(params.AttributeIds) == 0 {
 		logger_lib.Error(ctx, "attribute_ids parameter is empty")
 		resolveError(&w, http.StatusBadRequest)
 		return
 	}
 
-	// Получаем данные пользователя из БД
 	userAttributes, err := h.dbR.GetUserAttributesByUuid(ctx, params.XUserUuid)
 	if err != nil {
-		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to get user attributes data")
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get user attributes data")
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}
 
-	// Преобразуем IDs в модельные атрибуты
 	attributeIds := make([]model.Attribute, len(params.AttributeIds))
 	for i, id := range params.AttributeIds {
 		attributeIds[i] = model.Attribute(id)
 	}
 
-	// Получаем метаданные атрибутов
 	options, err := h.ohC.GetAttributesMeta(ctx, attributeIds)
 	if err != nil {
-		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to get attributes metadata")
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get attributes metadata")
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}
 
-	// Маппируем данные в ответ
 	result := mapUserAttributesToAttributeItems(userAttributes, options, params.AttributeIds)
 
 	response := api.UserAttributesResponse{
@@ -96,45 +91,47 @@ func (h *Handler) GetUserAttributes(w http.ResponseWriter, r *http.Request, para
 
 	resp, err := json.Marshal(response)
 	if err != nil {
-		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to marshal data")
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to marshal data")
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}
 
+	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write(resp)
 }
 
 func (h *Handler) UpdateProfile(w http.ResponseWriter, r *http.Request, params api.UpdateProfileParams) {
-	ctx := logger_lib.WithField(r.Context(), "user_uuid", params.XUserUuid)
-	t, err := io.ReadAll(r.Body)
+	ctx := logger_lib.WithUserUuid(r.Context(), params.XUserUuid)
+
+	bodyByte, err := io.ReadAll(r.Body)
 	if err != nil {
-		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to read body")
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to read body")
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}
+
 	var body api.AttributesValues
-	err = json.Unmarshal(t, &body)
+	err = json.Unmarshal(bodyByte, &body)
 	if err != nil {
-		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to unmarshal data")
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to unmarshal data")
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}
+
 	res, err := optionhub_lib.ParseAttributes(ctx, body.Attributes)
 	if err != nil {
-		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to unmarshal data")
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to parse data")
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}
-	ctx = logger_lib.WithField(ctx, "parsed len", len(res))
 
 	data := mapAttributeToFields(ctx, res)
 	err = h.dbR.UpdateProfile(ctx, data, params.XUserUuid)
 	if err != nil {
-		logger_lib.Error(logger_lib.WithField(ctx, "error", err.Error()), "failed to update profile")
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to update profile")
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}
-	logger_lib.Info(ctx, "update profile data")
 }
 
 func resolveError(w *http.ResponseWriter, status int) {

@@ -73,6 +73,8 @@ github.com/s21platform/logger-lib v1.0.0 h1:0Wh5u8WkPexKlhPg38P+aU4q6Wh8KggF85Ni
 github.com/s21platform/logger-lib v1.0.0/go.mod h1:GzLPrzQWhXxlLS7bE7/3AQP1q1u1ZmVb4GYoPaR15Pg=
 github.com/s21platform/logger-lib v1.0.1 h1:CNNUoRZMFeczCHMFd+mi2u6+pJicrAvvDm7AiIISrZU=
 github.com/s21platform/logger-lib v1.0.1/go.mod h1:GzLPrzQWhXxlLS7bE7/3AQP1q1u1ZmVb4GYoPaR15Pg=
+github.com/s21platform/logger-lib v1.0.2 h1:VumtVi5dgeMTAVqV3AdC6cldKXxyJ2LmkOAqfwHteB4=
+github.com/s21platform/logger-lib v1.0.2/go.mod h1:GzLPrzQWhXxlLS7bE7/3AQP1q1u1ZmVb4GYoPaR15Pg=
 github.com/s21platform/metrics-lib v0.0.9 h1:nFz4W+xps2nlxpOyGW/JLjZf2sTN/YXomumuC9nXwQ0=
 github.com/s21platform/metrics-lib v0.0.9/go.mod h1:Z1Aiy5uuyEmM//rQmhqkVh0JR8l5sVwe83TQegdNFxQ=
 github.com/s21platform/optionhub-lib v0.0.2 h1:f4t0dlm5+Dp47ntaJ6H0N7rIBJtcCzzVuItCVM4KTqE=
