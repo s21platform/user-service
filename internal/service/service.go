@@ -229,10 +229,11 @@ func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.C
 			return fmt.Errorf("failed to create user: %v", err)
 		}
 
-		rawMeassage, err := json.Marshal(model.UserCreated{
+		userCreated := model.UserCreated{
 			Nickname: nickname,
 			Uuid:     userUUIDStr,
-		})
+		}
+		rawMessage, err := json.Marshal(userCreated)
 		if err != nil {
 			return fmt.Errorf("failed to marshal user: %v", err)
 		}
@@ -240,7 +241,7 @@ func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.C
 		err = s.ucP.ProduceMessage(ctx, user.UserCreatedMessage{
 			UserUuid:     userUUIDStr,
 			UserNickname: nickname,
-			RawMessage:   rawMeassage,
+			RawMessage:   json.RawMessage(rawMessage),
 		}, userUUIDStr)
 		if err != nil {
 			return fmt.Errorf("failed to produce message: %v", err)
