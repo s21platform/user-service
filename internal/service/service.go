@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"regexp"
@@ -228,10 +229,18 @@ func (s *Server) CreateUser(ctx context.Context, in *user.CreateUserIn) (*user.C
 			return fmt.Errorf("failed to create user: %v", err)
 		}
 
+		rawMeassage, err := json.Marshal(model.UserCreated{
+			Nickname: nickname,
+			Uuid:     userUUIDStr,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to marshal user: %v", err)
+		}
+
 		err = s.ucP.ProduceMessage(ctx, user.UserCreatedMessage{
 			UserUuid:     userUUIDStr,
 			UserNickname: nickname,
-			UserEmail:    email,
+			RawMessage:   rawMeassage,
 		}, userUUIDStr)
 		if err != nil {
 			return fmt.Errorf("failed to produce message: %v", err)
