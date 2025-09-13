@@ -656,7 +656,7 @@ Message for response
 | ----- | ---- | ----- | ----------- |
 | user_uuid | [string](#string) |  |  |
 | user_nickname | [string](#string) |  |  |
-| user_email | [string](#string) |  |  |
+| raw_message | [bytes](#bytes) |  | 3 - DEPRECATED (OLD EMAIL) |
 
 
 
