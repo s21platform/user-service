@@ -17,7 +17,7 @@ require (
 	github.com/s21platform/avatar-service v0.0.0-20250413162426-a937ac435e67
 	github.com/s21platform/friends-proto v0.0.12
 	github.com/s21platform/kafka-lib v1.0.2
-	github.com/s21platform/logger-lib v1.0.0
+	github.com/s21platform/logger-lib v1.0.2
 	github.com/s21platform/metrics-lib v0.0.9
 	github.com/s21platform/optionhub-service v0.0.1
 	github.com/samber/lo v1.49.1
@@ -39,6 +39,7 @@ require (
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/s21platform/optionhub-lib v0.0.6 // indirect
 	github.com/segmentio/kafka-go v0.4.47 // indirect
 	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect

@@ -2,9 +2,11 @@ package rest
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 
 	logger_lib "github.com/s21platform/logger-lib"
+	optionhub_lib "github.com/s21platform/optionhub-lib"
 
 	api "github.com/s21platform/user-service/internal/generated"
 	"github.com/s21platform/user-service/internal/model"
@@ -50,6 +52,86 @@ func (h *Handler) MyPersonality(w http.ResponseWriter, r *http.Request, params a
 	}
 
 	_, _ = w.Write(resp)
+}
+
+func (h *Handler) GetUserAttributes(w http.ResponseWriter, r *http.Request, params api.GetUserAttributesParams) {
+	w.Header().Set("Content-Type", "application/json")
+	ctx := logger_lib.WithUserUuid(r.Context(), params.XUserUuid)
+
+	if len(params.AttributeIds) == 0 {
+		logger_lib.Error(ctx, "attribute_ids parameter is empty")
+		resolveError(&w, http.StatusBadRequest)
+		return
+	}
+
+	userAttributes, err := h.dbR.GetUserAttributesByUuid(ctx, params.XUserUuid)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get user attributes data")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+
+	attributeIds := make([]model.Attribute, len(params.AttributeIds))
+	for i, id := range params.AttributeIds {
+		attributeIds[i] = model.Attribute(id)
+	}
+
+	options, err := h.ohC.GetAttributesMeta(ctx, attributeIds)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get attributes metadata")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+
+	result := mapUserAttributesToAttributeItems(userAttributes, options, params.AttributeIds)
+
+	response := api.UserAttributesResponse{
+		Data: result,
+	}
+
+	resp, err := json.Marshal(response)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to marshal data")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(resp)
+}
+
+func (h *Handler) UpdateProfile(w http.ResponseWriter, r *http.Request, params api.UpdateProfileParams) {
+	ctx := logger_lib.WithUserUuid(r.Context(), params.XUserUuid)
+
+	bodyByte, err := io.ReadAll(r.Body)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to read body")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+
+	var body api.AttributesValues
+	err = json.Unmarshal(bodyByte, &body)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to unmarshal data")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+
+	res, err := optionhub_lib.ParseAttributes(ctx, body.Attributes)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to parse data")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+
+	data := mapAttributeToFields(ctx, res)
+	err = h.dbR.UpdateProfile(ctx, data, params.XUserUuid)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to update profile")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
 }
 
 func resolveError(w *http.ResponseWriter, status int) {

@@ -361,37 +361,51 @@ func (r *Repository) GetPersonalityByUuid(ctx context.Context, uuid string) (mod
 	return res, nil
 }
 
-func (r *Repository) UpdateProfile(ctx context.Context, data model.ProfileData, userUuid string) error {
-	tx, err := r.Beginx()
-	if err != nil {
-		return fmt.Errorf("failed to start transaction: %v", err)
-	}
-
-	log.Println(data.Birthdate)
-	query, args, err := sq.Update("data").
-		Set("name", data.Name).
-		Set("birthdate", data.Birthdate).
-		Set("git", data.Git).
-		Set("telegram", data.Telegram).
-		Set("os_id", data.OsId).
-		Where(sq.Eq{"user_uuid": userUuid}).
+// GetUserAttributesByUuid method returns user attributes data for attributes mapping
+func (r *Repository) GetUserAttributesByUuid(ctx context.Context, uuid string) (model.UserAttributes, error) {
+	query, args, err := sq.Select(
+		"name",
+		"surname",
+		"birthdate",
+		"city_id",
+		"telegram",
+	).From("data").
+		Where(sq.Eq{"user_uuid": uuid}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 
 	if err != nil {
-		_ = tx.Rollback()
-		return fmt.Errorf("failed to update user: %v", err)
+		return model.UserAttributes{}, fmt.Errorf("failed to build sql query: %v", err)
 	}
-	_, err = tx.ExecContext(ctx, query, args...)
+
+	var res model.UserAttributes
+	err = r.Chk(ctx).GetContext(ctx, &res, query, args...)
 	if err != nil {
-		_ = tx.Rollback()
+		return model.UserAttributes{}, fmt.Errorf("failed to get user attributes by uuid: %v", err)
+	}
+
+	return res, nil
+}
+
+func (r *Repository) UpdateProfile(ctx context.Context, data model.ProfileData, userUuid string) error {
+	query, args, err := sq.Update("data").
+		Set("name", data.Name).
+		Set("surname", data.Surname).
+		Set("birthdate", data.Birthday).
+		Set("city_id", data.CityId).
+		Set("telegram", data.Telegram).
+		Where(sq.Eq{"user_uuid": userUuid}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
 		return fmt.Errorf("failed to update user: %v", err)
 	}
 
-	err = tx.Commit()
+	_, err = r.Chk(ctx).ExecContext(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf("failed to commit transaction: %v", err)
+		return fmt.Errorf("failed to update user: %v", err)
 	}
+
 	return nil
 }
 

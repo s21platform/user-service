@@ -56,7 +56,7 @@ func main() {
 
 	grpcSrv := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
-			infra.Logger(logger),
+			infra.LoggerRPC(logger),
 			infra.UnaryInterceptor,
 			infra.MetricsInterceptor(metrics),
 			tx.TxMiddleWire(db),
@@ -67,6 +67,7 @@ func main() {
 	handler := rest.New(db, optionhubClient)
 	router := chi.NewRouter()
 	router.Use(infra.AuthRequest)
+	router.Use(infra.LoggerHTTP(logger))
 
 	api.HandlerFromMux(handler, router)
 	httpServer := &http.Server{

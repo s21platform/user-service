@@ -1,9 +1,13 @@
 package rest
 
 import (
+	"fmt"
+	"time"
+
+	"github.com/samber/lo"
+
 	api "github.com/s21platform/user-service/internal/generated"
 	"github.com/s21platform/user-service/internal/model"
-	"github.com/samber/lo"
 )
 
 // mapPersonalityToProfileItems преобразует данные о личности в профильные элементы
@@ -30,7 +34,7 @@ func mapPersonalityToProfileItems(personality model.Personality, options model.A
 
 	// Birthday
 	if meta, ok := options[model.AttributeBirthday_4.Int64()]; ok && personality.Birthdate != nil {
-		birthdateStr := lo.ToPtr(personality.Birthdate.String())
+		birthdateStr := lo.ToPtr(formatRussianDateGenitive(*personality.Birthdate))
 		items = append(items, api.ProfileItem{
 			Title: meta.Label,
 			Type:  meta.Type,
@@ -39,4 +43,18 @@ func mapPersonalityToProfileItems(personality model.Personality, options model.A
 	}
 
 	return items
+}
+
+// formatRussianDateGenitive форматирует дату как "30 октября 2005"
+func formatRussianDateGenitive(t time.Time) string {
+	months := [...]string{
+		"января", "февраля", "марта", "апреля", "мая", "июня",
+		"июля", "августа", "сентября", "октября", "ноября", "декабря",
+	}
+
+	day := t.Day()
+	monthName := months[int(t.Month())-1]
+	year := t.Year()
+
+	return fmt.Sprintf("%d %s %d", day, monthName, year)
 }
