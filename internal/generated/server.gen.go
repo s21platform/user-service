@@ -19,6 +19,15 @@ type ServerInterface interface {
 	// Ручка для получения данных для своей странички
 	// (GET /api/user/me/personality)
 	MyPersonality(w http.ResponseWriter, r *http.Request, params MyPersonalityParams)
+	// Ручка для создания поста в новостную ленту
+	// (POST /api/user/post)
+	CreatePost(w http.ResponseWriter, r *http.Request, params CreatePostParams)
+	// Ручка для удаления поста
+	// (DELETE /api/user/post/{post_id})
+	DeletePost(w http.ResponseWriter, r *http.Request, postId string, params DeletePostParams)
+	// Ручка для редактирования поста
+	// (PUT /api/user/post/{post_id})
+	EditPost(w http.ResponseWriter, r *http.Request, postId string, params EditPostParams)
 	// Ручка для обновления данных пользователя
 	// (PUT /api/user/update)
 	UpdateProfile(w http.ResponseWriter, r *http.Request, params UpdateProfileParams)
@@ -37,6 +46,24 @@ func (_ Unimplemented) GetUserAttributes(w http.ResponseWriter, r *http.Request,
 // Ручка для получения данных для своей странички
 // (GET /api/user/me/personality)
 func (_ Unimplemented) MyPersonality(w http.ResponseWriter, r *http.Request, params MyPersonalityParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Ручка для создания поста в новостную ленту
+// (POST /api/user/post)
+func (_ Unimplemented) CreatePost(w http.ResponseWriter, r *http.Request, params CreatePostParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Ручка для удаления поста
+// (DELETE /api/user/post/{post_id})
+func (_ Unimplemented) DeletePost(w http.ResponseWriter, r *http.Request, postId string, params DeletePostParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Ручка для редактирования поста
+// (PUT /api/user/post/{post_id})
+func (_ Unimplemented) EditPost(w http.ResponseWriter, r *http.Request, postId string, params EditPostParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -151,6 +178,159 @@ func (siw *ServerInterfaceWrapper) MyPersonality(w http.ResponseWriter, r *http.
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.MyPersonality(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// CreatePost operation middleware
+func (siw *ServerInterfaceWrapper) CreatePost(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreatePostParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "X-User-Uuid" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-User-Uuid")]; found {
+		var XUserUuid string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "X-User-Uuid", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithLocation("simple", false, "X-User-Uuid", runtime.ParamLocationHeader, valueList[0], &XUserUuid)
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "X-User-Uuid", Err: err})
+			return
+		}
+
+		params.XUserUuid = XUserUuid
+
+	} else {
+		err := fmt.Errorf("Header parameter X-User-Uuid is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "X-User-Uuid", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreatePost(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// DeletePost operation middleware
+func (siw *ServerInterfaceWrapper) DeletePost(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "post_id" -------------
+	var postId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "post_id", runtime.ParamLocationPath, chi.URLParam(r, "post_id"), &postId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "post_id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeletePostParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "X-User-Uuid" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-User-Uuid")]; found {
+		var XUserUuid string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "X-User-Uuid", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithLocation("simple", false, "X-User-Uuid", runtime.ParamLocationHeader, valueList[0], &XUserUuid)
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "X-User-Uuid", Err: err})
+			return
+		}
+
+		params.XUserUuid = XUserUuid
+
+	} else {
+		err := fmt.Errorf("Header parameter X-User-Uuid is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "X-User-Uuid", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeletePost(w, r, postId, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// EditPost operation middleware
+func (siw *ServerInterfaceWrapper) EditPost(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "post_id" -------------
+	var postId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "post_id", runtime.ParamLocationPath, chi.URLParam(r, "post_id"), &postId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "post_id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params EditPostParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "X-User-Uuid" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-User-Uuid")]; found {
+		var XUserUuid string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "X-User-Uuid", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithLocation("simple", false, "X-User-Uuid", runtime.ParamLocationHeader, valueList[0], &XUserUuid)
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "X-User-Uuid", Err: err})
+			return
+		}
+
+		params.XUserUuid = XUserUuid
+
+	} else {
+		err := fmt.Errorf("Header parameter X-User-Uuid is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "X-User-Uuid", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.EditPost(w, r, postId, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -323,6 +503,15 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/user/me/personality", wrapper.MyPersonality)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/user/post", wrapper.CreatePost)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/api/user/post/{post_id}", wrapper.DeletePost)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/user/post/{post_id}", wrapper.EditPost)
 	})
 	r.Group(func(r chi.Router) {
 		r.Put(options.BaseURL+"/api/user/update", wrapper.UpdateProfile)

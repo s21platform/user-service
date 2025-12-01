@@ -17,13 +17,13 @@ import (
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
 
+	"github.com/s21platform/user-service/internal/api"
 	optoinhub "github.com/s21platform/user-service/internal/clients/optionhub"
 	"github.com/s21platform/user-service/internal/config"
-	api "github.com/s21platform/user-service/internal/generated"
+	generated "github.com/s21platform/user-service/internal/generated"
 	"github.com/s21platform/user-service/internal/infra"
 	"github.com/s21platform/user-service/internal/pkg/tx"
 	"github.com/s21platform/user-service/internal/repository/postgres"
-	"github.com/s21platform/user-service/internal/rest"
 	"github.com/s21platform/user-service/internal/service"
 	"github.com/s21platform/user-service/pkg/user"
 )
@@ -64,12 +64,12 @@ func main() {
 	)
 	user.RegisterUserServiceServer(grpcSrv, server)
 
-	handler := rest.New(db, optionhubClient)
+	handler := api.New(db, optionhubClient, UserPostCreatedProducer)
 	router := chi.NewRouter()
 	router.Use(infra.AuthRequest)
 	router.Use(infra.LoggerHTTP(logger))
 
-	api.HandlerFromMux(handler, router)
+	generated.HandlerFromMux(handler, router)
 	httpServer := &http.Server{
 		Handler: router,
 	}

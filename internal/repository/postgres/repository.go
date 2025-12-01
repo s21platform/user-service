@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+
 	"github.com/s21platform/user-service/internal/config"
 	"github.com/s21platform/user-service/internal/model"
 )
@@ -501,14 +502,13 @@ func (r *Repository) CreatePost(ctx context.Context, ownerUUID uuid.UUID, conten
 		Suffix("RETURNING id").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
-
 	if err != nil {
 		return "", fmt.Errorf("failed to build insert query: %v", err)
 	}
 
 	var newPostUUID string
-	err = r.Chk(ctx).GetContext(ctx, &newPostUUID, query, args...)
 
+	err = r.Chk(ctx).GetContext(ctx, &newPostUUID, query, args...)
 	if err != nil {
 		return "", fmt.Errorf("failed to create post: %v", err)
 	}
@@ -548,4 +548,98 @@ func (r *Repository) GetPostsByIds(ctx context.Context, uuids []string) (*model.
 	}
 
 	return &posts, nil
+}
+
+func (r *Repository) CheckPostOwnership(ctx context.Context, postID string, ownerUUID uuid.UUID) error {
+	query, args, err := sq.Select("user_uuid", "deleted_at").
+		From("posts").
+		Where(sq.Eq{"id": postID}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		return fmt.Errorf("failed to build query: %v", err)
+	}
+
+	post := struct {
+		UserUUID  string        `db:"user_uuid"`
+		DeletedAt *sql.NullTime `db:"deleted_at"`
+	}{}
+
+	err = r.Chk(ctx).GetContext(ctx, &post, query, args...)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return errors.New("post not found")
+		}
+
+		return fmt.Errorf("failed to get post: %v", err)
+	}
+
+	if post.DeletedAt != nil && post.DeletedAt.Valid {
+		return errors.New("post already deleted")
+	}
+
+	if post.UserUUID != ownerUUID.String() {
+		return errors.New("user is not the owner of the post")
+	}
+
+	return nil
+}
+
+func (r *Repository) EditPost(ctx context.Context, postID string, ownerUUID uuid.UUID, content string) (string, error) {
+	query, args, err := sq.Update("posts").
+		Set("content", content).
+		Set("updated_at", sq.Expr("NOW()")).
+		Where(sq.And{
+			sq.Eq{"id": postID},
+			sq.Eq{"user_uuid": ownerUUID},
+			sq.Eq{"deleted_at": nil},
+		}).
+		Suffix("RETURNING content").
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		return "", fmt.Errorf("failed to build update query: %v", err)
+	}
+
+	var updatedContent string
+	err = r.Chk(ctx).GetContext(ctx, &updatedContent, query, args...)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", fmt.Errorf("post not found or user is not the owner")
+		}
+		return "", fmt.Errorf("failed to execute update query: %v", err)
+	}
+
+	return updatedContent, nil
+}
+
+func (r *Repository) DeletePost(ctx context.Context, postID string, ownerUUID uuid.UUID) error {
+	query, args, err := sq.Update("posts").
+		Set("deleted_at", sq.Expr("NOW()")).
+		Where(sq.And{
+			sq.Eq{"id": postID},
+			sq.Eq{"user_uuid": ownerUUID},
+			sq.Eq{"deleted_at": nil},
+		}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		return fmt.Errorf("failed to build delete query: %v", err)
+	}
+
+	result, err := r.Chk(ctx).ExecContext(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("failed to execute delete query: %v", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %v", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("post not found or user is not the owner")
+	}
+
+	return nil
 }

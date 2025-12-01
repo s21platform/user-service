@@ -24,6 +24,32 @@ type AttributesValues struct {
 	Attributes json.RawMessage `json:"attributes"`
 }
 
+// CreatePost defines model for CreatePost.
+type CreatePost struct {
+	Content string `json:"content"`
+}
+
+// CreatePostResponse defines model for CreatePostResponse.
+type CreatePostResponse struct {
+	PostId string `json:"post_id"`
+}
+
+// DeletePostResponse defines model for DeletePostResponse.
+type DeletePostResponse struct {
+	Message *string `json:"message,omitempty"`
+}
+
+// EditPost defines model for EditPost.
+type EditPost struct {
+	Content string `json:"content"`
+}
+
+// EditPostResponse defines model for EditPostResponse.
+type EditPostResponse struct {
+	Content string `json:"content"`
+	PostId  string `json:"post_id"`
+}
+
 // Error defines model for Error.
 type Error struct {
 	Message string `json:"message"`
@@ -61,6 +87,9 @@ type Forbidden = Error
 // InternalError defines model for InternalError.
 type InternalError = Error
 
+// NotFound defines model for NotFound.
+type NotFound = Error
+
 // Unauthorized defines model for Unauthorized.
 type Unauthorized = Error
 
@@ -75,10 +104,31 @@ type MyPersonalityParams struct {
 	XUserUuid string `json:"X-User-Uuid"`
 }
 
+// CreatePostParams defines parameters for CreatePost.
+type CreatePostParams struct {
+	XUserUuid string `json:"X-User-Uuid"`
+}
+
+// DeletePostParams defines parameters for DeletePost.
+type DeletePostParams struct {
+	XUserUuid string `json:"X-User-Uuid"`
+}
+
+// EditPostParams defines parameters for EditPost.
+type EditPostParams struct {
+	XUserUuid string `json:"X-User-Uuid"`
+}
+
 // UpdateProfileParams defines parameters for UpdateProfile.
 type UpdateProfileParams struct {
 	XUserUuid string `json:"X-User-Uuid"`
 }
+
+// CreatePostJSONRequestBody defines body for CreatePost for application/json ContentType.
+type CreatePostJSONRequestBody = CreatePost
+
+// EditPostJSONRequestBody defines body for EditPost for application/json ContentType.
+type EditPostJSONRequestBody = EditPost
 
 // UpdateProfileJSONRequestBody defines body for UpdateProfile for application/json ContentType.
 type UpdateProfileJSONRequestBody = AttributesValues
